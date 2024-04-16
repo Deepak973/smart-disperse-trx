@@ -32,12 +32,14 @@ function SameChain({ activeTab }) {
     setListData([]);
     setIsSendingEth(false);
   };
+  console.log("active tab",activeTab)
 
   return (
     <>
-      <div className={textStyle.divtocoversametextdiv}>
+      <div className={textStyle.divtocoversametextdi}>
+      {/* <div className={textStyle.divtocoversametextdiv}> */}
         <div className={textStyle.divforwholetoken}>
-          <div className={textStyle.titleloadtokensametext}>
+          <div className={textStyle.titlesametexttextarea}>
             <h2
               style={{
                 padding: "10px",

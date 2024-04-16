@@ -29,6 +29,7 @@ import {
   getERC20Tokens,
 } from "@/Helpers/GetSentTransactions";
 import { useAccount, useChainId, useNetwork } from "wagmi";
+import Sameswap from "../DashboardComponents/SameChain/Sameswap";
 
 function Samechaindashboard() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -415,6 +416,7 @@ function Samechaindashboard() {
 
     fetchData(address);
   }, [isOpen, selectedToken]);
+  console.log(activeTab)
   return (
     <div className={samechainStyle.maindivofdashboard}>
       <div style={{ position: "relative" }}>
@@ -478,11 +480,12 @@ function Samechaindashboard() {
         </div>
         <div className={samechainStyle.divtocenterthecomponentrender}>
           <div className={samechainStyle.componentcontainerdashboard}>
-            <SameChain
+            <Sameswap
               activeTab={activeTab}
               setErrorModalIsOpen={setErrorModalIsOpen}
               errorModalIsOpen={errorModalIsOpen}
             />
+           
           </div>
         </div>
       </div>
@@ -610,30 +613,6 @@ function Samechaindashboard() {
                   />
                 </button>
               </div>
-              {/* <div className={samechainStyle.popTitle}>
-                Track Your Transfers
-              </div>
-              <div className={samechainStyle.popTitle}>
-                Where Every Token's journey is Accounted For !
-              </div>
-              <div
-                style={{
-                  borderBottom: "1px solid #8f00ff",
-                  paddingTop: "10px",
-                }}
-              ></div>
-              <div className={samechainStyle.searchBar}>
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={query}
-                  onChange={handleChange}
-                  className={samechainStyle.inputSearch}
-                />
-                <div style={{ color: "#8f00ff" }}>
-                  Total Transferred:<span>2.25 ETH</span>
-                </div>
-              </div> */}
               <div className={popup.poolList}>
                 <div className={popup.upperPart}>
                   <div className={samechainStyle.popTitle}>
@@ -650,12 +629,6 @@ function Samechaindashboard() {
                       </p>
                     )}
                   </div>
-
-                  {/* <div className={popup.right}>
-                    <Link to={"/add/ETH"}>
-                      <button className={popup.button}>Create position</button>
-                    </Link>
-                  </div> */}
                 </div>
                 <div
                   style={{
