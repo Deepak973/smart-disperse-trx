@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef} from "react";
 import Link from "next/link";
 import navStyle from "../Navbar/navbar.module.css";
 import smartlogo from "../../Assets/logo.png";
@@ -10,6 +10,8 @@ import Cookies from "universal-cookie";
 import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import jwt from "jsonwebtoken";
+import TronWallet from "../TronWallet/TronConnect";
+import { useWallet, WalletProvider } from '@tronweb3/tronwallet-adapter-react-hooks';
 
 function Navbar() {
   const [toggleSVG, setToggleSVG] = useState(false);
@@ -22,8 +24,31 @@ function Navbar() {
     isReconnecting,
   } = useAccount();
   const { theme, setTheme } = useTheme();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
   const cookie = new Cookies();
   const [isMainnet, setIsMainnet] = useState(true);
+  const { connected, wallet } = useWallet();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      console.log("....................")
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+  
+
 
   const handelMainnet = () => {
     console.log(!isMainnet);
@@ -156,7 +181,11 @@ function Navbar() {
           </Link>
         </div>
         <div className={navStyle.connectwalletbuttondiv}>
-          {isConnected && (
+        <div
+          className={navStyle.connectwalletbuttondiv}
+          
+        >
+           {isConnected && (
             <label className={navStyle.toggle}>
               <input
                 type="checkbox"
@@ -171,7 +200,33 @@ function Navbar() {
               ></span>
             </label>
           )}
-          <ConnectButtonCustom isMainnet={isMainnet} />
+    
+        
+        {isConnected ? (
+             <ConnectButtonCustom  isMainnet={isMainnet} />
+              ) : connected ? (
+                <TronWallet />
+              ) : (
+                <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
+              )
+        }
+
+      
+        {(isConnected || connected) ? (
+              null
+          ) :
+          <div>     
+              {showDropdown && (
+                <div ref={dropdownRef} className={navStyle.dropdownContent}>
+                  <div style={{margin:"5px 0px"}}>
+                  <TronWallet />
+                  </div>
+                  <ConnectButtonCustom  isMainnet={isMainnet}/>
+                </div>
+              )}
+          </div>
+          }
+
           {theme === "light" ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -210,6 +265,7 @@ function Navbar() {
               />
             </svg>
           )}
+        </div>
         </div>
       </div>
     </div>
