@@ -72,8 +72,8 @@ const modeMainnet = {
 
 export function Providers({ children }) {
   const [isSigned, setIsSigned] = useState();
-  
-  function onError() {
+
+  function onError(e) {
     console.log(e);
     if (e instanceof WalletNotFoundError) {
       toast.error(e.message);
@@ -146,7 +146,7 @@ export function Providers({ children }) {
   async function onAdapterChanged(adapter) {
     console.log("onAdapterChanged", adapter);
   }
- 
+
   const chains = [
     modeMainnet,
     scroll,
@@ -174,26 +174,26 @@ export function Providers({ children }) {
 
   return (
     <WalletProvider
-    onError={onError}
-    onConnect={onConnect}
-    onAccountsChanged={onAccountsChanged}
-    onAdapterChanged={onAdapterChanged}
-    autoConnect={true}
-    adapters={adapters}
-    disableAutoConnectOnLoad={true}
-  >
-    <WalletModalProvider>
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          <>
-            <Navbar />
-            {children}
-          </>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-    </WalletModalProvider>
+      onError={onError}
+      onConnect={onConnect}
+      onAccountsChanged={onAccountsChanged}
+      onAdapterChanged={onAdapterChanged}
+      autoConnect={true}
+      adapters={adapters}
+      disableAutoConnectOnLoad={true}
+    >
+      <WalletModalProvider>
+        <WagmiProvider config={config}>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider>
+              <>
+                <Navbar />
+                {children}
+              </>
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </WalletModalProvider>
     </WalletProvider>
   );
 }

@@ -16,6 +16,10 @@ import warning from "@/Assets/warning.webp";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 
 function SendEth({ activeTab, listData, setListData }) {
   const [ethToUsdExchangeRate, setEthToUsdExchangeRate] = useState(null); //store ETH to USD exchange rate
@@ -29,6 +33,7 @@ function SendEth({ activeTab, listData, setListData }) {
   const [allAddresses, setAllAddresses] = useState([]);
   const [errormsg, setErrormsg] = useState("");
   const [errorModalIsOpen, setErrorModalIsOpen] = useState(false);
+  const { address: TronAddress, connected, wallet } = useWallet();
 
   const renderComponent = (tab) => {
     switch (tab) {
@@ -93,12 +98,25 @@ function SendEth({ activeTab, listData, setListData }) {
    */
   const getEthBalance = async () => {
     const { ethereum } = window;
-    if (!ethBalance) {
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      if (address) {
-        let ethBalance = await provider.getBalance(address);
-        setEthBalance(ethBalance);
-      }
+
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    if (address) {
+      let ethBalance = await provider.getBalance(address);
+      console.log(ethBalance);
+      setEthBalance(ethBalance);
+    }
+  };
+
+  const getTrxBalance = async (address) => {
+    const { tronWeb } = window;
+
+    if (TronAddress) {
+      // Fetch TRX balance
+      const trxBalance = await tronWeb.trx.getBalance(address);
+      let balance = ethers.utils.parseUnits(String(trxBalance), 0);
+      console.log(balance);
+      console.log(trxBalance);
+      setEthBalance(balance);
     }
   };
 
@@ -116,6 +134,7 @@ function SendEth({ activeTab, listData, setListData }) {
       let totalEth = ethers.BigNumber.from(0);
       if (listData.length > 0) {
         listData.forEach((data) => {
+          console.log(data.value);
           totalEth = totalEth.add(data.value);
         });
       }
@@ -128,18 +147,33 @@ function SendEth({ activeTab, listData, setListData }) {
 
   /* for getting values on render */
   useEffect(() => {
-    // console.log(listData);
-    getEthBalance();
-  });
+    console.log(TronAddress);
+    if (address) {
+      getEthBalance();
+    } else if (TronAddress) {
+      getTrxBalance();
+    }
+  }, [address, TronAddress]);
 
   useEffect(() => {
     calculateRemaining();
   }, [totalEth]);
 
   const calculateRemaining = () => {
-    if (ethBalance && totalEth) {
-      const remaining = ethBalance.sub(totalEth);
-      setRemaining(ethers.utils.formatEther(remaining));
+    if (address) {
+      if (ethBalance && totalEth) {
+        const remaining = ethBalance.sub(totalEth);
+
+        setRemaining(ethers.utils.formatEther(remaining));
+      }
+    } else if (TronAddress) {
+      if (ethBalance && totalEth) {
+        // const totalTrx = ethers.utils.formatUnits(totalEth, 6);
+        console.log(ethBalance, totalEth);
+        const remaining = ethBalance.sub(totalEth);
+
+        setRemaining(ethers.utils.formatUnits(remaining, 6));
+      }
     } else {
       setRemaining(null);
     }
@@ -170,8 +204,11 @@ function SendEth({ activeTab, listData, setListData }) {
   };
 
   useEffect(() => {
-    fetchUserDetails();
-  }, []);
+    console.log(address);
+    if (address) {
+      fetchUserDetails();
+    }
+  }, [address]);
 
   const setLabelValues = (index, name) => {
     const updatedLabels = [...labels]; // Create a copy of the labels array
@@ -181,8 +218,7 @@ function SendEth({ activeTab, listData, setListData }) {
   };
 
   const onAddLabel = async (index, recipientAddress) => {
-    console.log("enteringggg")
-    console.log(address)
+    console.log(address);
     const userData = {
       userid: address,
       name: labels[index],
@@ -191,13 +227,16 @@ function SendEth({ activeTab, listData, setListData }) {
     console.log(userData);
     try {
       // console.log("entered into try block");
-      let result = await fetch(`http://localhost:3000/api/all-user-data?address=${address}`, {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
+      let result = await fetch(
+        `http://localhost:3000/api/all-user-data?address=${address}`,
+        {
+          method: "POST",
+          body: JSON.stringify(userData),
+        }
+      );
 
       result = await result.json();
-      console.log(result)
+      console.log(result);
       if (typeof result.error === "string") {
         setErrorModalIsOpen(true);
         toast.warn("Name Already Exist! Please Enter Unique Name.");
@@ -334,12 +373,14 @@ function SendEth({ activeTab, listData, setListData }) {
                                     const inputValue = e.target.value;
                                     // Regular expression to allow only alphanumeric characters without spaces
                                     const regex = /^[a-zA-Z0-9]*$/;
-                                
-                                    if (regex.test(inputValue) && inputValue.length <= 10 ) {
+
+                                    if (
+                                      regex.test(inputValue) &&
+                                      inputValue.length <= 10
+                                    ) {
                                       setLabelValues(index, inputValue);
-                                  }
-                                }}
-                                
+                                    }
+                                  }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                       onAddLabel(index, data.address);
@@ -478,10 +519,19 @@ function SendEth({ activeTab, listData, setListData }) {
                         letterSpacing: "1px",
                       }}
                     >
-                      {totalEth
-                        ? `${(+ethers.utils.formatEther(totalEth)).toFixed(
-                            9
-                          )} ETH`
+                      {address
+                        ? totalEth
+                          ? `${(+ethers.utils.formatEther(totalEth)).toFixed(
+                              9
+                            )} ETH`
+                          : null
+                        : null}
+                      {TronAddress
+                        ? totalEth
+                          ? `${(+ethers.utils.formatUnits(totalEth, 6)).toFixed(
+                              6
+                            )} TRX`
+                          : null
                         : null}
                     </div>
                   </td>
@@ -521,10 +571,21 @@ function SendEth({ activeTab, listData, setListData }) {
                         letterSpacing: "1px",
                       }}
                     >
-                      {ethBalance
-                        ? `${(+ethers.utils.formatEther(ethBalance)).toFixed(
-                            9
-                          )} ETH`
+                      {address
+                        ? ethBalance
+                          ? `${(+ethers.utils.formatEther(ethBalance)).toFixed(
+                              9
+                            )} ETH`
+                          : null
+                        : null}
+
+                      {TronAddress
+                        ? ethBalance
+                          ? `${(+ethers.utils.formatUnits(
+                              ethBalance,
+                              6
+                            )).toFixed(6)} TRX`
+                          : null
                         : null}
                     </div>
                   </td>
@@ -550,9 +611,16 @@ function SendEth({ activeTab, listData, setListData }) {
                         fontSize: "12px",
                       }}
                     >
-                      {remaining === null
-                        ? null
-                        : `${(+remaining).toFixed(9)} ETH`}{" "}
+                      {address
+                        ? remaining === null
+                          ? null
+                          : `${(+remaining).toFixed(9)} ETH`
+                        : null}
+                      {TronAddress
+                        ? remaining === null
+                          ? null
+                          : `${(+remaining).toFixed(6)} TRX`
+                        : null}
                     </div>
                   </td>
                 </tr>

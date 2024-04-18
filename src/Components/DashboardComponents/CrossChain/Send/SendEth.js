@@ -174,8 +174,10 @@ function SendEth({ activeTab, listData, setListData }) {
   };
 
   useEffect(() => {
-    fetchUserDetails();
-  }, []);
+    if (address) {
+      fetchUserDetails();
+    }
+  }, [address]);
 
   const setLabelValues = (index, name) => {
     const updatedLabels = [...labels]; // Create a copy of the labels array
@@ -340,12 +342,14 @@ function SendEth({ activeTab, listData, setListData }) {
                                     const inputValue = e.target.value;
                                     // Regular expression to allow only alphanumeric characters without spaces
                                     const regex = /^[a-zA-Z0-9]*$/;
-                                
-                                    if (regex.test(inputValue) && inputValue.length <= 10 ) {
-                                        setLabelValues(index, inputValue);
+
+                                    if (
+                                      regex.test(inputValue) &&
+                                      inputValue.length <= 10
+                                    ) {
+                                      setLabelValues(index, inputValue);
                                     }
-                                }}
-                                
+                                  }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                       onAddLabel(index, data.address);

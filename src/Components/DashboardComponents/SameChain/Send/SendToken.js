@@ -9,6 +9,8 @@ import { useAccount } from "wagmi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ExecuteToken from "../Execute/ExecuteToken";
 import { LoadToken } from "@/Helpers/LoadToken.js";
+import { TronLoadToken } from "@/Helpers/LoadToken.js";
+
 import {
   faCircleExclamation,
   faTrashAlt,
@@ -22,6 +24,10 @@ import Image from "next/image";
 import oopsimage from "@/Assets/oops.webp";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 
 function SendToken({ activeTab, listData, setListData }) {
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
@@ -44,12 +50,12 @@ function SendToken({ activeTab, listData, setListData }) {
     useState(
       false
     ); /* Flag to check if the user has loaded their ERC20 Tokens */
-
+  const { address: TronAddress, connected, wallet } = useWallet();
   const defaultTokenDetails = {
     name: null,
     symbol: null,
     balance: null,
-    decimal: null,
+    decimals: null,
   };
 
   const [labels, setLabels] = useState([]);
@@ -65,7 +71,7 @@ function SendToken({ activeTab, listData, setListData }) {
           <Textify
             listData={listData}
             setListData={setListData}
-            tokenDecimal={tokenDetails.decimal}
+            tokenDecimal={tokenDetails.decimals}
             allNames={allNames}
             allAddresses={allAddresses}
           />
@@ -75,7 +81,7 @@ function SendToken({ activeTab, listData, setListData }) {
           <Listify
             listData={listData}
             setListData={setListData}
-            tokenDecimal={tokenDetails.decimal}
+            tokenDecimal={tokenDetails.decimals}
             allNames={allNames}
             allAddresses={allAddresses}
           />
@@ -85,7 +91,7 @@ function SendToken({ activeTab, listData, setListData }) {
           <Uploadify
             listData={listData}
             setListData={setListData}
-            tokenDecimal={tokenDetails.decimal}
+            tokenDecimal={tokenDetails.decimals}
             allNames={allNames}
             allAddresses={allAddresses}
           />
@@ -95,7 +101,7 @@ function SendToken({ activeTab, listData, setListData }) {
           <Textify
             listData={listData}
             setListData={setListData}
-            tokenDecimal={tokenDetails.decimal}
+            tokenDecimal={tokenDetails.decimals}
             allNames={allNames}
             allAddresses={allAddresses}
           />
@@ -150,7 +156,18 @@ function SendToken({ activeTab, listData, setListData }) {
     setTokenDetails(defaultTokenDetails);
 
     try {
-      const tokenDetails = await LoadToken(customTokenAddress, address);
+      var tokenDetails = {
+        name: null,
+        symbol: null,
+        balance: null,
+        decimals: null,
+      };
+      if (address) {
+        tokenDetails = await LoadToken(customTokenAddress, address);
+      } else if (TronAddress) {
+        tokenDetails = await TronLoadToken(customTokenAddress, TronAddress);
+      }
+      console.log(tokenDetails);
       if (tokenDetails) {
         setTokenDetails(tokenDetails);
         setERC20Balance(tokenDetails.balance);
@@ -208,7 +225,7 @@ function SendToken({ activeTab, listData, setListData }) {
       console.log(result);
       result = await result.json();
       console.log("Result after submission:", result);
-      
+
       if (typeof result.error === "string") {
         setNameErrorModalIsOpen(true);
         toast.warn("Name Already Exist! Please Enter Unique Name.");
@@ -305,9 +322,11 @@ function SendToken({ activeTab, listData, setListData }) {
   };
 
   useEffect(() => {
-    fetchUserDetails();
-  }, []);
-
+    console.log(address);
+    if (address) {
+      fetchUserDetails();
+    }
+  }, [address]);
   const setLabelValues = (index, name) => {
     const updatedLabels = [...labels]; // Create a copy of the labels array
     updatedLabels[index] = name; // Update the value at the specified index
@@ -455,7 +474,7 @@ function SendToken({ activeTab, listData, setListData }) {
                     <td className={textStyle.tableTd}>
                       {ethers.utils.formatUnits(
                         tokenDetails.balance,
-                        tokenDetails.decimal
+                        tokenDetails.decimals
                       )}{" "}
                     </td>
                   </tr>
@@ -557,12 +576,13 @@ function SendToken({ activeTab, listData, setListData }) {
                                       const inputValue = e.target.value;
                                       // Regular expression to allow only alphanumeric characters without spaces
                                       const regex = /^[a-zA-Z0-9]*$/;
-                                      if (regex.test(inputValue) && inputValue.length <= 10 ) {
+                                      if (
+                                        regex.test(inputValue) &&
+                                        inputValue.length <= 10
+                                      ) {
                                         setLabelValues(index, inputValue);
-                                    }
-                                  }}
-                                  
-                                  
+                                      }
+                                    }}
                                     onKeyDown={(e) => {
                                       if (e.key === "Enter") {
                                         onAddLabel(index, data.address);
@@ -598,7 +618,7 @@ function SendToken({ activeTab, listData, setListData }) {
                               >
                                 {(+ethers.utils.formatUnits(
                                   data.value,
-                                  tokenDetails.decimal
+                                  tokenDetails.decimals
                                 )).toFixed(4)}{" "}
                                 {tokenDetails.symbol}
                               </div>
@@ -683,7 +703,7 @@ function SendToken({ activeTab, listData, setListData }) {
                         {totalERC20
                           ? (+ethers.utils.formatUnits(
                               totalERC20,
-                              tokenDetails.decimal
+                              tokenDetails.decimals
                             )).toFixed(4)
                           : null}{" "}
                       </div>
@@ -728,7 +748,7 @@ function SendToken({ activeTab, listData, setListData }) {
                         {ERC20Balance
                           ? (+ethers.utils.formatUnits(
                               ERC20Balance,
-                              tokenDetails.decimal
+                              tokenDetails.decimals
                             )).toFixed(4) +
                             " " +
                             tokenDetails.symbol
@@ -761,7 +781,7 @@ function SendToken({ activeTab, listData, setListData }) {
                           ? null
                           : (+ethers.utils.formatUnits(
                               remaining,
-                              tokenDetails.decimal
+                              tokenDetails.decimals
                             )).toFixed(4) +
                             " " +
                             tokenDetails.symbol}
