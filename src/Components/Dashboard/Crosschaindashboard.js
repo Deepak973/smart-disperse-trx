@@ -25,6 +25,7 @@ import { ethers } from "ethers";
 import notnx from "../../Assets/nodata.png";
 import contracts from "@/Helpers/ContractAddresses";
 import CrossChain from "../DashboardComponents/CrossChain/CrossChain";
+import Crossswap from "../DashboardComponents/CrossChain/Crossswap";
 
 function Crosschaindashboard() {
   const [activeTab, setActiveTab] = useState("text"); //default tab is textify
@@ -357,7 +358,7 @@ function Crosschaindashboard() {
         </div>
         <div className={samechainStyle.divtocenterthecomponentrender}>
           <div className={samechainStyle.componentcontainerdashboard}>
-            <CrossChain
+            <Crossswap
               activeTab={activeTab}
               setErrorModalIsOpen={setErrorModalIsOpen}
               errorModalIsOpen={errorModalIsOpen}

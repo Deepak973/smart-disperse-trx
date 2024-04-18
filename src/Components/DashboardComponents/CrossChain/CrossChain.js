@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import "driver.js/dist/driver.css";
-import textStyle from "./Type/textify.module.css";
 import SendEth from "./Send/SendEth";
+import textStyle from "@/Components/DashboardComponents/CrossChain/Type/textify.module.css";
 import SendToken from "./Send/SendToken";
 
 /*
@@ -35,9 +35,9 @@ function CrossChain({ activeTab }) {
 
   return (
     <>
-      <div className={textStyle.divtocoversametextdiv}>
+      <div className={textStyle.divtocoversameetextdiv}>
         <div className={textStyle.divforwholetoken}>
-          <div className={textStyle.titleloadtokensametext}>
+          <div className={textStyle.titlesametexttextarea}>
             <h2
               style={{
                 padding: "10px",

@@ -22,7 +22,10 @@
   text-align: left;
   border-bottom: 1px solid #8f00ff;
 }
-
+.divtocoversametextdv{
+  border: 1px solid white;
+  border-radius: 47px;
+}
 .dropdown {
   position: absolute;
   left: 32px;
