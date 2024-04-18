@@ -3,6 +3,7 @@ import textStyle from "../Type/textify.module.css";
 import swapStyle from "./swap.module.css";
 import text from "../../../../Assets/text-editor.png";
 import Image from "next/image";
+import down from "../../../../Assets/down.png"
 
 function Swap() {
   return (
@@ -53,31 +54,32 @@ function Swap() {
                 placeholder="0.0"
                 className={swapStyle.swapInput}
               />
-              <button className={swapStyle.swapMax}>Max</button>
+              <button id={swapStyle.swapMaxbtn}>Max</button>
               <button className={swapStyle.TokenMain}>
                 <span className={swapStyle.TokenSpanMain}>
                   <Image src={text} />
                   <span className={swapStyle.tokenName}>Eth</span>
-                  <span className={swapStyle.tokenName}>^</span>
+                  <Image src={down} />
                 </span>
               </button>
             </div>
             <div
               style={{
-                color: "#8A8F9D",
+                color: "white",
                 textAlign: "left",
-                padding: "0 0.75rem 0 1rem",
+                padding: "0 0.75rem 0.75rem 1rem",
                 fontSize: "14px",
               }}
             >
               -
             </div>
+            <div style={{borderBottom:"1px solid white", width:"95%",margin:"0 auto"}}></div>
             <div className={swapStyle.FromToMain}>
               <div className={swapStyle.swapCurrencyInput}>
                 <div className={swapStyle.FromMain}>
                   <div className={swapStyle.FromBal}>
                     <div className={swapStyle.FromBalFlex}>
-                      <div className={swapStyle.From}>From</div>
+                      <div className={swapStyle.From}>To</div>
                       <div className={swapStyle.Balance}>Balance:</div>
                     </div>
                   </div>
@@ -93,18 +95,18 @@ function Swap() {
                 placeholder="0.0"
                 className={swapStyle.swapInput}
               />
-              <button className={swapStyle.swapMax}>Max</button>
+              <button id={swapStyle.swapMaxbtn}>Max</button>
               <button className={swapStyle.TokenMain}>
                 <span className={swapStyle.TokenSpanMain}>
                   <Image src={text} />
                   <span className={swapStyle.tokenName}>Eth</span>
-                  <span className={swapStyle.tokenName}>^</span>
+                  <Image src={down} />
                 </span>
               </button>
             </div>
             <div
               style={{
-                color: "#8A8F9D",
+                color: "white",
                 textAlign: "left",
                 padding: "0 0.75rem 0 1rem",
                 fontSize: "14px",
@@ -112,9 +114,7 @@ function Swap() {
             >
               -
             </div>
-
-            <div className={swapStyle.SwapBtnMain}>
-              
+            <div className={swapStyle.SwapBtnMain}>  
             </div>
           </div>
         </div>
