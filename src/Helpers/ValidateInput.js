@@ -5,6 +5,11 @@ import { ethers } from "ethers";
   */
 export const isValidAddress = (address) => ethers.utils.isAddress(address);
 
+export const TronIsValidAddress = (address) => {
+  const { tronWeb } = window;
+  return tronWeb.isAddress(address);
+};
+
 /*
   Funtion : for checking if the value is in correct format and 
   can be added to the listData for transaction lineup
@@ -18,6 +23,24 @@ export const isValidValue = (value) => {
       }
       if (+value > 0) {
         return ethers.utils.parseUnits(value, "ether");
+      }
+      return false;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  }
+};
+
+export const TronIsValidValue = (value) => {
+  if (value) {
+    try {
+      // regex to check if the value starts from digits 0-9
+      if (!/^\d/.test(value)) {
+        value = value.slice(1);
+      }
+      if (+value > 0) {
+        return ethers.utils.parseUnits(value, 6);
       }
       return false;
     } catch (err) {

@@ -3,12 +3,12 @@
   position: relative;
   max-width: 500px;
   width: 100%;
-  background-color: rgb(19, 17, 24);
+  background-color: transparent;
   box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px,
     rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
   border-radius: 30px;
-  padding: 1rem;
-  border: 0.5px solid rgb(19, 17, 24);
+  padding: 1.8rem 1rem;
+  border: 0.5px solid white;
 }
 
 .FromToMain {
@@ -34,7 +34,7 @@
   flex-flow: row;
   -webkit-box-align: center;
   align-items: center;
-  color: rgb(0, 0, 0);
+  color: white;
   font-size: 0.75rem;
   line-height: 1rem;
   padding: 0.75rem 1rem 0px;
@@ -68,7 +68,7 @@
   color: rgb(255, 255, 255);
 }
 .swapInput {
-  color: rgb(166, 160, 187);
+  color: white;
   width: 0px;
   position: relative;
   font-weight: 500;
@@ -83,17 +83,20 @@
   padding: 0px 10px 0px 0px;
   appearance: textfield;
 }
-.swapmax {
+#swapMaxbtn {
   height: 28px;
-  background-color: rgb(56, 37, 83);
-  border: none;
+  background-color: white;
+  border:1px solid white;
   border-radius: 0.4rem;
   font-size: 12px;
   padding: 5px 10px;
   font-weight: 500;
   cursor: pointer;
   margin-right: 0.5rem;
-  color: white;
+  color: #924afc;
+}
+#swapMaxbtn:hover{
+opacity: 0.8;
 }
 .TokenMain {
   -webkit-box-align: center;

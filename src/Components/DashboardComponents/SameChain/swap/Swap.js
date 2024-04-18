@@ -3,8 +3,7 @@ import textStyle from "../Type/textify.module.css";
 import swapStyle from "./swap.module.css";
 import text from "../../../../Assets/text-editor.png";
 import Image from "next/image";
-import Modal from "react-modal";
-
+import down from "../../../../Assets/down.png"
 
 function Swap() {
   const [isModalIsOpen, setModalIsOpen] = useState(false);
@@ -86,32 +85,33 @@ function Swap() {
                 placeholder="Enter Amount"
                 className={swapStyle.swapInput}
               />
-              <button className={swapStyle.swapMax}>Max</button>
-              <button onClick={handletokens} className={swapStyle.TokenMain}>
+              <button id={swapStyle.swapMaxbtn}>Max</button>
+              <button className={swapStyle.TokenMain}>
                 <span className={swapStyle.TokenSpanMain}>
                   <Image src={text} />
                   <span className={swapStyle.tokenName}>Eth</span>
-                  <span  className={swapStyle.tokenName}>^</span>
+                  <Image src={down} />
                 </span>
               </button>
             </div>
             <div
               style={{
-                color: "#8A8F9D",
+                color: "white",
                 textAlign: "left",
-                padding: "0 0.75rem 0 1rem",
+                padding: "0 0.75rem 0.75rem 1rem",
                 fontSize: "14px",
               }}
             >
               price
             </div>
+            <div style={{borderBottom:"1px solid white", width:"95%",margin:"0 auto"}}></div>
             <div className={swapStyle.FromToMain}>
               <div className={swapStyle.swapCurrencyInput}>
                 <div className={swapStyle.FromMain}>
                   <div className={swapStyle.FromBal}>
                     <div className={swapStyle.FromBalFlex}>
-                      <div className={swapStyle.From}>To(estimated)</div>
-                      <div className={swapStyle.Balance}>Balance: 0.0</div>
+                      <div className={swapStyle.From}>To</div>
+                      <div className={swapStyle.Balance}>Balance:</div>
                     </div>
                   </div>
                 </div>
@@ -126,18 +126,18 @@ function Swap() {
                 placeholder="0.0"
                 className={swapStyle.swapInput}
               />
-              <button className={swapStyle.swapMax}>Max</button>
-              <button onClick={handletokens} className={swapStyle.TokenMain}>
+              <button id={swapStyle.swapMaxbtn}>Max</button>
+              <button className={swapStyle.TokenMain}>
                 <span className={swapStyle.TokenSpanMain}>
                   <Image src={text} />
                   <span className={swapStyle.tokenName}>Eth</span>
-                  <span  className={swapStyle.tokenName}>^</span>
+                  <Image src={down} />
                 </span>
               </button>
             </div>
             <div
               style={{
-                color: "#8A8F9D",
+                color: "white",
                 textAlign: "left",
                 padding: "0 0.75rem 0 1rem",
                 fontSize: "14px",
@@ -145,42 +145,11 @@ function Swap() {
             >
               price
             </div>
-
-            <div className={swapStyle.SwapBtnMain}>
+            <div className={swapStyle.SwapBtnMain}>  
             </div>
           </div>
         </div>
       </div>
-      <Modal
-        className={textStyle.popupforpayment}
-        isOpen={isModalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
-        contentLabel="Token Modal"
-      >
-        <div style={{ width: "400px", height: "500px" }}>
-          <div>Select a Token</div>
-          <div>
-            <input
-              className={swapStyle.searchinputintoken}
-              placeholder="Search by name or paste the address here"
-            />
-          </div>
-          <div className={swapStyle.tokenlistingdiv}>
-            <h3>Tokens</h3>
-            {tokenList.map((token, index) => (
-              <div key={index}>{token}</div>
-            ))}
-          </div>
-        </div>
-        <button
-          style={{ margin: "0px 5px" }}
-          onClick={() => {
-            setModalIsOpen(false);
-          }}
-        >
-          Close
-        </button>
-      </Modal>
     </div>
   );
 }

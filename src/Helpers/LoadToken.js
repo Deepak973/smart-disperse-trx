@@ -22,12 +22,39 @@ export const LoadToken = async (customTokenAddress, address) => {
         name,
         symbol,
         balance: balance,
-        decimal: decimals,
+        decimals: decimals,
       };
     } catch (error) {
       console.log("loading token error", error.message);
       return null;
     }
+  }
+};
+
+export const TronLoadToken = async (customTokenAddress, address) => {
+  const { tronWeb } = window;
+
+  if (tronWeb && customTokenAddress !== "") {
+    try {
+      const tokenContract = await tronWeb.contract().at(customTokenAddress);
+      const name = await tokenContract.name().call();
+      const symbol = await tokenContract.symbol().call();
+      const balance = await tokenContract.balanceOf(address).call();
+      const decimals = await tokenContract.decimals().call();
+
+      return {
+        name,
+        symbol,
+        balance: balance / 10 ** decimals, // Convert balance to match Ethereum's standard
+        decimals,
+      };
+    } catch (error) {
+      console.log("loading token error", error.message);
+      return null;
+    }
+  } else {
+    console.log("TronWeb not available or customTokenAddress is empty");
+    return null;
   }
 };
 

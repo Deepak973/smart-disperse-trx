@@ -9,6 +9,13 @@ import Modal from "react-modal";
 import textStyle from "./textify.module.css";
 import oopsimage from "@/Assets/oops.webp";
 import Image from "next/image";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
+import { useAccount } from "wagmi";
+import { TronIsValidAddress } from "@/Helpers/ValidateInput.js";
+import { TronIsValidValue } from "@/Helpers/ValidateInput.js";
 
 function Listify({
   listData,
@@ -29,7 +36,8 @@ function Listify({
   const [nameSuggestions, setNameSuggestions] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const dropdownRef = useRef(null);
-  // Function to close the error modal
+  const { address: TronAddress, connected, wallet } = useWallet();
+  const { address } = useAccount();
   const closeErrorModal = () => {
     // console.log("clicked");
     setErrorModalIsOpen(false);
@@ -38,7 +46,7 @@ function Listify({
   };
 
   const handleReceiverAddressChange = (event) => {
-    const receiverAddress = event.target.value.toLowerCase();
+    const receiverAddress = event.target.value;
 
     const index = allAddresses.findIndex((n) => n === receiverAddress);
     if (index !== -1) {
@@ -105,33 +113,57 @@ function Listify({
   };
 
   const validateFormData = async () => {
-    var address = formData.address;
+    var recipientAddress = formData.address;
     var amount = formData.value;
     if (!/^\d/.test(amount)) {
       amount = amount.slice(1);
     }
+    if (address) {
+      if (!isValidValue(amount) && !isValidAddress(recipientAddress)) {
+        // console.log("Invalid address");
+        setErrorMessage("Incorrect details");
+        setErrorModalIsOpen(true);
+        return false;
+      }
 
-    if (!isValidValue(amount) && !isValidAddress(address)) {
-      // console.log("Invalid address");
-      setErrorMessage("Incorrect details");
-      setErrorModalIsOpen(true);
-      return false;
-    }
+      if (!isValidValue(amount)) {
+        setErrorMessage("Invalid Eth Value");
+        setErrorModalIsOpen(true);
+        return false;
+      }
+      if (!isValidAddress(recipientAddress)) {
+        setErrorMessage("Invalid recipient Address");
+        setErrorModalIsOpen(true);
+        return false;
+      }
+    } else if (TronAddress) {
+      if (!TronIsValidValue(amount) && !TronIsValidAddress(recipientAddress)) {
+        // console.log("Invalid address");
+        setErrorMessage("Incorrect details");
+        setErrorModalIsOpen(true);
+        return false;
+      }
 
-    if (!isValidValue(amount)) {
-      setErrorMessage("Invalid Eth Value");
-      setErrorModalIsOpen(true);
-      return false;
-    }
-    if (!isValidAddress(address)) {
-      setErrorMessage("Invalid recipient Address");
-      setErrorModalIsOpen(true);
-      return false;
+      if (!TronIsValidValue(amount)) {
+        setErrorMessage("Invalid Trx Value");
+        setErrorModalIsOpen(true);
+        return false;
+      }
+      if (!TronIsValidAddress(recipientAddress)) {
+        setErrorMessage("Invalid recipient Address");
+        setErrorModalIsOpen(true);
+        return false;
+      }
     }
     if (tokenDecimal) {
       formData.value = isValidTokenValue(amount, tokenDecimal);
     } else {
-      formData.value = isValidValue(amount);
+      if (address) {
+        formData.value = isValidValue(amount);
+      }
+      if (TronAddress) {
+        formData.value = TronIsValidValue(amount);
+      }
     }
     // console.log("here");
     return true;

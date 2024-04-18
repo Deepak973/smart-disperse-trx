@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import textStyle from "./textify.module.css";
 import { isValidAddress } from "@/Helpers/ValidateInput.js";
+import { TronIsValidAddress } from "@/Helpers/ValidateInput.js";
+import { TronIsValidValue } from "@/Helpers/ValidateInput.js";
 import { isValidValue } from "@/Helpers/ValidateInput.js";
 import { isValidTokenValue } from "@/Helpers/ValidateInput.js";
 import { useAccount } from "wagmi";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 
 function Textify({
   listData,
@@ -20,6 +26,7 @@ function Textify({
   const [suggestionItemHeight, setSuggestionItemHeight] = useState(0);
   const dropdownRef = useRef(null);
   const { address } = useAccount();
+  const { address: TronAddress, connected, wallet } = useWallet();
 
   const handleInputChange = (e) => {
     const { value } = e.target;
@@ -110,6 +117,8 @@ function Textify({
       const value = valueParts.join(" "); // Rejoin value parts in case it contains spaces
 
       if (value) {
+        console.log(tokenDecimal);
+
         let validValue;
         if (value.endsWith("$")) {
           // Remove the "$" sign from the value
@@ -121,9 +130,15 @@ function Textify({
           console.log("Converted value:", convertedValue); // Log the converted value
           validValue = isValidValue(String(convertedValue)); // Convert to string
         } else if (tokenDecimal) {
+          console.log("first");
           validValue = isValidTokenValue(value, tokenDecimal);
         } else {
-          validValue = isValidValue(value);
+          console.log("second");
+          if (address) {
+            validValue = isValidValue(value);
+          } else if (TronAddress) {
+            validValue = TronIsValidValue(value);
+          }
         }
 
         // Check if validValue is false or invalid BigNumber string
@@ -134,12 +149,25 @@ function Textify({
         }
 
         const index = allAddresses.indexOf(recipientAddressFormatted);
-        if (isValidAddress(recipientAddressFormatted)) {
-          updatedRecipients.push({
-            address: recipientAddressFormatted,
-            value: validValue,
-            label: allNames[index] ? allNames[index] : "",
-          });
+        if (address) {
+          if (isValidAddress(recipientAddressFormatted)) {
+            updatedRecipients.push({
+              address: recipientAddressFormatted,
+              value: validValue,
+              label: allNames[index] ? allNames[index] : "",
+            });
+          }
+        }
+        if (TronAddress) {
+          if (TronIsValidAddress(recipientAddress)) {
+            {
+              updatedRecipients.push({
+                address: recipientAddressFormatted,
+                value: validValue,
+                label: allNames[index] ? allNames[index] : "",
+              });
+            }
+          }
         }
       }
     }

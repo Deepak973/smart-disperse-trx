@@ -4,8 +4,14 @@ import React, { useState, useEffect } from "react";
 import uploadStyle from "./uploadify.module.css";
 import { isValidAddress } from "@/Helpers/ValidateInput.js";
 import { isValidValue } from "@/Helpers/ValidateInput.js";
+import { TronIsValidAddress } from "@/Helpers/ValidateInput.js";
+import { TronIsValidValue } from "@/Helpers/ValidateInput.js";
 import { isValidTokenValue } from "@/Helpers/ValidateInput.js";
-import SendEth from "../Send/SendEth";
+import { useAccount } from "wagmi";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 
 function Uploadify({
   listData,
@@ -21,10 +27,8 @@ function Uploadify({
   const [alladdresses, setAllAddresses] = useState([]);
   const [matchedData, setMatchedData] = useState([]);
   const [labels, setLabels] = useState([]);
-
-  const isValidEthereumAddress = (str) => {
-    return str.startsWith("0x");
-  };
+  const { address } = useAccount();
+  const { address: TronAddress, connected, wallet } = useWallet();
 
   useEffect(() => {
     fetchUserDetails();
@@ -102,6 +106,18 @@ function Uploadify({
 
             if (
               isValidAddress(parsedData[i]["Receiver Address"]) &&
+              validValue
+            ) {
+              const recipientAddressFormatted =
+                parsedData[i]["Receiver Address"].toLowerCase();
+              const index = allAddresses.indexOf(recipientAddressFormatted);
+              listData.push({
+                address: parsedData[i]["Receiver Address"],
+                value: validValue,
+                label: allNames[index] ? allNames[index] : "",
+              });
+            } else if (
+              TronIsValidAddress(parsedData[i]["Receiver Address"]) &&
               validValue
             ) {
               const recipientAddressFormatted =
@@ -203,24 +219,45 @@ function Uploadify({
   // Add a new row to the csvData array and reset the input fields
   const updateListData = () => {
     const newListData = [];
-    for (let i = 0; i < csvData.length; i++) {
-      if (tokenDecimal) {
-        var validValue = isValidTokenValue(
-          csvData[i]["Token Amount"],
-          tokenDecimal
-        );
-      } else {
-        var validValue = isValidValue(csvData[i]["Token Amount"]);
-      }
+    if (address) {
+      for (let i = 0; i < csvData.length; i++) {
+        if (tokenDecimal) {
+          var validValue = isValidTokenValue(
+            csvData[i]["Token Amount"],
+            tokenDecimal
+          );
+        } else {
+          var validValue = isValidValue(csvData[i]["Token Amount"]);
+        }
 
-      if (isValidAddress(csvData[i]["Receiver Address"]) && validValue) {
-        newListData.push({
-          address: csvData[i]["Receiver Address"],
-          value: validValue,
-        });
+        if (isValidAddress(csvData[i]["Receiver Address"]) && validValue) {
+          newListData.push({
+            address: csvData[i]["Receiver Address"],
+            value: validValue,
+          });
+        }
       }
+      setListData(newListData);
+    } else if (TronAddress) {
+      for (let i = 0; i < csvData.length; i++) {
+        if (tokenDecimal) {
+          var validValue = isValidTokenValue(
+            csvData[i]["Token Amount"],
+            tokenDecimal
+          );
+        } else {
+          var validValue = TronIsValidValue(csvData[i]["Token Amount"]);
+        }
+
+        if (TronIsValidAddress(csvData[i]["Receiver Address"]) && validValue) {
+          newListData.push({
+            address: csvData[i]["Receiver Address"],
+            value: validValue,
+          });
+        }
+      }
+      setListData(newListData);
     }
-    setListData(newListData);
   };
 
   // Update listData whenever csvData changes

@@ -64,8 +64,10 @@ function Displayallusers() {
     }
   };
   useEffect(() => {
-    fetchUserDetails();
-  }, []);
+    if (address) {
+      fetchUserDetails();
+    }
+  }, [address]);
 
   const handleEdit = (index) => {
     setEditUserIndex(index);
