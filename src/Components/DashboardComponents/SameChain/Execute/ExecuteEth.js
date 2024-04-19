@@ -18,7 +18,11 @@ import {
   faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { useChainId, useNetwork } from "wagmi";
-
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
+import { TronContractInstance } from "@/Helpers/troncontractinstance";
 const ConfettiScript = () => (
   <Head>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.1/confetti.min.js"></script>
@@ -31,8 +35,10 @@ function ExecuteEth(props) {
   const [success, setSuccess] = useState(false);
   const [paymentmodal, setPaymentmodal] = useState(false);
   const [limitexceed, setLimitexceed] = useState(null);
-  const [tweetModalIsOpen, setTweetModalIsOpen] = useState(false); // New state for tweet modal
+  const [tweetModalIsOpen, setTweetModalIsOpen] = useState(false);
   const chainId = useChainId();
+  const { address: TronAddress, connected, wallet } = useWallet();
+
 
   const sendTweet = () => {
     console.log("tweeting");
@@ -70,6 +76,7 @@ function ExecuteEth(props) {
       }
 
       try {
+        if(!TronAddress){
         const con = await smartDisperseInstance(chainId);
         const txsendPayment = await con.disperseEther(recipients, values, {
           value: props.totalEth,
@@ -87,6 +94,30 @@ function ExecuteEth(props) {
             }}
           />
         );
+      }
+      else {
+        console.log(recipients)
+        console.log("recepients",values, {
+          value: props.totalEth,
+        })
+        console.log("tron payment karega")
+        const con = await TronContractInstance();
+        console.log("object")
+        try
+        {
+        const txsendPayment = await con.disperseTrx(recipients, values, {
+          value: props.totalEth,
+        });
+      }catch(e)
+      {console.log("error",e)}  
+        console.log("tron  kar rha hai")
+        const receipt = await txsendPayment.wait();
+        console.log("tron  kar rha hai.....")
+        let result = await tronWeb.trx.getTransaction(txID);
+        console.log("tron  kar rha hai.....")
+        console.log(result)
+        props.setLoading(false);
+      }
         setModalIsOpen(true);
         setSuccess(true);
       } catch (error) {

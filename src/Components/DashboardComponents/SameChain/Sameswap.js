@@ -2,9 +2,16 @@ import React,{useState} from 'react'
 import textStyle from "./Type/textify.module.css";
 import Swap from './swap/Swap';
 import SameChain from './SameChain';
+import { TronContractInstance } from '@/Helpers/troncontractinstance';
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
+
 
 function Sameswap({activeTab, listData, setListData}) {
     const [issimpledisperse, setSimpledisperse] = useState(true);
+    const {address: Tronaddress, connected} = useWallet();
     const [isswapdisperse, setSwapdisperse] = useState(false);
   
      const handlesimpledisperse = () => {
@@ -19,7 +26,13 @@ function Sameswap({activeTab, listData, setListData}) {
   setSwapdisperse(true)
      }
 
-     console.log(activeTab);
+     const handletroncontract = async() => {
+      console.log("enteringggggg");
+      console.log(Tronaddress);
+    const callcontract = await TronContractInstance();
+    console.log(callcontract);
+     }
+
   return (
     <div className={textStyle.divtocoversametextdiv}>
         <div className={textStyle.divforwholetoken}>
@@ -47,6 +60,13 @@ function Sameswap({activeTab, listData, setListData}) {
             className={textStyle.sametextmain}
           >
             <div id="send-eth" className={textStyle.sendethdiv}>
+            <button
+                id={issimpledisperse ? textStyle.truee : textStyle.falsee}
+                className={textStyle.buttontoaddformdata}
+                onClick={handletroncontract}
+              >
+         Tron contract
+              </button>
               <button
                 id={issimpledisperse ? textStyle.truee : textStyle.falsee}
                 className={textStyle.buttontoaddformdata}
@@ -58,7 +78,6 @@ function Sameswap({activeTab, listData, setListData}) {
 
             <div className={textStyle.importtokendiv}>
               <div style={{ margin: "10px 0px" }}>OR</div>
-
               <button
                 style={{
                   backgroundColor: issimpledisperse ? "" : "white",
