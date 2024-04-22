@@ -130,10 +130,8 @@ function Textify({
           console.log("Converted value:", convertedValue); // Log the converted value
           validValue = isValidValue(String(convertedValue)); // Convert to string
         } else if (tokenDecimal) {
-          console.log("first");
           validValue = isValidTokenValue(value, tokenDecimal);
         } else {
-          console.log("second");
           if (address) {
             validValue = isValidValue(value);
           } else if (TronAddress) {
@@ -162,7 +160,7 @@ function Textify({
           if (TronIsValidAddress(recipientAddress)) {
             {
               updatedRecipients.push({
-                address: recipientAddressFormatted,
+                address: recipientAddress,
                 value: validValue,
                 label: allNames[index] ? allNames[index] : "",
               });

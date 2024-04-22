@@ -39,7 +39,6 @@ function ExecuteEth(props) {
   const chainId = useChainId();
   const { address: TronAddress, connected, wallet } = useWallet();
 
-
   const sendTweet = () => {
     console.log("tweeting");
     const tweetContent = `Just used @SmartDisperse to transfer to multiple accounts simultaneously across the same chain! Transferring to multiple accounts simultaneously has never been easier. Check out Smart Disperse at https://smartdisperse.xyz?utm_source=twitter_tweet&utm_medium=social&utm_campaign=smart_disperse&utm_id=002 and simplify your crypto transfers today!`;
@@ -76,48 +75,49 @@ function ExecuteEth(props) {
       }
 
       try {
-        if(!TronAddress){
-        const con = await smartDisperseInstance(chainId);
-        const txsendPayment = await con.disperseEther(recipients, values, {
-          value: props.totalEth,
-        });
+        if (!TronAddress) {
+          const con = await smartDisperseInstance(chainId);
+          const txsendPayment = await con.disperseEther(recipients, values, {
+            value: props.totalEth,
+          });
 
-        const receipt = await txsendPayment.wait();
-        props.setLoading(false);
+          const receipt = await txsendPayment.wait();
+          props.setLoading(false);
 
-        let blockExplorerURL = await getExplorer();
-        setMessage(
-          <div
-          className={textStyle.Link}
-            dangerouslySetInnerHTML={{
-              __html: `Your Transaction was successful. Visit <a href="https://${blockExplorerURL}/tx/${receipt.transactionHash}" target="_blank "   style={{ color: "white", textDecoration: "none" }}>here</a> for details.`,
-            }}
-          />
-        );
-      }
-      else {
-        console.log(recipients)
-        console.log("recepients",values, {
-          value: props.totalEth,
-        })
-        console.log("tron payment karega")
-        const con = await TronContractInstance();
-        console.log("object")
-        try
-        {
-        const txsendPayment = await con.disperseTrx(recipients, values, {
-          value: props.totalEth,
-        });
-      }catch(e)
-      {console.log("error",e)}  
-        console.log("tron  kar rha hai")
-        const receipt = await txsendPayment.wait();
-        console.log("tron  kar rha hai.....")
-        let result = await tronWeb.trx.getTransaction(txID);
-        console.log("tron  kar rha hai.....")
-        console.log(result)
-        props.setLoading(false);
-      }
+          let blockExplorerURL = await getExplorer();
+          setMessage(
+            <div
+              className={textStyle.Link}
+              dangerouslySetInnerHTML={{
+                __html: `Your Transaction was successful. Visit <a href="https://${blockExplorerURL}/tx/${receipt.transactionHash}" target="_blank "   style={{ color: "white", textDecoration: "none" }}>here</a> for details.`,
+              }}
+            />
+          );
+        } else {
+          console.log(recipients);
+          console.log(props.totalEth);
+          console.log("recepients", values, {
+            value: props.totalEth,
+          });
+          console.log("tron payment karega");
+          const con = await TronContractInstance();
+          console.log("object");
+
+          try {
+            let tx = await con.disperseTrx(recipients, values).send({
+              callValue: props.totalEth,
+            });
+          } catch (e) {
+            console.log("error", e);
+          }
+          console.log("tron  kar rha hai");
+          const receipt = await txsendPayment.wait();
+          console.log("tron  kar rha hai.....");
+          let result = await tronWeb.trx.getTransaction(txID);
+          console.log("tron  kar rha hai.....");
+          console.log(result);
+          props.setLoading(false);
+        }
         setModalIsOpen(true);
         setSuccess(true);
       } catch (error) {
