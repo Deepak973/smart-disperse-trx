@@ -17,6 +17,10 @@ import {
   faPaperPlane,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 import { useAccount, useChainId, useNetwork } from "wagmi";
 
 const ConfettiScript = () => (
@@ -32,6 +36,8 @@ function ExecuteToken(props) {
   const [paymentmodal, setPaymentmodal] = useState(false);
   const [limitexceed, setLimitexceed] = useState(null);
   const chainId = useChainId();
+  const { address: TronAddress, connected, wallet } = useWallet();
+
 
   const sendTweet = () => {
     console.log("tweeting");
@@ -74,7 +80,6 @@ function ExecuteToken(props) {
         values.push(props.listData[i]["value"]);
       }
       // Check if token is approved
-
       const isTokenApproved = await approveToken(
         props.totalERC20,
         props.customTokenAddress,
