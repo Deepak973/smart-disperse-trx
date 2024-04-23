@@ -55,7 +55,6 @@ function Samechaindashboard() {
   const inputRef1 = useRef();
   const [totalAmount, setTotalAmount] = useState(0);
   const inputRef3 = useRef();
-
   const { address } = useAccount(); /*/User's Ethereum Address*/
   const [tokenListOfUser, setTokenListOfUser] = useState([]);
   const [transactionData, setTransactionData] = useState([]);
@@ -156,6 +155,7 @@ function Samechaindashboard() {
       }
     );
   };
+
   const copyToClipboardHash = (text, index) => {
     setIsCopiedAddressIndexHash(index);
     navigator.clipboard.writeText(text).then(
@@ -400,7 +400,6 @@ function Samechaindashboard() {
                 ethData[i].label = allNames[index];
               }
             }
-
             setTransactionData(ethData);
             setFilteredTransactions(ethData);
             const userTokens = await getERC20Tokens(address, chainId);

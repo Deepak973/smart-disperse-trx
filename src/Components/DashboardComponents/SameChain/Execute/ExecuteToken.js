@@ -4,7 +4,7 @@ import textStyle from "../Type/textify.module.css";
 import contracts from "@/Helpers/ContractAddresses.js";
 import { ethers } from "ethers";
 import Modal from "react-modal";
-import { approveToken } from "@/Helpers/ApproveToken";
+import { approveToken, tronapprovetoken } from "@/Helpers/ApproveToken";
 import Image from "next/image";
 import oopsimage from "@/Assets/oops.webp";
 import bggif from "@/Assets/bp.gif";
@@ -17,7 +17,13 @@ import {
   faPaperPlane,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 import { useAccount, useChainId, useNetwork } from "wagmi";
+import { TronContractInstance } from "@/Helpers/troncontractinstance";
+import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
 
 const ConfettiScript = () => (
   <Head>
@@ -32,6 +38,9 @@ function ExecuteToken(props) {
   const [paymentmodal, setPaymentmodal] = useState(false);
   const [limitexceed, setLimitexceed] = useState(null);
   const chainId = useChainId();
+  const { address: TronAddress, connected, wallet } = useWallet();
+  const [ aprrovetoken, setAprrovetoken ] = useState(false);
+  const [getTronnetwork, settronNetwork ] = useState();
 
   const sendTweet = () => {
     console.log("tweeting");
@@ -41,15 +50,26 @@ function ExecuteToken(props) {
     )}`;
     window.open(twitterUrl, "_blank");
   };
-  // Function to execute token transfer
+
+  useEffect(() => {
+    console.log("chainid....");
+    const getChainId = async () => {
+      const { tronWeb } = window;
+      const adapter = new TronLinkAdapter();
+      let net = await adapter.network();
+      console.log(net);
+      console.log(net.networkType);
+      const tronnetwork = net.networkType;
+      settronNetwork(tronnetwork);
+      console.log(settronNetwork);
+    };
+    getChainId();
+  }, []);
+
   const execute = async () => {
     setPaymentmodal(true);
-    // console.log(props.listData);
+    console.log(props.listData);
     props.setLoading(true);
-    // console.log(props.ERC20Balance);
-    // console.log(props.totalERC20);
-
-    // Check if ERC20 balance is sufficient for transaction
     if (!props.ERC20Balance.gt(props.totalERC20)) {
       props.setLoading(false);
       setMessage(
@@ -66,58 +86,103 @@ function ExecuteToken(props) {
       setModalIsOpen(true);
       return;
     } else {
-      // Prepare recipients and values arrays
       var recipients = [];
       var values = [];
       for (let i = 0; i < props.listData.length; i++) {
         recipients.push(props.listData[i]["address"]);
         values.push(props.listData[i]["value"]);
+        console.log(props.listData[i]["value"]);
       }
-      // Check if token is approved
+      try {
+        if (!TronAddress) {
+          // console.log("erc token here");
+          {
+            const isTokenApproved = await approveToken(
+              props.totalERC20,
+              props.customTokenAddress,
+              chainId
+            );
+            if (isTokenApproved) {
+              console.log("erc token disperse here");
+              const con = await smartDisperseInstance(chainId);
+              const txsendPayment = await con.disperseToken(
+                props.customTokenAddress,
+                recipients,
+                values
+              );
 
-      const isTokenApproved = await approveToken(
-        props.totalERC20,
-        props.customTokenAddress,
-        chainId
-      );
+              const receipt = await txsendPayment.wait();
+              let blockExplorerURL = await getExplorer();
+              props.setLoading(false);
 
-      if (isTokenApproved) {
-        try {
-          const con = await smartDisperseInstance(chainId);
-          // Execute token transfer
-          const txsendPayment = await con.disperseToken(
-            props.customTokenAddress,
-            recipients,
-            values
-          );
+              console.log("yayy");
+              setMessage(
+                <div
+                  className={textStyle.Link}
+                  dangerouslySetInnerHTML={{
+                    __html: `Your Transaction was successful. Visit <a href="https://${blockExplorerURL}/tx/${receipt.transactionHash}" target="_blank">here</a> for details.`,
+                  }}
+                />
+              );
+              setSuccess(true);
+              setModalIsOpen(true);
+            } else {
+              props.setLoading(false);
+              setMessage("Approval Rejected");
+              setModalIsOpen(true);
+              return;
+            }
+          }
+        } else {
+          // console.log("trc token here");
+          {
+            const isTokenApproved = await tronapprovetoken(
+              props.totalERC20,
+              props.customTokenAddress
+            );
+            if (isTokenApproved) {
+              const con = await TronContractInstance();
+              // console.log("object");
 
-          const receipt = await txsendPayment.wait();
-          let blockExplorerURL = await getExplorer();
-          props.setLoading(false);
-          // console.log("yayy");
-          setMessage(
-            <div
-              className={textStyle.Link}
-              dangerouslySetInnerHTML={{
-                __html: `Your Transaction was successful. Visit <a href="https://${blockExplorerURL}/tx/${receipt.transactionHash}" target="_blank">here</a> for details.`,
-              }}
-            />
-          );
-          // console.log("modal opening");
-          setModalIsOpen(true);
-          setSuccess(true);
-          // console.log("success is true");
-          // props.setListData([]);
-        } catch (e) {
-          props.setLoading(false);
-          console.log("error", e);
-          setMessage("Transaction Rejected");
-          setModalIsOpen(true);
-          return;
+              try {
+                console.log(recipients, values);
+                // console.log("trying");
+
+                let tx = await con
+                  .disperseToken(props.customTokenAddress, recipients, values)
+                  .send();
+                // console.log("transaction hash:", tx);
+                // console.log("successful");
+
+                props.setLoading(false);
+                // console.log(getTronnetwork);
+                const link = `https://${getTronnetwork}.tronscan.org/#/transaction/${tx}`;
+                // console.log(link);
+                setMessage(
+                  <div
+                    className={textStyle.Link}
+                    dangerouslySetInnerHTML={{
+                      __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
+                    }}
+                  />
+                );
+                setModalIsOpen(true);
+                setSuccess(true);
+              } catch (e) {
+                console.log("error", e);
+              }
+            } else {
+              props.setLoading(false);
+              setMessage("Approval Rejected");
+              setModalIsOpen(true);
+              return;
+            }
+          }
         }
-      } else {
+      } catch (e) {
         props.setLoading(false);
-        setMessage("Approval Rejected");
+        console.log("error", e);
+        setMessage("Transaction Rejected");
         setModalIsOpen(true);
         return;
       }
