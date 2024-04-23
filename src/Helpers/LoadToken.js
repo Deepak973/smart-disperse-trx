@@ -45,7 +45,7 @@ export const TronLoadToken = async (customTokenAddress, address) => {
       return {
         name,
         symbol,
-        balance: balance / 10 ** decimals, // Convert balance to match Ethereum's standard
+        balance, // Convert balance to match Ethereum's standard
         decimals,
       };
     } catch (error) {

@@ -23,6 +23,9 @@ import {
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { TronContractInstance } from "@/Helpers/troncontractinstance";
+import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
+
+
 const ConfettiScript = () => (
   <Head>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.1/confetti.min.js"></script>
@@ -38,6 +41,8 @@ function ExecuteEth(props) {
   const [tweetModalIsOpen, setTweetModalIsOpen] = useState(false);
   const chainId = useChainId();
   const { address: TronAddress, connected, wallet } = useWallet();
+  const [getTronnetwork, settronNetwork ] = useState();
+
 
   const sendTweet = () => {
     console.log("tweeting");
@@ -47,6 +52,21 @@ function ExecuteEth(props) {
     )}`;
     window.open(twitterUrl, "_blank");
   };
+  useEffect(() => {
+    // console.log("chainid....");
+    const getChainId = async () => {
+      const { tronWeb } = window;
+      const adapter = new TronLinkAdapter();
+      let net = await adapter.network();
+      // console.log(net);
+      // console.log(net.networkType);
+      const tronnetwork = net.networkType;
+      settronNetwork(tronnetwork);
+      // console.log(settronNetwork);
+    };
+    getChainId();
+  }, []);
+
 
   const execute = async () => {
     setPaymentmodal(true);
@@ -83,7 +103,7 @@ function ExecuteEth(props) {
 
           const receipt = await txsendPayment.wait();
           props.setLoading(false);
-
+      setSuccess(true);
           let blockExplorerURL = await getExplorer();
           setMessage(
             <div
@@ -94,31 +114,38 @@ function ExecuteEth(props) {
             />
           );
         } else {
-          console.log(recipients);
-          console.log(props.totalEth);
-          console.log("recepients", values, {
-            value: props.totalEth,
-          });
-          console.log("tron payment karega");
+          // console.log(recipients);
+          // console.log(props.totalEth);
+          // console.log("recepients", values, {
+          //   value: props.totalEth,
+          // });
           const con = await TronContractInstance();
-          console.log("object");
+          // console.log("object");
 
           try {
             let tx = await con.disperseTrx(recipients, values).send({
               callValue: props.totalEth,
             });
+            // console.log(tx)
+            // console.log("successful")
+          props.setLoading(false);
+          setModalIsOpen(true);
+      setSuccess(true);
+      const link = `https://${getTronnetwork}.tronscan.org/#/transaction/${tx}`;
+                // console.log(link);
+                setMessage(
+                  <div
+                    className={textStyle.Link}
+                    dangerouslySetInnerHTML={{
+                      __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
+                    }}
+                  />
+                );
+          console.log("successful")
           } catch (e) {
             console.log("error", e);
           }
-          console.log("tron  kar rha hai");
-          const receipt = await txsendPayment.wait();
-          console.log("tron  kar rha hai.....");
-          let result = await tronWeb.trx.getTransaction(txID);
-          console.log("tron  kar rha hai.....");
-          console.log(result);
-          props.setLoading(false);
         }
-        setModalIsOpen(true);
         setSuccess(true);
       } catch (error) {
         props.setLoading(false);

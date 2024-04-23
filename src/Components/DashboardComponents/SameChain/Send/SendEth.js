@@ -20,6 +20,7 @@ import {
   useWallet,
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { BigNumber } from 'ethers';
 
 function SendEth({ activeTab, listData, setListData }) {
   const [ethToUsdExchangeRate, setEthToUsdExchangeRate] = useState(null); //store ETH to USD exchange rate
@@ -160,6 +161,8 @@ function SendEth({ activeTab, listData, setListData }) {
   }, [totalEth]);
 
   const calculateRemaining = () => {
+    console.log("calculating...")
+    console.log(ethBalance, totalEth);
     if (address) {
       if (ethBalance && totalEth) {
         const remaining = ethBalance.sub(totalEth);
@@ -178,7 +181,7 @@ function SendEth({ activeTab, listData, setListData }) {
       setRemaining(null);
     }
   };
-
+  
   const fetchUserDetails = async () => {
     try {
       const result = await fetch(

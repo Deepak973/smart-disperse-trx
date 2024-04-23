@@ -1,6 +1,11 @@
 import { ethers } from "ethers";
 import ERC20ABI from "@/artifacts/contracts/ERC20.sol/ERC20.json";
 import contracts from "@/Helpers/ContractAddresses.js";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
+import { TronContractInstance } from "./troncontractinstance";
 
 export const approveToken = async (amount, tokenContractAddress, chainId) => {
   const { ethereum } = window; // Grab the global ethereum object so we can interact with it
@@ -29,3 +34,22 @@ export const approveToken = async (amount, tokenContractAddress, chainId) => {
     }
   }
 };
+
+export const tronapprovetoken = async(amount, tokenContractAddress) => {
+  console.log("Aprroving trc token")
+  const TroncontractAddress = 'TSijZfgARceZzHGBU14GcfQuDSsQhZtVdh';
+  const { tronWeb } = window;
+  if (tronWeb) {
+  try {
+ 
+    let con = await tronWeb.contract( ERC20ABI.abi, tokenContractAddress);
+    const tx = await con.approve(TroncontractAddress, amount).send();
+    // await tx.wait();
+      console.log(`${amount} tokens Approved`);
+    return true;
+  } catch (error) {
+    console.error("Error Approving token:", error);
+    return false;
+  }
+}
+}
