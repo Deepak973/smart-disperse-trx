@@ -1,7 +1,4 @@
-import React from "react";
-import TronWeb from "tronweb";
-import tronabi from "../artifacts/contracts/TronContract.json";
-import tronabiSunSwap from "../artifacts/contracts/SunSwapRouter.json";
+import tronabi from "../artifacts/contracts/SunSwapRouter.json";
 
 export const TronContractInstance = async () => {
   try {
@@ -17,12 +14,12 @@ export const TronContractInstance = async () => {
   }
 };
 
-export const TronContractInstanceSunSwap = async () => {
+export const AddLiquidity = async () => {
   try {
+    console.log("trying...");
     const { tronWeb } = window;
-    const TroncontractAddress = "TKzxdSv2FZKQrEqkKVgp5DcwEXBEKMg2Ax";
-    let contract = await tronWeb.contract(tronabiSunSwap, TroncontractAddress);
-    console.log(contract);
+    const TroncontractAddress = "TSv6BtXo5rtgGFTPT17FiyPs981uZxkYx1";
+    let contract = await tronWeb.contract(tronabi, TroncontractAddress);
     return contract;
   } catch (error) {
     console.log("error:", error.message);

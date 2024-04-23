@@ -287,6 +287,7 @@ function SendToken({ activeTab, listData, setListData }) {
   }, [totalERC20]);
 
   const calculateRemaining = () => {
+    console.log(ERC20Balance, totalERC20);
     if (ERC20Balance && totalERC20) {
       const remaining = ERC20Balance.sub(totalERC20);
       setRemaining(remaining);

@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import ERC20ABI from "@/artifacts/contracts/ERC20.sol/ERC20.json";
+import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
 
 export const LoadToken = async (customTokenAddress, address) => {
   const { ethereum } = window;
@@ -33,6 +34,9 @@ export const LoadToken = async (customTokenAddress, address) => {
 
 export const TronLoadToken = async (customTokenAddress, address) => {
   const { tronWeb } = window;
+  const adapter = new TronLinkAdapter();
+  let net = await adapter.network();
+  console.log("Networkkkkkkk", net);
 
   if (tronWeb && customTokenAddress !== "") {
     try {
@@ -45,7 +49,7 @@ export const TronLoadToken = async (customTokenAddress, address) => {
       return {
         name,
         symbol,
-        balance: balance / 10 ** decimals, // Convert balance to match Ethereum's standard
+        balance,
         decimals,
       };
     } catch (error) {

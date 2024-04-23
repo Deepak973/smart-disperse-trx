@@ -3,7 +3,7 @@ import textStyle from "../Type/textify.module.css";
 import swapStyle from "./swap.module.css";
 import text from "../../../../Assets/text-editor.png";
 import Image from "next/image";
-import down from "../../../../Assets/down.png"
+import down from "../../../../Assets/down.png";
 
 function Swap() {
   const [isModalIsOpen, setModalIsOpen] = useState(false);
@@ -11,15 +11,17 @@ function Swap() {
   const [tokenlogourl, setTokenurl] = useState([]);
 
   useEffect(() => {
-    console.log("fetching...")
+    console.log("fetching...");
     // Fetch token list from the API
     const fetchTokenList = async () => {
       try {
-        const response = await fetch("https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json");
+        const response = await fetch(
+          "https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json"
+        );
         const data = await response.json();
-        console.log("token api data:",data)
-        const names = data.tokens.map(token => token.name);
-        const logourl = data.tokens.map(tokenn => tokenn.logoURI);
+        console.log("token api data:", data);
+        const names = data.tokens.map((token) => token.name);
+        const logourl = data.tokens.map((tokenn) => tokenn.logoURI);
         setTokenList(names);
         setTokenurl(logourl);
       } catch (error) {
@@ -27,15 +29,15 @@ function Swap() {
       }
     };
 
+    const getAmountIn = () => {};
+
     fetchTokenList();
   }, []);
 
-
-
   const handletokens = () => {
-    console.log("handle token clicked")
+    console.log("handle token clicked");
     setModalIsOpen(true);
-  }
+  };
   return (
     <div>
       <div className={textStyle.titlesametexttextarea}>
@@ -61,7 +63,6 @@ function Swap() {
         }}
         className={textStyle.sametextmain}
       >
-        
         <div className={swapStyle.maindivofswap}>
           <div className={swapStyle.swapMain}>
             <div className={swapStyle.FromToMain}>
@@ -104,7 +105,13 @@ function Swap() {
             >
               price
             </div>
-            <div style={{borderBottom:"1px solid white", width:"95%",margin:"0 auto"}}></div>
+            <div
+              style={{
+                borderBottom: "1px solid white",
+                width: "95%",
+                margin: "0 auto",
+              }}
+            ></div>
             <div className={swapStyle.FromToMain}>
               <div className={swapStyle.swapCurrencyInput}>
                 <div className={swapStyle.FromMain}>
@@ -145,8 +152,7 @@ function Swap() {
             >
               price
             </div>
-            <div className={swapStyle.SwapBtnMain}>  
-            </div>
+            <div className={swapStyle.SwapBtnMain}></div>
           </div>
         </div>
       </div>
