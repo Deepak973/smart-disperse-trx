@@ -417,7 +417,6 @@ function Samechaindashboard() {
 
     fetchData(address);
   }, [isOpen, selectedToken]);
-  console.log(activeTab);
   return (
     <div className={samechainStyle.maindivofdashboard}>
       <div style={{ position: "relative" }}>

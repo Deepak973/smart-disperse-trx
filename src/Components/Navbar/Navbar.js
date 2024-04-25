@@ -35,7 +35,6 @@ function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log("....................");
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
       }

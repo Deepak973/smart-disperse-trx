@@ -140,6 +140,14 @@ opacity: 0.8;
   padding: 0.75rem 0.75rem 0.75rem 1rem;
 }
 
+.selectedToken {
+  /* Add styles to change the color */
+  background-color: #ccc; /* Example color */
+  /* Add styles to make it unclickable */
+  pointer-events: none;
+}
+
+
 .searchinputintoken{
     width: 100%;
     border-radius: 5px;
@@ -151,4 +159,47 @@ opacity: 0.8;
 .tokenlistingdiv{
     overflow-y: scroll;
     height: 400px;
+}
+
+.modalouterdiv{
+  margin: 100px;
+  position: absolute;
+    inset: 40px;
+    border: 1px solid rgb(204, 204, 204);
+    background: rgb(255, 255, 255);
+    overflow: auto;
+    border-radius: 4px;
+    outline: none;
+    padding: 20px;
+}
+
+#srchbar{
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.dropdownouter{
+  height: 38vh;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.215);
+}
+
+.alldatatokendiv:hover{
+  background-color: rgba(0, 0, 0, 0.088);
+  cursor: pointer;
+}
+.alldatatokendiv{
+  padding: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.balanceaddressdiv{
+  text-align: end;
+}
+.tokenbalanceinmodal{
+  font-size: 13px;
+}
+
+.tokenaddressinmodal{
+font-size: 10px;
 }
