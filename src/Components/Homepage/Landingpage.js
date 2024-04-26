@@ -137,7 +137,6 @@ export default function Landingpage() {
                 <span>Scroll !</span>
                 <span>Optimism !</span>
                 <span>Base !</span>
-                <span>Ethereum !</span>
               </div>
             </h1>
           </div>

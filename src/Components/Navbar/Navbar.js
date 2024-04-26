@@ -15,22 +15,17 @@ import {
   useWallet,
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { usePathname } from "next/navigation";
 
 function Navbar() {
-  const [toggleSVG, setToggleSVG] = useState(false);
-  const {
-    isConnected,
-    address,
-    isDisconnected,
-    status,
-    isConnecting,
-    isReconnecting,
-  } = useAccount();
+  const { isConnected, address } = useAccount();
   const { theme, setTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const cookie = new Cookies();
   const [isMainnet, setIsMainnet] = useState(true);
+  const path = usePathname();
+  const isHome = path === "/";
 
   const { address: Tronaddress, connected: TronConnected } = useWallet();
 
@@ -211,7 +206,7 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && !isHome) {
       console.log("isConnected", isConnected);
       const jwtToken = cookie.get("jwt_token");
       console.log(jwtToken);
@@ -219,7 +214,7 @@ function Navbar() {
         createSign();
       }
     }
-    if (TronConnected) {
+    if (TronConnected && !isHome) {
       console.log("isConnected", isConnected);
       const jwtToken = cookie.get("jwt_token");
       console.log(jwtToken);
@@ -241,7 +236,9 @@ function Navbar() {
             />
           </Link>
         </div>
-        <div className={navStyle.connectwalletbuttondiv}>
+        {isHome ? (
+          <></>
+        ) : (
           <div className={navStyle.connectwalletbuttondiv}>
             {isConnected && (
               <label className={navStyle.toggle}>
@@ -258,31 +255,19 @@ function Navbar() {
                 ></span>
               </label>
             )}
-
-            {/*         
-        {isConnected ? (
-             <ConnectButtonCustom  isMainnet={isMainnet} />
-              ) : connected ? (
-               <TronWallet />
-              ) : (
-                <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
-              )
-        } */}
-
-            {/* {(isConnected || connected) ? (
-              null
-          ) :
-          <div>     
-              {showDropdown && (
-                <div ref={dropdownRef} className={navStyle.dropdownContent}>
-                  <div style={{margin:"5px 0px"}}>
-                  <TronWallet />
-                  </div>
-                  <ConnectButtonCustom  isMainnet={isMainnet}/>
-                </div>
-              )}
-          </div>
-          } */}
+            <span>
+              {" "}
+              {!TronConnected ? (
+                <ConnectButtonCustom isMainnet={isMainnet} />
+              ) : null}
+              {!isConnected ? <TronWallet /> : null}
+              {isConnected && TronConnected ? (
+                <>
+                  <ConnectButtonCustom isMainnet={isMainnet} />
+                  <TronWallet />{" "}
+                </>
+              ) : null}
+            </span>
 
             {theme === "light" ? (
               <svg
@@ -323,7 +308,7 @@ function Navbar() {
               </svg>
             )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
