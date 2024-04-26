@@ -133,6 +133,7 @@ export default function Landingpage() {
               Smart-Disperse Your Crypto Transactions on
               <div className={homeStyle.slidingVertical}>
                 <span>Mode !</span>
+                <span>Tron !</span>
                 <span>Scroll !</span>
                 <span>Optimism !</span>
                 <span>Base !</span>
