@@ -31,7 +31,8 @@ function Navbar() {
   const dropdownRef = useRef(null);
   const cookie = new Cookies();
   const [isMainnet, setIsMainnet] = useState(true);
-  const { connected, wallet } = useWallet();
+
+  const { address: Tronaddress, connected: TronConnected } = useWallet();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -91,13 +92,43 @@ function Navbar() {
         console.log("Error while decoding signature");
       } else {
         const storetoken = await storeToken(jwtToken);
-        // jwt.verify(jwtToken, "This is the msg for Jwt Token", (err, decoded) => {
-        //   if (err) {
-        //     console.error("Error verifying token:", err);
-        //   } else {
-        //     console.log("Decoded payload:", decoded);
-        //   }
-        // });
+        if (storetoken) {
+          window.location.reload();
+        }
+      }
+    } catch (e) {
+      console.log("error", e);
+    }
+  };
+
+  const TroncreateSign = async () => {
+    try {
+      if (typeof window !== "undefined") {
+        const { tronWeb } = window;
+
+        async function signMessage(tronWeb, message) {
+          try {
+            const signature = await tronWeb.trx.signMessageV2(message);
+            console.log("Signature:", signature);
+            return signature;
+          } catch (error) {
+            console.error("Error signing message:", error);
+          }
+        }
+        const message =
+          "sign this message to verify the ownership of your address";
+
+        const signature = await signMessage(tronWeb, message);
+
+        const jwtToken = await decodeSignature(signature, message);
+        if (jwtToken === null) {
+          console.log("Error while decoding signature");
+        } else {
+          const storetoken = await storeToken(jwtToken);
+          // if (storetoken) {
+          //   window.location.reload();
+          // }
+        }
       }
     } catch (e) {
       console.log("error", e);
@@ -105,20 +136,42 @@ function Navbar() {
   };
 
   const decodeSignature = async (signature, message) => {
-    try {
-      // Decode the signature to get the signer's address
-      const signerAddress = ethers.utils.verifyMessage(message, signature);
-      console.log("Signer's address:", signerAddress, address);
+    if (isConnected) {
+      try {
+        // Decode the signature to get the signer's address
+        const signerAddress = ethers.utils.verifyMessage(message, signature);
+        console.log("Signer's address:", signerAddress, address);
 
-      if (signerAddress.toLowerCase() === address.toLowerCase()) {
-        // Normalize addresses and compare them
-        const jwtToken = generateJWTToken(signature, message);
-        return jwtToken;
+        if (signerAddress.toLowerCase() === address.toLowerCase()) {
+          // Normalize addresses and compare them
+          const jwtToken = generateJWTToken(signature, message);
+          return jwtToken;
+        }
+        return null;
+      } catch (e) {
+        console.error("Error decoding signature:", e);
+        return null;
       }
-      return null;
-    } catch (e) {
-      console.error("Error decoding signature:", e);
-      return null;
+    }
+    if (TronConnected) {
+      try {
+        // Decode the signature to get the signer's address
+        const base58Address = await tronWeb.trx.verifyMessageV2(
+          message,
+          signature
+        );
+        console.log("Signer's address:", base58Address, Tronaddress);
+
+        if (base58Address.toLowerCase() === Tronaddress.toLowerCase()) {
+          // Normalize addresses and compare them
+          const jwtToken = generateJWTToken(signature, message);
+          return jwtToken;
+        }
+        return null;
+      } catch (e) {
+        console.error("Error decoding signature:", e);
+        return null;
+      }
     }
   };
 
@@ -166,7 +219,15 @@ function Navbar() {
         createSign();
       }
     }
-  }, [isConnected]);
+    if (TronConnected) {
+      console.log("isConnected", isConnected);
+      const jwtToken = cookie.get("jwt_token");
+      console.log(jwtToken);
+      if (jwtToken === undefined || jwtToken === null) {
+        TroncreateSign();
+      }
+    }
+  }, [isConnected, TronConnected]);
 
   return (
     <div className={navStyle.navbarMain}>
@@ -209,11 +270,11 @@ function Navbar() {
         } */}
             <span>
               {" "}
-              {!connected ? (
+              {!TronConnected ? (
                 <ConnectButtonCustom isMainnet={isMainnet} />
               ) : null}
               {!isConnected ? <TronWallet /> : null}
-              {isConnected && connected ? (
+              {isConnected && TronConnected ? (
                 <>
                   <ConnectButtonCustom isMainnet={isMainnet} />
                   <TronWallet />{" "}

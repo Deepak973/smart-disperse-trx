@@ -19,10 +19,10 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import Navbar from "./Components/Navbar/Navbar";
-import {
-  WalletDisconnectedError,
-  WalletNotFoundError,
-} from "@tronweb3/tronwallet-abstract-adapter";
+// import {
+//   WalletDisconnectedError,
+//   WalletNotFoundError,
+// } from "@tronweb3/tronwallet-abstract-adapter";
 import {
   WalletProvider,
   useWallet,
@@ -33,10 +33,10 @@ import {
   TronLinkAdapter,
   TokenPocketAdapter,
   BitKeepAdapter,
-  OkxWalletAdapter,
 } from "@tronweb3/tronwallet-adapters";
 import { WalletConnectAdapter } from "@tronweb3/tronwallet-adapter-walletconnect";
 import { LedgerAdapter } from "@tronweb3/tronwallet-adapter-ledger";
+import Cookies from "universal-cookie";
 const { wallets } = getDefaultWallets();
 const modeTestnet = {
   id: 919,
@@ -72,14 +72,14 @@ const modeMainnet = {
 
 export function Providers({ children }) {
   const [isSigned, setIsSigned] = useState();
-
+  const cookie = new Cookies();
   function onError(e) {
     console.log(e);
-    if (e instanceof WalletNotFoundError) {
-      toast.error(e.message);
-    } else if (e instanceof WalletDisconnectedError) {
-      toast.error(e.message);
-    } else toast.error(e.message);
+    // if (e instanceof WalletNotFoundError) {
+    //   toast.error(e.message);
+    // } else if (e instanceof WalletDisconnectedError) {
+    //   toast.error(e.message);
+    // } else toast.error(e.message);
   }
   const adapters = useMemo(function () {
     const tronLink1 = new TronLinkAdapter();
@@ -127,18 +127,21 @@ export function Providers({ children }) {
     });
     const tokenPocket = new TokenPocketAdapter();
     const bitKeep = new BitKeepAdapter();
-    const okxWalletAdapter = new OkxWalletAdapter();
-    return [
-      tronLink1,
-      walletConnect1,
-      ledger,
-      tokenPocket,
-      bitKeep,
-      okxWalletAdapter,
-    ];
+    // const okxWalletAdapter = new OkxWalletAdapter();
+    // return [
+    //   tronLink1,
+    //   walletConnect1,
+    //   ledger,
+    //   tokenPocket,
+    //   bitKeep,
+    //   okxWalletAdapter,
+    // ];
   }, []);
   function onConnect() {
     console.log("onConnect");
+  }
+  function onDisconnect() {
+    cookie.set("jwt_token", null);
   }
   async function onAccountsChanged() {
     console.log("onAccountsChanged");
@@ -176,6 +179,7 @@ export function Providers({ children }) {
     <WalletProvider
       onError={onError}
       onConnect={onConnect}
+      onDisconnect={onDisconnect}
       onAccountsChanged={onAccountsChanged}
       onAdapterChanged={onAdapterChanged}
       autoConnect={true}

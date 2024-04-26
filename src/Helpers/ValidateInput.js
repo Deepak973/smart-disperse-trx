@@ -1,3 +1,4 @@
+"use client";
 import { ethers } from "ethers";
 
 /*
@@ -6,8 +7,10 @@ import { ethers } from "ethers";
 export const isValidAddress = (address) => ethers.utils.isAddress(address);
 
 export const TronIsValidAddress = (address) => {
-  const { tronWeb } = window;
-  return tronWeb.isAddress(address);
+  if (typeof window !== "undefined") {
+    const { tronWeb } = window;
+    return tronWeb.isAddress(address);
+  }
 };
 
 /*

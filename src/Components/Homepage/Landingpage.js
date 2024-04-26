@@ -95,11 +95,7 @@ export default function Landingpage() {
   const [showModal, setShowModal] = useState(false);
 
   const handleGetStartedClick = () => {
-    if (isConnected) {
-      setShowModal(true);
-    } else {
-      openConnectModal();
-    }
+    setShowModal(true);
   };
 
   const closeModal = () => {

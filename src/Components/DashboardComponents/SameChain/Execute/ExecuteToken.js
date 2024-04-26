@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { smartDisperseInstance } from "@/Helpers/ContractInstance";
 import textStyle from "../Type/textify.module.css";
@@ -39,8 +40,8 @@ function ExecuteToken(props) {
   const [limitexceed, setLimitexceed] = useState(null);
   const chainId = useChainId();
   const { address: TronAddress, connected, wallet } = useWallet();
-  const [ aprrovetoken, setAprrovetoken ] = useState(false);
-  const [getTronnetwork, settronNetwork ] = useState();
+  const [aprrovetoken, setAprrovetoken] = useState(false);
+  const [getTronnetwork, settronNetwork] = useState();
 
   const sendTweet = () => {
     console.log("tweeting");
@@ -54,14 +55,16 @@ function ExecuteToken(props) {
   useEffect(() => {
     console.log("chainid....");
     const getChainId = async () => {
-      const { tronWeb } = window;
-      const adapter = new TronLinkAdapter();
-      let net = await adapter.network();
-      console.log(net);
-      console.log(net.networkType);
-      const tronnetwork = net.networkType;
-      settronNetwork(tronnetwork);
-      console.log(settronNetwork);
+      if (typeof window !== "undefined") {
+        const { tronWeb } = window;
+        const adapter = new TronLinkAdapter();
+        let net = await adapter.network();
+        console.log(net);
+        console.log(net.networkType);
+        const tronnetwork = net.networkType;
+        settronNetwork(tronnetwork);
+        console.log(settronNetwork);
+      }
     };
     getChainId();
   }, []);

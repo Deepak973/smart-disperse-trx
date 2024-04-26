@@ -1,3 +1,4 @@
+"use client";
 import { ethers } from "ethers";
 import ERC20ABI from "@/artifacts/contracts/ERC20.sol/ERC20.json";
 import contracts from "@/Helpers/ContractAddresses.js";
@@ -38,17 +39,19 @@ export const approveToken = async (amount, tokenContractAddress, chainId) => {
 export const tronapprovetoken = async (amount, tokenContractAddress) => {
   console.log("Aprroving trc token");
   const TroncontractAddress = "TSijZfgARceZzHGBU14GcfQuDSsQhZtVdh";
-  const { tronWeb } = window;
-  if (tronWeb) {
-    try {
-      let con = await tronWeb.contract(ERC20ABI.abi, tokenContractAddress);
-      const tx = await con.approve(TroncontractAddress, amount).send();
-      // await tx.wait();
-      console.log(`${amount} tokens Approved`);
-      return true;
-    } catch (error) {
-      console.error("Error Approving token:", error);
-      return false;
+  if (typeof window !== "undefined") {
+    const { tronWeb } = window;
+    if (tronWeb) {
+      try {
+        let con = await tronWeb.contract(ERC20ABI.abi, tokenContractAddress);
+        const tx = await con.approve(TroncontractAddress, amount).send();
+        // await tx.wait();
+        console.log(`${amount} tokens Approved`);
+        return true;
+      } catch (error) {
+        console.error("Error Approving token:", error);
+        return false;
+      }
     }
   }
 };

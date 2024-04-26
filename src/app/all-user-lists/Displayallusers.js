@@ -22,6 +22,10 @@ import notfound from "../../Assets/oops.webp";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 
 function Displayallusers() {
   const [usersData, setUsersData] = useState([]);
@@ -32,19 +36,16 @@ function Displayallusers() {
   const [isLoading, setIsLoading] = useState(true); // State for tracking loading
   const { openConnectModal } = useConnectModal();
   const { isConnected } = useAccount();
-  useEffect(() => {
-    const handleClick = () => {
-      if (!isConnected) {
-        openConnectModal();
-      }
-    };
-    window.addEventListener("click", handleClick);
-    return () => {
-      window.removeEventListener("click", handleClick);
-    };
-  }, [isConnected, openConnectModal]);
+  const { address: Tronaddress, connected } = useWallet();
 
   const fetchUserDetails = async () => {
+    let addressToPass = "";
+    if (Tronaddress) {
+      addressToPass = Tronaddress;
+    }
+    if (address) {
+      addressToPass = address;
+    }
     console.log(address);
     try {
       console.log("entered into try block");
@@ -64,10 +65,10 @@ function Displayallusers() {
     }
   };
   useEffect(() => {
-    if (address) {
+    if (address || Tronaddress) {
       fetchUserDetails();
     }
-  }, [address]);
+  }, [address, Tronaddress]);
 
   const handleEdit = (index) => {
     setEditUserIndex(index);

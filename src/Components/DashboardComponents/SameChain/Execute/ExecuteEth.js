@@ -25,7 +25,6 @@ import {
 import { TronContractInstance } from "@/Helpers/troncontractinstance";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
 
-
 const ConfettiScript = () => (
   <Head>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.1/confetti.min.js"></script>
@@ -41,8 +40,7 @@ function ExecuteEth(props) {
   const [tweetModalIsOpen, setTweetModalIsOpen] = useState(false);
   const chainId = useChainId();
   const { address: TronAddress, connected, wallet } = useWallet();
-  const [getTronnetwork, settronNetwork ] = useState();
-
+  const [getTronnetwork, settronNetwork] = useState();
 
   const sendTweet = () => {
     console.log("tweeting");
@@ -55,18 +53,19 @@ function ExecuteEth(props) {
   useEffect(() => {
     // console.log("chainid....");
     const getChainId = async () => {
-      const { tronWeb } = window;
-      const adapter = new TronLinkAdapter();
-      let net = await adapter.network();
-      // console.log(net);
-      // console.log(net.networkType);
-      const tronnetwork = net.networkType;
-      settronNetwork(tronnetwork);
-      // console.log(settronNetwork);
+      if (typeof window !== "undefined") {
+        const { tronWeb } = window;
+        const adapter = new TronLinkAdapter();
+        let net = await adapter.network();
+        // console.log(net);
+        // console.log(net.networkType);
+        const tronnetwork = net.networkType;
+        settronNetwork(tronnetwork);
+        // console.log(settronNetwork);
+      }
     };
     getChainId();
   }, []);
-
 
   const execute = async () => {
     setPaymentmodal(true);
@@ -103,7 +102,7 @@ function ExecuteEth(props) {
 
           const receipt = await txsendPayment.wait();
           props.setLoading(false);
-      setSuccess(true);
+          setSuccess(true);
           let blockExplorerURL = await getExplorer();
           setMessage(
             <div
@@ -128,20 +127,20 @@ function ExecuteEth(props) {
             });
             // console.log(tx)
             // console.log("successful")
-          props.setLoading(false);
-          setModalIsOpen(true);
-      setSuccess(true);
-      const link = `https://${getTronnetwork}.tronscan.org/#/transaction/${tx}`;
-                // console.log(link);
-                setMessage(
-                  <div
-                    className={textStyle.Link}
-                    dangerouslySetInnerHTML={{
-                      __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
-                    }}
-                  />
-                );
-          console.log("successful")
+            props.setLoading(false);
+            setModalIsOpen(true);
+            setSuccess(true);
+            const link = `https://${getTronnetwork}.tronscan.org/#/transaction/${tx}`;
+            // console.log(link);
+            setMessage(
+              <div
+                className={textStyle.Link}
+                dangerouslySetInnerHTML={{
+                  __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
+                }}
+              />
+            );
+            console.log("successful");
           } catch (e) {
             console.log("error", e);
           }

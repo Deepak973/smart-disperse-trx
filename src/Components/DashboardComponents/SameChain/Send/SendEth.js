@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Textify from "../Type/Textify";
 import Listify from "../Type/Listify";
@@ -20,7 +21,7 @@ import {
   useWallet,
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
-import { BigNumber } from 'ethers';
+import { BigNumber } from "ethers";
 
 function SendEth({ activeTab, listData, setListData }) {
   const [ethToUsdExchangeRate, setEthToUsdExchangeRate] = useState(null); //store ETH to USD exchange rate
@@ -109,15 +110,17 @@ function SendEth({ activeTab, listData, setListData }) {
   };
 
   const getTrxBalance = async (address) => {
-    const { tronWeb } = window;
+    if (typeof window !== "undefined") {
+      const { tronWeb } = window;
 
-    if (TronAddress) {
-      // Fetch TRX balance
-      const trxBalance = await tronWeb.trx.getBalance(address);
-      let balance = ethers.utils.parseUnits(String(trxBalance), 0);
-      console.log(balance);
-      console.log(trxBalance);
-      setEthBalance(balance);
+      if (TronAddress) {
+        // Fetch TRX balance
+        const trxBalance = await tronWeb.trx.getBalance(address);
+        let balance = ethers.utils.parseUnits(String(trxBalance), 0);
+        console.log(balance);
+        console.log(trxBalance);
+        setEthBalance(balance);
+      }
     }
   };
 
@@ -161,7 +164,7 @@ function SendEth({ activeTab, listData, setListData }) {
   }, [totalEth]);
 
   const calculateRemaining = () => {
-    console.log("calculating...")
+    console.log("calculating...");
     console.log(ethBalance, totalEth);
     if (address) {
       if (ethBalance && totalEth) {
@@ -181,7 +184,7 @@ function SendEth({ activeTab, listData, setListData }) {
       setRemaining(null);
     }
   };
-  
+
   const fetchUserDetails = async () => {
     try {
       const result = await fetch(
@@ -223,15 +226,15 @@ function SendEth({ activeTab, listData, setListData }) {
   const onAddLabel = async (index, recipientAddress) => {
     console.log(address);
     const userData = {
-      userid: address,
+      userid: address ? address : TronAddress,
       name: labels[index],
-      address: recipientAddress.toLowerCase(),
+      address: recipientAddress,
     };
     console.log(userData);
     try {
       // console.log("entered into try block");
       let result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`,
+        `http://localhost:3000/api/all-user-data?address=${recipientAddress}`,
         {
           method: "POST",
           body: JSON.stringify(userData),

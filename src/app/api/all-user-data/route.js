@@ -23,6 +23,7 @@ export const smartdisperse_data =
 export async function GET(req) {
   let data = [];
   console.log("Connecting to MongoDB...");
+  console.log(process.env.MONGODB_URL);
   const { searchParams } = new URL(req.url);
   const address = searchParams.get("address");
   console.log(address);

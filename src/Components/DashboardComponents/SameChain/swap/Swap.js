@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import textStyle from "../Type/textify.module.css";
 import swapStyle from "./swap.module.css";
@@ -47,26 +48,28 @@ function Swap() {
 
   const fetchTronTokenBalance = async (tokenAddress) => {
     console.log("fetching");
-    const { tronWeb } = window;
-    try {
-      console.log(Tronaddress);
+    if (typeof window !== "undefined") {
+      const { tronWeb } = window;
+      try {
+        console.log(Tronaddress);
 
-      const tronTokenContractInstance = await tronWeb
-        .contract()
-        .at(tokenAddress);
-      console.log(tronTokenContractInstance);
-      const balance = await tronTokenContractInstance
-        .balanceOf(Tronaddress)
-        .call();
-      console.log(balance);
-      console.log(parseInt(balance, 10));
+        const tronTokenContractInstance = await tronWeb
+          .contract()
+          .at(tokenAddress);
+        console.log(tronTokenContractInstance);
+        const balance = await tronTokenContractInstance
+          .balanceOf(Tronaddress)
+          .call();
+        console.log(balance);
+        console.log(parseInt(balance, 10));
 
-      setTokenBalances((prevBalances) => ({
-        ...prevBalances,
-        [tokenAddress]: balance,
-      }));
-    } catch (error) {
-      console.error("Error fetching Tron token balance:", error);
+        setTokenBalances((prevBalances) => ({
+          ...prevBalances,
+          [tokenAddress]: balance,
+        }));
+      } catch (error) {
+        console.error("Error fetching Tron token balance:", error);
+      }
     }
   };
 

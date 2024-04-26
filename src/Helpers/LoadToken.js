@@ -1,3 +1,4 @@
+"use client";
 import { ethers } from "ethers";
 import ERC20ABI from "@/artifacts/contracts/ERC20.sol/ERC20.json";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
@@ -33,32 +34,34 @@ export const LoadToken = async (customTokenAddress, address) => {
 };
 
 export const TronLoadToken = async (customTokenAddress, address) => {
-  const { tronWeb } = window;
-  const adapter = new TronLinkAdapter();
-  let net = await adapter.network();
-  console.log("Networkkkkkkk", net);
+  if (typeof window !== "undefined") {
+    const { tronWeb } = window;
+    const adapter = new TronLinkAdapter();
+    let net = await adapter.network();
+    console.log("Networkkkkkkk", net);
 
-  if (tronWeb && customTokenAddress !== "") {
-    try {
-      const tokenContract = await tronWeb.contract().at(customTokenAddress);
-      const name = await tokenContract.name().call();
-      const symbol = await tokenContract.symbol().call();
-      const balance = await tokenContract.balanceOf(address).call();
-      const decimals = await tokenContract.decimals().call();
+    if (tronWeb && customTokenAddress !== "") {
+      try {
+        const tokenContract = await tronWeb.contract().at(customTokenAddress);
+        const name = await tokenContract.name().call();
+        const symbol = await tokenContract.symbol().call();
+        const balance = await tokenContract.balanceOf(address).call();
+        const decimals = await tokenContract.decimals().call();
 
-      return {
-        name,
-        symbol,
-        balance,
-        decimals,
-      };
-    } catch (error) {
-      console.log("loading token error", error.message);
+        return {
+          name,
+          symbol,
+          balance,
+          decimals,
+        };
+      } catch (error) {
+        console.log("loading token error", error.message);
+        return null;
+      }
+    } else {
+      console.log("TronWeb not available or customTokenAddress is empty");
       return null;
     }
-  } else {
-    console.log("TronWeb not available or customTokenAddress is empty");
-    return null;
   }
 };
 
