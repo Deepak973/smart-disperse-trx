@@ -268,19 +268,6 @@ function Navbar() {
                 <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
               )
         } */}
-            <span>
-              {" "}
-              {!TronConnected ? (
-                <ConnectButtonCustom isMainnet={isMainnet} />
-              ) : null}
-              {!isConnected ? <TronWallet /> : null}
-              {isConnected && TronConnected ? (
-                <>
-                  <ConnectButtonCustom isMainnet={isMainnet} />
-                  <TronWallet />{" "}
-                </>
-              ) : null}
-            </span>
 
             {/* {(isConnected || connected) ? (
               null
