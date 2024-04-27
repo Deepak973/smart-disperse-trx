@@ -25,7 +25,7 @@ function Swap() {
   const [toTokenAmount, setToTokenAmount] = useState("");
   const { address: Tronaddress, connected } = useWallet();
   const [currentSection, setCurrentSection] = useState("");
-
+  const [isSwapped, setIsSwapped] = useState(false);
   const tokenList = [
     { name: "USDC", address: "TEMVynQpntMqkPxP6wXTW2K7e4sM3cRmWz" },
     { name: "USDT", address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf" },
@@ -124,6 +124,7 @@ function Swap() {
   
     setFromTokenAmount(toTokenAmount);
     setToTokenAmount(fromTokenAmount);
+    setIsSwapped(!isSwapped);
   };
   
   
@@ -238,9 +239,12 @@ function Swap() {
                 margin: "0 auto",
               }}
             ></div> */}
-            <div className={swapStyle.swapbtndiv}>
-              <button onClick={handleSwap} className={swapStyle.swapbutton}><FontAwesomeIcon icon={faRetweet} /></button>
-            </div>
+           <div className={`${swapStyle.swaButton} ${isSwapped ? swapStyle.rotate : ""}`}>
+  <button className={swapStyle.swapButton} onClick={handleSwap}>
+    <FontAwesomeIcon icon={faRetweet} />
+  </button>
+</div>
+
             {/* "to" section start here */}
 
             <div className={swapStyle.tofromdiv}>

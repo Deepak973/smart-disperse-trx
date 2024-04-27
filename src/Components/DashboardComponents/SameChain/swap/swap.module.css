@@ -17,16 +17,28 @@
   border-radius: 10px;
 }
 
-.swapbutton:hover{
+.swapButton:hover{
   cursor: pointer;
-  opacity: 0.5;
+  /* opacity: 0.5; */
 }
-.swapbutton{
-  border: 1px solid white;
+.swapButton{
+  /* border: 1px solid white; */
+  border: none;
   background-color: transparent;
   font-size: 15px;
   border-radius: 25px;
   color: white;
+}
+
+.rotate {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+  
+}
+
+.rotateClockwise {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease; /* Add transition for smooth rotation */
 }
 
 .FromToMain {
