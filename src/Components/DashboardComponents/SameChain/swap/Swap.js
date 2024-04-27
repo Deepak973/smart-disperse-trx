@@ -12,6 +12,9 @@ import {
   useWallet,
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowsUpDown } from "@fortawesome/free-solid-svg-icons";
+
 
 function Swap() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -141,6 +144,7 @@ function Swap() {
       >
         <div className={swapStyle.maindivofswap}>
           <div className={swapStyle.swapMain}>
+            <div className={swapStyle.tofromdiv}>
             <div className={swapStyle.FromToMain}>
               <div className={swapStyle.swapCurrencyInput}>
                 <div className={swapStyle.FromMain}>
@@ -213,13 +217,18 @@ function Swap() {
             >
               price
             </div>
-            <div
+            </div>
+            {/* <div
               style={{
                 borderBottom: "1px solid white",
                 width: "95%",
                 margin: "0 auto",
               }}
-            ></div>
+            ></div> */}
+            <div className={swapStyle.swapbtndiv}>
+              <button className={swapStyle.swapbutton}><FontAwesomeIcon icon={faArrowsUpDown} /></button>
+            </div>
+            <div className={swapStyle.tofromdiv}>
             <div className={swapStyle.FromToMain}>
               <div className={swapStyle.swapCurrencyInput}>
                 <div className={swapStyle.FromMain}>
@@ -288,6 +297,7 @@ function Swap() {
               price
             </div>
             <div className={swapStyle.SwapBtnMain}></div>
+          </div>
           </div>
         </div>
       </div>
