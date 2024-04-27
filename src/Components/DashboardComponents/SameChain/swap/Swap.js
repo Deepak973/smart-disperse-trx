@@ -48,14 +48,13 @@ function Swap() {
       );
     }
   };
-
+  
   const fetchTronTokenBalance = async (tokenAddress) => {
     console.log("fetching");
     if (typeof window !== "undefined") {
       const { tronWeb } = window;
       try {
         console.log(Tronaddress);
-
         const tronTokenContractInstance = await tronWeb
           .contract()
           .at(tokenAddress);
