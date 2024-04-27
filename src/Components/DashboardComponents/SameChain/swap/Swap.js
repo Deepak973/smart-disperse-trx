@@ -13,7 +13,7 @@ import {
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsUpDown } from "@fortawesome/free-solid-svg-icons";
+import {  faRetweet } from "@fortawesome/free-solid-svg-icons";
 
 
 function Swap() {
@@ -117,6 +117,16 @@ function Swap() {
     }
   }, [isModalOpen, currentSection, selectedFromToken, selectedToToken]);
 
+  const handleSwap = () => {
+    const tempSelectedToken = selectedFromToken;
+    setSelectedFromToken(selectedToToken);
+    setSelectedToToken(tempSelectedToken);
+  
+    setFromTokenAmount(toTokenAmount);
+    setToTokenAmount(fromTokenAmount);
+  };
+  
+  
   return (
     <div>
       <div className={textStyle.titlesametexttextarea}>
@@ -144,6 +154,7 @@ function Swap() {
       >
         <div className={swapStyle.maindivofswap}>
           <div className={swapStyle.swapMain}>
+            {/* "from" section start here */}
             <div className={swapStyle.tofromdiv}>
             <div className={swapStyle.FromToMain}>
               <div className={swapStyle.swapCurrencyInput}>
@@ -218,6 +229,8 @@ function Swap() {
               price
             </div>
             </div>
+            {/* "from" section end here */}
+
             {/* <div
               style={{
                 borderBottom: "1px solid white",
@@ -226,8 +239,10 @@ function Swap() {
               }}
             ></div> */}
             <div className={swapStyle.swapbtndiv}>
-              <button className={swapStyle.swapbutton}><FontAwesomeIcon icon={faArrowsUpDown} /></button>
+              <button onClick={handleSwap} className={swapStyle.swapbutton}><FontAwesomeIcon icon={faRetweet} /></button>
             </div>
+            {/* "to" section start here */}
+
             <div className={swapStyle.tofromdiv}>
             <div className={swapStyle.FromToMain}>
               <div className={swapStyle.swapCurrencyInput}>
@@ -298,6 +313,8 @@ function Swap() {
             </div>
             <div className={swapStyle.SwapBtnMain}></div>
           </div>
+            {/* "to" section end here */}
+
           </div>
         </div>
       </div>
