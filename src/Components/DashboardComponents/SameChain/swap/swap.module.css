@@ -10,18 +10,32 @@
   padding: 1.8rem 1rem;
   /* border: 0.5px solid white; */
 }
+.disabledToken:hover {
+  cursor: no-drop;
+}
+.disabledToken {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 
-.tofromdiv{
+.tofromdiv {
   border: 1px solid white;
   /* margin: 15px 5px; */
   border-radius: 10px;
 }
 
-.swapButton:hover{
+.divimagemsgnotfound{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.swapButton:hover {
   cursor: pointer;
   /* opacity: 0.5; */
 }
-.swapButton{
+
+.swapButton {
   /* border: 1px solid white; */
   border: none;
   background-color: transparent;
@@ -30,17 +44,42 @@
   color: white;
 }
 
+.closemodalbtn:hover{
+  cursor: pointer;
+  opacity: 0.5;
+}
+
 .rotate {
   transform: rotate(180deg);
   transition: transform 0.3s ease;
-  
+}
+.rotates {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
 }
 
 .rotateClockwise {
   transform: rotate(180deg);
-  transition: transform 0.3s ease; /* Add transition for smooth rotation */
+  transition: transform 0.3s ease;
 }
 
+.clearbtn:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+.divtokenheadclear {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.clearbtn {
+  border: 1px solid #924afc;
+  padding: 5px 8px;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: transparent;
+  color: black;
+}
 .FromToMain {
   display: grid;
   grid-auto-rows: auto;
@@ -116,7 +155,7 @@
 #swapMaxbtn {
   height: 28px;
   background-color: white;
-  border:1px solid white;
+  border: 1px solid white;
   border-radius: 0.4rem;
   font-size: 12px;
   padding: 5px 10px;
@@ -125,8 +164,8 @@
   margin-right: 0.5rem;
   color: #924afc;
 }
-#swapMaxbtn:hover{
-opacity: 0.8;
+#swapMaxbtn:hover {
+  opacity: 0.8;
 }
 .TokenMain {
   -webkit-box-align: center;
@@ -177,59 +216,59 @@ opacity: 0.8;
   pointer-events: none;
 }
 
-
-.searchinputintoken{
-    width: 100%;
-    border-radius: 5px;
-    border: none;
-    margin: 20px 0px;
-    padding: 5px;
+.searchinputintoken {
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  margin: 20px 0px;
+  padding: 5px;
 }
 
-.tokenlistingdiv{
-    overflow-y: scroll;
-    height: 400px;
+.tokenlistingdiv {
+  overflow-y: scroll;
+  height: 400px;
 }
 
-.modalouterdiv{
+.modalouterdiv {
   margin: 100px;
   position: absolute;
-    inset: 40px;
-    border: 1px solid rgb(204, 204, 204);
-    background: rgb(255, 255, 255);
-    overflow: auto;
-    border-radius: 4px;
-    outline: none;
-    padding: 20px;
+  inset: 40px;
+  border: 1px solid rgb(204, 204, 204);
+  background: rgb(255, 255, 255);
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
 }
 
-#srchbar{
+#srchbar {
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
-.dropdownouter{
+.dropdownouter {
   height: 38vh;
   width: 100%;
   border: 1px solid rgba(0, 0, 0, 0.215);
+  border-radius: 5px;
 }
 
-.alldatatokendiv:hover{
+.alldatatokendiv:hover {
   background-color: rgba(0, 0, 0, 0.088);
   cursor: pointer;
 }
-.alldatatokendiv{
+.alldatatokendiv {
   padding: 15px;
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
-.balanceaddressdiv{
+.balanceaddressdiv {
   text-align: end;
 }
-.tokenbalanceinmodal{
+.tokenbalanceinmodal {
   font-size: 13px;
 }
 
-.tokenaddressinmodal{
-font-size: 10px;
+.tokenaddressinmodal {
+  font-size: 10px;
 }
