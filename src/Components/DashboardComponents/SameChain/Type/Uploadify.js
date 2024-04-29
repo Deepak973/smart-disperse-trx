@@ -27,7 +27,6 @@ function Uploadify({
   const [alladdresses, setAllAddresses] = useState([]);
   const [matchedData, setMatchedData] = useState([]);
   const [labels, setLabels] = useState([]);
-  const { address } = useAccount();
   const { address: TronAddress, connected, wallet } = useWallet();
 
   useEffect(() => {
@@ -37,15 +36,13 @@ function Uploadify({
   // Fetching all names and addresses stored in the database
   const fetchUserDetails = async () => {
     try {
-      const result = await fetch(`http://localhost:3000/api/all-user-data`);
+      const result = await fetch(`api/all-user-data`);
       const response = await result.json();
 
       const usersData = response.result;
-      const names = usersData.map((user) =>
-        user.name ? user.name.toLowerCase() : ""
-      );
+      const names = usersData.map((user) => (user.name ? user.name : ""));
       const addresses = usersData.map((user) =>
-        user.address ? user.address.toLowerCase() : ""
+        user.address ? user.address : ""
       );
       setAllNames(names);
       setAllAddresses(addresses);
@@ -109,7 +106,7 @@ function Uploadify({
               validValue
             ) {
               const recipientAddressFormatted =
-                parsedData[i]["Receiver Address"].toLowerCase();
+                parsedData[i]["Receiver Address"];
               const index = allAddresses.indexOf(recipientAddressFormatted);
               listData.push({
                 address: parsedData[i]["Receiver Address"],
@@ -121,7 +118,7 @@ function Uploadify({
               validValue
             ) {
               const recipientAddressFormatted =
-                parsedData[i]["Receiver Address"].toLowerCase();
+                parsedData[i]["Receiver Address"];
               const index = allAddresses.indexOf(recipientAddressFormatted);
               listData.push({
                 address: parsedData[i]["Receiver Address"],
@@ -219,26 +216,7 @@ function Uploadify({
   // Add a new row to the csvData array and reset the input fields
   const updateListData = () => {
     const newListData = [];
-    if (address) {
-      for (let i = 0; i < csvData.length; i++) {
-        if (tokenDecimal) {
-          var validValue = isValidTokenValue(
-            csvData[i]["Token Amount"],
-            tokenDecimal
-          );
-        } else {
-          var validValue = isValidValue(csvData[i]["Token Amount"]);
-        }
-
-        if (isValidAddress(csvData[i]["Receiver Address"]) && validValue) {
-          newListData.push({
-            address: csvData[i]["Receiver Address"],
-            value: validValue,
-          });
-        }
-      }
-      setListData(newListData);
-    } else if (TronAddress) {
+    if (TronAddress) {
       for (let i = 0; i < csvData.length; i++) {
         if (tokenDecimal) {
           var validValue = isValidTokenValue(

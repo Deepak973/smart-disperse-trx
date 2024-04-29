@@ -76,14 +76,14 @@ function Crosschaindashboard() {
 
     if (query) {
       filtered = filtered.filter((transaction) =>
-        transaction.recipient.toLowerCase().includes(query.toLowerCase())
+        transaction.recipient.includes(query)
       );
     }
 
     if (selectedToken !== "all") {
       filtered = filtered.filter(
         (transaction) =>
-          transaction.tokenName?.toLowerCase() === selectedToken.toLowerCase()
+          transaction.tokenName? === selectedToken
       );
     }
 
@@ -267,7 +267,7 @@ function Crosschaindashboard() {
     try {
       console.log("entered into try block");
       const result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`
+        `api/all-user-data?address=${address}`
       );
       const response = await result.json();
 

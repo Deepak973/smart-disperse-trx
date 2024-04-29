@@ -37,7 +37,7 @@ function Listify({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const dropdownRef = useRef(null);
   const { address: TronAddress, connected, wallet } = useWallet();
-  const { address } = useAccount();
+
   const closeErrorModal = () => {
     // console.log("clicked");
     setErrorModalIsOpen(false);
@@ -79,11 +79,11 @@ function Listify({
   };
 
   const handleNameChange = (e) => {
-    const enteredName = e.target.value.toLowerCase();
+    const enteredName = e.target.value;
 
     // Find suggestions based on the entered name
     const filteredSuggestions = allNames.filter((name) =>
-      name.toLowerCase().includes(enteredName)
+      name.includes(enteredName)
     );
     setNameSuggestions(filteredSuggestions);
     // Find the index of the entered name in the allNames array (case-insensitive)
@@ -118,25 +118,7 @@ function Listify({
     if (!/^\d/.test(amount)) {
       amount = amount.slice(1);
     }
-    if (address) {
-      if (!isValidValue(amount) && !isValidAddress(recipientAddress)) {
-        // console.log("Invalid address");
-        setErrorMessage("Incorrect details");
-        setErrorModalIsOpen(true);
-        return false;
-      }
-
-      if (!isValidValue(amount)) {
-        setErrorMessage("Invalid Eth Value");
-        setErrorModalIsOpen(true);
-        return false;
-      }
-      if (!isValidAddress(recipientAddress)) {
-        setErrorMessage("Invalid recipient Address");
-        setErrorModalIsOpen(true);
-        return false;
-      }
-    } else if (TronAddress) {
+    if (TronAddress) {
       if (!TronIsValidValue(amount) && !TronIsValidAddress(recipientAddress)) {
         // console.log("Invalid address");
         setErrorMessage("Incorrect details");
@@ -158,9 +140,6 @@ function Listify({
     if (tokenDecimal) {
       formData.value = isValidTokenValue(amount, tokenDecimal);
     } else {
-      if (address) {
-        formData.value = isValidValue(amount);
-      }
       if (TronAddress) {
         formData.value = TronIsValidValue(amount);
       }

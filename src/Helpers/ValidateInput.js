@@ -76,7 +76,7 @@ export const isContractAddress = async (address) => {
   const code = await provider.getCode(address);
   // If code is not empty, it's a contract address
   // console.log("code", code);
-  if (code.toLowerCase() === "0x") {
+  if (code === "0x") {
     // console.log("not a contract");
     return false;
   } else {

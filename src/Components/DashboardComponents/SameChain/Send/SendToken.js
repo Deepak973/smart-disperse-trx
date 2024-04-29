@@ -5,29 +5,21 @@ import Uploadify from "../Type/Uploadify";
 import { useState, useEffect } from "react";
 import textStyle from "../Type/textify.module.css";
 import { ethers } from "ethers";
-import { useAccount } from "wagmi";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ExecuteToken from "../Execute/ExecuteToken";
-import { LoadToken } from "@/Helpers/LoadToken.js";
+
 import { TronLoadToken } from "@/Helpers/LoadToken.js";
 
-import {
-  faCircleExclamation,
-  faTrashAlt,
-  faExclamationTriangle,
-  faTriangleExclamation,
-} from "@fortawesome/free-solid-svg-icons";
-import homeStyle from "@/Components/Homepage/landingpage.module.css";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+
 import Modal from "react-modal";
 import warning from "@/Assets/warning.webp";
 import Image from "next/image";
 import oopsimage from "@/Assets/oops.webp";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  useWallet,
-  WalletProvider,
-} from "@tronweb3/tronwallet-adapter-react-hooks";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 function SendToken({ activeTab, listData, setListData }) {
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
@@ -36,12 +28,12 @@ function SendToken({ activeTab, listData, setListData }) {
   const [nameErrorModalIsOpen, setNameErrorModalIsOpen] = useState(false);
   const [ethToUsdExchangeRate, setEthToUsdExchangeRate] =
     useState(null); /*/USD/ETH exchange rate */
-  const [totalERC20, setTotalERC20] =
+  const [totalTRC20, setTotalTRC20] =
     useState(null); /* Total ERC20 tokens in wallet */
   const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
-  const [ERC20Balance, setERC20Balance] =
+  const [TRC20Balance, setERC20Balance] =
     useState(null); /* User's ERC20 token balance */
-  const { address } = useAccount(); /*/User's Ethereum Address*/
+
   const [loading, setLoading] =
     useState(false); /* Loading indicator for sending transaction */
   const [customTokenAddress, setCustomTokenAddress] =
@@ -110,13 +102,13 @@ function SendToken({ activeTab, listData, setListData }) {
   };
 
   /*
-  For fetching the Exchnage rate of ETH to USD to display value in USD
+  For fetching the Exchnage rate of Trx to USD to display value in USD
   */
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
         const response = await fetch(
-          "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
+          "https://min-api.cryptocompare.com/data/price?fsym=TRX&tsyms=USD"
         );
         const data = await response.json();
         const rate = data.USD;
@@ -145,7 +137,7 @@ function SendToken({ activeTab, listData, setListData }) {
   // Function to load token details
   const loadToken = async () => {
     setRemaining(null);
-    setTotalERC20(null);
+    setTotalTRC20(null);
     setListData([]);
     if (customTokenAddress === "") {
       setErrorMessage("Please add token address");
@@ -162,9 +154,8 @@ function SendToken({ activeTab, listData, setListData }) {
         balance: null,
         decimals: null,
       };
-      if (address) {
-        tokenDetails = await LoadToken(customTokenAddress, address);
-      } else if (TronAddress) {
+
+      if (TronAddress) {
         tokenDetails = await TronLoadToken(customTokenAddress, TronAddress);
       }
       console.log(tokenDetails);
@@ -193,7 +184,7 @@ function SendToken({ activeTab, listData, setListData }) {
   const unloadToken = async () => {
     setTokenDetails(defaultTokenDetails);
     setRemaining(null);
-    setTotalERC20(null);
+    setTotalTRC20(null);
     setTokenLoaded(false);
     setListData([]);
   };
@@ -210,14 +201,14 @@ function SendToken({ activeTab, listData, setListData }) {
 
   const onAddLabel = async (index, recipientAddress) => {
     const userData = {
-      userid: address,
+      userid: TronAddress,
       name: labels[index],
-      address: recipientAddress.toLowerCase(),
+      address: recipientAddress,
     };
     console.log(userData);
     try {
       console.log("entered into try block");
-      let result = await fetch(`http://localhost:3000/api/all-user-data`, {
+      let result = await fetch(`api/all-user-data`, {
         method: "POST",
         body: JSON.stringify(userData),
       });
@@ -267,16 +258,16 @@ function SendToken({ activeTab, listData, setListData }) {
 
   useEffect(() => {
     const calculateTotal = () => {
-      let totalERC20 = ethers.BigNumber.from(0);
+      let totalTRC20 = ethers.BigNumber.from(0);
       if (listData.length > 0) {
         listData.forEach((data) => {
           console.log(data);
-          totalERC20 = totalERC20.add(data.value);
+          totalTRC20 = totalTRC20.add(data.value);
         });
       }
-      // console.log(totalERC20);
+      // console.log(totalTRC20);
 
-      setTotalERC20(totalERC20);
+      setTotalTRC20(totalTRC20);
     };
 
     calculateTotal();
@@ -284,12 +275,12 @@ function SendToken({ activeTab, listData, setListData }) {
 
   useEffect(() => {
     calculateRemaining();
-  }, [totalERC20]);
+  }, [totalTRC20]);
 
   const calculateRemaining = () => {
-    console.log(ERC20Balance, totalERC20);
-    if (ERC20Balance && totalERC20) {
-      const remaining = ERC20Balance.sub(totalERC20);
+    console.log(TRC20Balance, totalTRC20);
+    if (TRC20Balance && totalTRC20) {
+      const remaining = TRC20Balance.sub(totalTRC20);
       setRemaining(remaining);
     } else {
       setRemaining(null);
@@ -298,18 +289,14 @@ function SendToken({ activeTab, listData, setListData }) {
 
   const fetchUserDetails = async () => {
     try {
-      const result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`
-      );
+      const result = await fetch(`api/all-user-data?address=${TronAddress}`);
       const response = await result.json();
       console.log("Response from API:", response);
 
       const usersData = response.result;
-      const names = usersData.map((user) =>
-        user.name ? user.name.toLowerCase() : ""
-      );
+      const names = usersData.map((user) => (user.name ? user.name : ""));
       const addresses = usersData.map((user) =>
-        user.address ? user.address.toLowerCase() : ""
+        user.address ? user.address : ""
       );
       setAllNames(names);
       console.log("Addresses:", addresses);
@@ -323,11 +310,10 @@ function SendToken({ activeTab, listData, setListData }) {
   };
 
   useEffect(() => {
-    console.log(address);
-    if (address) {
+    if (TronAddress) {
       fetchUserDetails();
     }
-  }, [address]);
+  }, [TronAddress]);
   const setLabelValues = (index, name) => {
     const updatedLabels = [...labels]; // Create a copy of the labels array
     updatedLabels[index] = name; // Update the value at the specified index
@@ -701,9 +687,9 @@ function SendToken({ activeTab, listData, setListData }) {
                   <tr>
                     <td id={textStyle.fontsize10px}>
                       <div id="font-size-10px" className={textStyle.textAccSum}>
-                        {totalERC20
+                        {totalTRC20
                           ? (+ethers.utils.formatUnits(
-                              totalERC20,
+                              totalTRC20,
                               tokenDetails.decimals
                             )).toFixed(4)
                           : null}{" "}
@@ -726,9 +712,9 @@ function SendToken({ activeTab, listData, setListData }) {
                         letterSpacing: "1px",
                       }}
                     >
-                      {totalERC20
+                      {totalTRC20
                         ? `${(
-                            ethers.utils.formatUnits(totalERC20, 18) *
+                            ethers.utils.formatUnits(totalTRC20, 18) *
                             ethToUsdExchangeRate
                           ).toFixed(2)} $`
                         : null}
@@ -746,9 +732,9 @@ function SendToken({ activeTab, listData, setListData }) {
                           letterSpacing: "1px",
                         }}
                       >
-                        {ERC20Balance
+                        {TRC20Balance
                           ? (+ethers.utils.formatUnits(
-                              ERC20Balance,
+                              TRC20Balance,
                               tokenDetails.decimals
                             )).toFixed(4) +
                             " " +
@@ -799,8 +785,8 @@ function SendToken({ activeTab, listData, setListData }) {
             <ExecuteToken
               listData={listData}
               setListData={setListData}
-              ERC20Balance={ERC20Balance}
-              totalERC20={totalERC20}
+              TRC20Balance={TRC20Balance}
+              totalTRC20={totalTRC20}
               loading={loading}
               setLoading={setLoading}
               tokenDetails={tokenDetails}

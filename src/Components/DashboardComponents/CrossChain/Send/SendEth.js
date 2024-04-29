@@ -149,18 +149,14 @@ function SendEth({ activeTab, listData, setListData }) {
 
   const fetchUserDetails = async () => {
     try {
-      const result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`
-      );
+      const result = await fetch(`api/all-user-data?address=${address}`);
       const response = await result.json();
       console.log("Response from API:", response);
 
       const usersData = response.result;
-      const names = usersData.map((user) =>
-        user.name ? user.name.toLowerCase() : ""
-      );
+      const names = usersData.map((user) => (user.name ? user.name : ""));
       const addresses = usersData.map((user) =>
-        user.address ? user.address.toLowerCase() : ""
+        user.address ? user.address : ""
       );
       setAllNames(names);
       console.log("Addresses:", addresses);
@@ -190,12 +186,12 @@ function SendEth({ activeTab, listData, setListData }) {
     const userData = {
       userid: address,
       name: labels[index],
-      address: recipientAddress.toLowerCase(),
+      address: recipientAddress,
     };
     console.log(userData);
     try {
       console.log("entered into try block");
-      let result = await fetch(`http://localhost:3000/api/all-user-data`, {
+      let result = await fetch(`api/all-user-data`, {
         method: "POST",
         body: JSON.stringify(userData),
       });
@@ -224,9 +220,9 @@ function SendEth({ activeTab, listData, setListData }) {
     const updatedListData = await listData.map((item) => {
       if (
         (item.label === undefined || item.label === "") &&
-        addresses.includes(item.address.toLowerCase())
+        addresses.includes(item.address)
       ) {
-        const index = addresses.indexOf(item.address.toLowerCase());
+        const index = addresses.indexOf(item.address);
         console.log(index);
         item.label = names[index];
       }
@@ -286,7 +282,7 @@ function SendEth({ activeTab, listData, setListData }) {
                       className={textStyle.fontsize12px}
                       style={{ letterSpacing: "1px", padding: "8px" }}
                     >
-                      Amount(ETH)
+                      Amount(TRX)
                     </th>
                     <th
                       className={textStyle.fontsize12px}
@@ -317,7 +313,7 @@ function SendEth({ activeTab, listData, setListData }) {
                             id={textStyle.fontsize10px}
                             style={{ letterSpacing: "1px", padding: "8px" }}
                           >
-                            {data.address.toUpperCase()}
+                            {data.address}
                           </td>
                           <td
                             id={textStyle.fontsize10px}
@@ -462,7 +458,7 @@ function SendEth({ activeTab, listData, setListData }) {
               <thead className={textStyle.tableheadertextlist}>
                 <tr style={{ width: "100%", margin: "0 auto" }}>
                   <th className={textStyle.accountsummaryth}>
-                    Total Amount(ETH)
+                    Total Amount(TRX)
                   </th>
                   <th className={textStyle.accountsummaryth}>
                     Total Amount(USD)

@@ -6,29 +6,21 @@ import Uploadify from "../Type/Uploadify";
 import { useState, useEffect } from "react";
 import textStyle from "../Type/textify.module.css";
 import { ethers } from "ethers";
-import { useAccount } from "wagmi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import ExecuteEth from "../Execute/ExecuteEth";
-import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
-import { isContractAddress } from "@/Helpers/ValidateInput.js";
 import Modal from "react-modal";
 import warning from "@/Assets/warning.webp";
 import Image from "next/image";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  useWallet,
-  WalletProvider,
-} from "@tronweb3/tronwallet-adapter-react-hooks";
-import { BigNumber } from "ethers";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 function SendEth({ activeTab, listData, setListData }) {
   const [ethToUsdExchangeRate, setEthToUsdExchangeRate] = useState(null); //store ETH to USD exchange rate
-  const [totalEth, setTotalEth] = useState(null); // store total amount of Ether in the transaction
+  const [totalTrx, setTotalTrx] = useState(null); // store total amount of Ether in the transaction
   const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
-  const [ethBalance, setEthBalance] = useState(null); // store user's Ether balance
-  const { address } = useAccount(); /*/gather account data for current user */
+  const [trxBalance, setTrxBalance] = useState(null); // store user's Ether balance
   const [loading, setLoading] = useState(false); //indicate whether a request is being processed or not
   const [labels, setLabels] = useState([]);
   const [allNames, setAllNames] = useState([]);
@@ -78,12 +70,12 @@ function SendEth({ activeTab, listData, setListData }) {
     }
   };
 
-  // For fetching the Exchange rate of ETH to USD to display value in USD
+  // For fetching the Exchange rate of Trx to USD to display value in USD
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
         const response = await fetch(
-          "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
+          "https://min-api.cryptocompare.com/data/price?fsym=TRX&tsyms=USD"
         );
         const data = await response.json();
         const rate = data.USD;
@@ -98,28 +90,18 @@ function SendEth({ activeTab, listData, setListData }) {
 
   /* For getting the user Balance
    */
-  const getEthBalance = async () => {
-    const { ethereum } = window;
 
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    if (address) {
-      let ethBalance = await provider.getBalance(address);
-      console.log(ethBalance);
-      setEthBalance(ethBalance);
-    }
-  };
-
-  const getTrxBalance = async (address) => {
+  const getTrxBalance = async () => {
     if (typeof window !== "undefined") {
       const { tronWeb } = window;
 
       if (TronAddress) {
         // Fetch TRX balance
-        const trxBalance = await tronWeb.trx.getBalance(address);
+        const trxBalance = await tronWeb.trx.getBalance(TronAddress);
         let balance = ethers.utils.parseUnits(String(trxBalance), 0);
-        console.log(balance);
-        console.log(trxBalance);
-        setEthBalance(balance);
+        // console.log(balance);
+        // console.log(trxBalance);
+        setTrxBalance(balance);
       }
     }
   };
@@ -135,15 +117,15 @@ function SendEth({ activeTab, listData, setListData }) {
   */
   useEffect(() => {
     const calculateTotal = () => {
-      let totalEth = ethers.BigNumber.from(0);
+      let totalTrx = ethers.BigNumber.from(0);
       if (listData.length > 0) {
         listData.forEach((data) => {
           console.log(data.value);
-          totalEth = totalEth.add(data.value);
+          totalTrx = totalTrx.add(data.value);
         });
       }
 
-      setTotalEth(totalEth);
+      setTotalTrx(totalTrx);
     };
 
     calculateTotal();
@@ -151,32 +133,23 @@ function SendEth({ activeTab, listData, setListData }) {
 
   /* for getting values on render */
   useEffect(() => {
-    console.log(TronAddress);
-    if (address) {
-      getEthBalance();
-    } else if (TronAddress) {
+    if (TronAddress) {
       getTrxBalance();
     }
-  }, [address, TronAddress]);
+  }, [TronAddress]);
 
   useEffect(() => {
     calculateRemaining();
-  }, [totalEth]);
+  }, [totalTrx]);
 
   const calculateRemaining = () => {
     console.log("calculating...");
-    console.log(ethBalance, totalEth);
-    if (address) {
-      if (ethBalance && totalEth) {
-        const remaining = ethBalance.sub(totalEth);
-
-        setRemaining(ethers.utils.formatEther(remaining));
-      }
-    } else if (TronAddress) {
-      if (ethBalance && totalEth) {
-        // const totalTrx = ethers.utils.formatUnits(totalEth, 6);
-        console.log(ethBalance, totalEth);
-        const remaining = ethBalance.sub(totalEth);
+    console.log(trxBalance, totalTrx);
+    if (TronAddress) {
+      if (trxBalance && totalTrx) {
+        // const totalTrx = ethers.utils.formatUnits(totalTrx, 6);
+        console.log(trxBalance, totalTrx);
+        const remaining = trxBalance.sub(totalTrx);
 
         setRemaining(ethers.utils.formatUnits(remaining, 6));
       }
@@ -187,16 +160,12 @@ function SendEth({ activeTab, listData, setListData }) {
 
   const fetchUserDetails = async () => {
     try {
-      const result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`
-      );
+      const result = await fetch(`api/all-user-data?address=${TronAddress}`);
       const response = await result.json();
       const usersData = response.result;
-      const names = usersData.map((user) =>
-        user.name ? user.name.toLowerCase() : ""
-      );
+      const names = usersData.map((user) => (user.name ? user.name : ""));
       const addresses = usersData.map((user) =>
-        user.address ? user.address.toLowerCase() : ""
+        user.address ? user.address : ""
       );
       setAllNames(names);
 
@@ -210,11 +179,11 @@ function SendEth({ activeTab, listData, setListData }) {
   };
 
   useEffect(() => {
-    console.log(address);
-    if (address) {
+    console.log(TronAddress);
+    if (TronAddress) {
       fetchUserDetails();
     }
-  }, [address]);
+  }, [TronAddress]);
 
   const setLabelValues = (index, name) => {
     const updatedLabels = [...labels]; // Create a copy of the labels array
@@ -224,9 +193,8 @@ function SendEth({ activeTab, listData, setListData }) {
   };
 
   const onAddLabel = async (index, recipientAddress) => {
-    console.log(address);
     const userData = {
-      userid: address ? address : TronAddress,
+      userid: TronAddress,
       name: labels[index],
       address: recipientAddress,
     };
@@ -234,7 +202,7 @@ function SendEth({ activeTab, listData, setListData }) {
     try {
       // console.log("entered into try block");
       let result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${recipientAddress}`,
+        `api/all-user-data?address=${recipientAddress}`,
         {
           method: "POST",
           body: JSON.stringify(userData),
@@ -264,9 +232,9 @@ function SendEth({ activeTab, listData, setListData }) {
     const updatedListData = await listData.map((item) => {
       if (
         (item.label === undefined || item.label === "") &&
-        addresses.includes(item.address.toLowerCase())
+        addresses.includes(item.address)
       ) {
-        const index = addresses.indexOf(item.address.toLowerCase());
+        const index = addresses.indexOf(item.address);
         // console.log(index);
         item.label = names[index];
       }
@@ -324,7 +292,7 @@ function SendEth({ activeTab, listData, setListData }) {
                       className={textStyle.fontsize12px}
                       style={{ letterSpacing: "1px", padding: "8px" }}
                     >
-                      Amount(ETH)
+                      Amount(TRX)
                     </th>
                     <th
                       className={textStyle.fontsize12px}
@@ -354,7 +322,7 @@ function SendEth({ activeTab, listData, setListData }) {
                             id={textStyle.fontsize10px}
                             style={{ letterSpacing: "1px", padding: "8px" }}
                           >
-                            {data.address.toUpperCase()}
+                            {data.address}
                           </td>
                           <td
                             id={textStyle.fontsize10px}
@@ -420,9 +388,10 @@ function SendEth({ activeTab, listData, setListData }) {
                                 letterSpacing: "1px",
                               }}
                             >
-                              {`${(+ethers.utils.formatEther(
-                                data.value
-                              )).toFixed(9)} ETH`}
+                              {`${(+ethers.utils.formatUnits(
+                                data.value,
+                                6
+                              )).toFixed(6)} TRX`}
                             </div>
                           </td>
                           <td id="font-size-10px" style={{ padding: "8px" }}>
@@ -441,7 +410,7 @@ function SendEth({ activeTab, listData, setListData }) {
                               }}
                             >
                               {`${(
-                                ethers.utils.formatUnits(data.value, 18) *
+                                ethers.utils.formatUnits(data.value, 6) *
                                 ethToUsdExchangeRate
                               ).toFixed(2)} $`}
                             </div>
@@ -496,7 +465,7 @@ function SendEth({ activeTab, listData, setListData }) {
               <thead className={textStyle.tableheadertextlist}>
                 <tr style={{ width: "100%", margin: "0 auto" }}>
                   <th className={textStyle.accountsummaryth}>
-                    Total Amount(ETH)
+                    Total Amount(TRX)
                   </th>
                   <th className={textStyle.accountsummaryth}>
                     Total Amount(USD)
@@ -525,16 +494,9 @@ function SendEth({ activeTab, listData, setListData }) {
                         letterSpacing: "1px",
                       }}
                     >
-                      {address
-                        ? totalEth
-                          ? `${(+ethers.utils.formatEther(totalEth)).toFixed(
-                              9
-                            )} ETH`
-                          : null
-                        : null}
                       {TronAddress
-                        ? totalEth
-                          ? `${(+ethers.utils.formatUnits(totalEth, 6)).toFixed(
+                        ? totalTrx
+                          ? `${(+ethers.utils.formatUnits(totalTrx, 6)).toFixed(
                               6
                             )} TRX`
                           : null
@@ -558,9 +520,9 @@ function SendEth({ activeTab, listData, setListData }) {
                         letterSpacing: "1px",
                       }}
                     >
-                      {totalEth
+                      {totalTrx
                         ? `${(
-                            ethers.utils.formatUnits(totalEth, 18) *
+                            ethers.utils.formatUnits(totalTrx, 6) *
                             ethToUsdExchangeRate
                           ).toFixed(2)} $`
                         : null}
@@ -577,18 +539,10 @@ function SendEth({ activeTab, listData, setListData }) {
                         letterSpacing: "1px",
                       }}
                     >
-                      {address
-                        ? ethBalance
-                          ? `${(+ethers.utils.formatEther(ethBalance)).toFixed(
-                              9
-                            )} ETH`
-                          : null
-                        : null}
-
                       {TronAddress
-                        ? ethBalance
+                        ? trxBalance
                           ? `${(+ethers.utils.formatUnits(
-                              ethBalance,
+                              trxBalance,
                               6
                             )).toFixed(6)} TRX`
                           : null
@@ -617,11 +571,6 @@ function SendEth({ activeTab, listData, setListData }) {
                         fontSize: "12px",
                       }}
                     >
-                      {address
-                        ? remaining === null
-                          ? null
-                          : `${(+remaining).toFixed(9)} ETH`
-                        : null}
                       {TronAddress
                         ? remaining === null
                           ? null
@@ -653,8 +602,8 @@ function SendEth({ activeTab, listData, setListData }) {
           <ExecuteEth
             listData={listData}
             setListData={setListData}
-            ethBalance={ethBalance}
-            totalEth={totalEth}
+            trxBalance={trxBalance}
+            totalTrx={totalTrx}
             loading={loading}
             setLoading={setLoading}
           />

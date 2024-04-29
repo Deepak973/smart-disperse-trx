@@ -33,16 +33,14 @@ function Uploadify({
   // Fetching all names and addresses stored in the database
   const fetchUserDetails = async () => {
     try {
-      const result = await fetch(`http://localhost:3000/api/all-user-data`);
+      const result = await fetch(`api/all-user-data`);
       const response = await result.json();
       console.log("Response from API:", response);
 
       const usersData = response.result;
-      const names = usersData.map((user) =>
-        user.name ? user.name.toLowerCase() : ""
-      );
+      const names = usersData.map((user) => (user.name ? user.name : ""));
       const addresses = usersData.map((user) =>
-        user.address ? user.address.toLowerCase() : ""
+        user.address ? user.address : ""
       );
       setAllNames(names);
       setAllAddresses(addresses);
@@ -109,7 +107,7 @@ function Uploadify({
             ) {
               console.log("going in if");
               const recipientAddressFormatted =
-                parsedData[i]["Receiver Address"].toLowerCase();
+                parsedData[i]["Receiver Address"];
               const index = allAddresses.indexOf(recipientAddressFormatted);
               listData.push({
                 address: parsedData[i]["Receiver Address"],

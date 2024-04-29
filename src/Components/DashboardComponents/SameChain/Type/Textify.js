@@ -25,16 +25,16 @@ function Textify({
   const textareaRef = useRef(null);
   const [suggestionItemHeight, setSuggestionItemHeight] = useState(0);
   const dropdownRef = useRef(null);
-  const { address } = useAccount();
+
   const { address: TronAddress, connected, wallet } = useWallet();
 
   const handleInputChange = (e) => {
     const { value } = e.target;
     setTextValue(value);
     if (value.includes("@")) {
-      const searchTerm = value.split("@").pop().toLowerCase();
+      const searchTerm = value.split("@").pop();
       const filteredSuggestions = allNames.filter((name) =>
-        name.toLowerCase().includes(searchTerm)
+        name.includes(searchTerm)
       );
       setSuggestions(filteredSuggestions);
     } else {
@@ -113,28 +113,17 @@ function Textify({
     const lines = newTextValue.split("\n").filter((line) => line.trim() !== "");
     for (const line of lines) {
       const [recipientAddress, ...valueParts] = line.split(/[,= \t]+/);
-      const recipientAddressFormatted = recipientAddress.toLowerCase();
+      const recipientAddressFormatted = recipientAddress;
       const value = valueParts.join(" "); // Rejoin value parts in case it contains spaces
 
       if (value) {
         console.log(tokenDecimal);
 
         let validValue;
-        if (value.endsWith("$")) {
-          // Remove the "$" sign from the value
-          const numericValue = parseFloat(value.slice(0, -1));
-          // Divide the numeric value by the USD exchange rate
-          let convertedValue = numericValue / ethToUsdExchangeRate;
-          // Round the converted value to 18 decimal places
-          convertedValue = parseFloat(convertedValue.toFixed(18));
-          console.log("Converted value:", convertedValue); // Log the converted value
-          validValue = isValidValue(String(convertedValue)); // Convert to string
-        } else if (tokenDecimal) {
+        if (tokenDecimal) {
           validValue = isValidTokenValue(value, tokenDecimal);
         } else {
-          if (address) {
-            validValue = isValidValue(value);
-          } else if (TronAddress) {
+          if (TronAddress) {
             validValue = TronIsValidValue(value);
           }
         }
@@ -147,15 +136,7 @@ function Textify({
         }
 
         const index = allAddresses.indexOf(recipientAddressFormatted);
-        if (address) {
-          if (isValidAddress(recipientAddressFormatted)) {
-            updatedRecipients.push({
-              address: recipientAddressFormatted,
-              value: validValue,
-              label: allNames[index] ? allNames[index] : "",
-            });
-          }
-        }
+
         if (TronAddress) {
           if (TronIsValidAddress(recipientAddress)) {
             {

@@ -195,12 +195,12 @@ function SendToken({ activeTab, listData, setListData }) {
     const userData = {
       userid: address,
       name: labels[index],
-      address: recipientAddress.toLowerCase(),
+      address: recipientAddress,
     };
     console.log(userData);
     try {
       console.log("entered into try block");
-      let result = await fetch(`http://localhost:3000/api/all-user-data`, {
+      let result = await fetch(`api/all-user-data`, {
         method: "POST",
         body: JSON.stringify(userData),
       });
@@ -280,18 +280,14 @@ function SendToken({ activeTab, listData, setListData }) {
 
   const fetchUserDetails = async () => {
     try {
-      const result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`
-      );
+      const result = await fetch(`api/all-user-data?address=${address}`);
       const response = await result.json();
       console.log("Response from API:", response);
 
       const usersData = response.result;
-      const names = usersData.map((user) =>
-        user.name ? user.name.toLowerCase() : ""
-      );
+      const names = usersData.map((user) => (user.name ? user.name : ""));
       const addresses = usersData.map((user) =>
-        user.address ? user.address.toLowerCase() : ""
+        user.address ? user.address : ""
       );
       setAllNames(names);
       console.log("Addresses:", addresses);

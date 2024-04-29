@@ -279,15 +279,9 @@ function Samechaindashboard() {
     var filtered = transactionData;
     filtered = transactionData.filter(
       (transaction) =>
-        transaction.recipient
-          .toLowerCase()
-          .indexOf(searchQuery.toLowerCase()) !== -1 ||
-        (transaction.label &&
-          transaction.label.toLowerCase().indexOf(searchQuery.toLowerCase()) !==
-            -1) ||
-        transaction.transactionHash
-          .toLowerCase()
-          .indexOf(searchQuery.toLowerCase()) !== -1
+        transaction.recipient.indexOf(searchQuery) !== -1 ||
+        (transaction.label && transaction.label.indexOf(searchQuery) !== -1) ||
+        transaction.transactionHash.indexOf(searchQuery) !== -1
     );
 
     setFilteredTransactions(filtered);
@@ -330,9 +324,7 @@ function Samechaindashboard() {
 
   const fetchUserDetails = async () => {
     try {
-      const result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`
-      );
+      const result = await fetch(`api/all-user-data?address=${address}`);
       const response = await result.json();
       const alldata = response.result;
       const allNames = alldata.map((user) => user.name);
@@ -391,7 +383,7 @@ function Samechaindashboard() {
           if (ethData && ethData.length > 0) {
             console.log(ethData);
             for (let i = 0; i < ethData.length; i++) {
-              const recipientAddress = ethData[i].recipient.toLowerCase();
+              const recipientAddress = ethData[i].recipient;
               console.log(allNames, allAddress);
               const index = allAddress.findIndex(
                 (addr) => addr === recipientAddress
@@ -615,7 +607,7 @@ function Samechaindashboard() {
               <div className={popup.poolList}>
                 <div className={popup.upperPart}>
                   <div className={samechainStyle.popTitle}>
-                    Track your Native and ERC-20 token transfers with precision!
+                    Track your Native and TRC-20 token transfers with precision!
                   </div>
                   <div className={samechainStyle.popTitle}></div>
                   <div className={popup.total}>

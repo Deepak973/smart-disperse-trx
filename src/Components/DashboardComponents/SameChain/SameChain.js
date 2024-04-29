@@ -1,20 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "driver.js/dist/driver.css";
 import textStyle from "./Type/textify.module.css";
 import SendEth from "./Send/SendEth";
 import SendToken from "./Send/SendToken";
-import {
-  useWallet,
-  WalletProvider,
-} from "@tronweb3/tronwallet-adapter-react-hooks";
-
 
 function SameChain({ activeTab }) {
   const [isSendingEth, setIsSendingEth] = useState(true);
   const [isSendingToken, setIsSendingToken] = useState(false);
   const [listData, setListData] = useState([]);
-  const { address: TronAddress, connected, wallet } = useWallet();
+
   /*
   Funtion : To load SendEth component
   */
@@ -37,7 +32,7 @@ function SameChain({ activeTab }) {
   return (
     <>
       <div className={textStyle.divtocoversametextdi}>
-      {/* <div className={textStyle.divtocoversametextdiv}> */}
+        {/* <div className={textStyle.divtocoversametextdiv}> */}
         <div className={textStyle.divforwholetoken}>
           <div className={textStyle.titlesametexttextarea}>
             <h2
@@ -63,24 +58,13 @@ function SameChain({ activeTab }) {
             className={textStyle.sametextmain}
           >
             <div id="send-eth" className={textStyle.sendethdiv}>
-            {TronAddress ? (
-               <button
-               id={isSendingEth ? textStyle.truee : textStyle.falsee}
-               className={textStyle.buttontoaddformdata}
-               onClick={handleSendEthbuttonClick}
-             > 
-               Send TRX
-             </button>
-            ):(
               <button
-              id={isSendingEth ? textStyle.truee : textStyle.falsee}
-              className={textStyle.buttontoaddformdata}
-              onClick={handleSendEthbuttonClick}
-            > 
-              Send Eth
-            </button>
-            )}
-                
+                id={isSendingEth ? textStyle.truee : textStyle.falsee}
+                className={textStyle.buttontoaddformdata}
+                onClick={handleSendEthbuttonClick}
+              >
+                Send TRX
+              </button>
             </div>
 
             <div className={textStyle.importtokendiv}>

@@ -71,16 +71,16 @@ function ExecuteEth(props) {
     setPaymentmodal(true);
     props.setLoading(true);
 
-    if (!props.ethBalance.gt(props.totalEth)) {
+    if (!props.trxBalance.gt(props.totalTrx)) {
       props.setLoading(false);
       setLimitexceed("Insufficient ETH balance");
       setMessage(
         `Current ETH Balance is ${(+ethers.utils.formatEther(
-          props.ethBalance
+          props.trxBalance
         )).toFixed(
           9
         )}ETH & your Total Sending ETH Amount is ${(+ethers.utils.formatEther(
-          props.totalEth
+          props.totalTrx
         )).toFixed(9)} ETH `
       );
       setModalIsOpen(true);
@@ -94,36 +94,13 @@ function ExecuteEth(props) {
       }
 
       try {
-        if (!TronAddress) {
-          const con = await smartDisperseInstance(chainId);
-          const txsendPayment = await con.disperseEther(recipients, values, {
-            value: props.totalEth,
-          });
-
-          const receipt = await txsendPayment.wait();
-          props.setLoading(false);
-          setSuccess(true);
-          let blockExplorerURL = await getExplorer();
-          setMessage(
-            <div
-              className={textStyle.Link}
-              dangerouslySetInnerHTML={{
-                __html: `Your Transaction was successful. Visit <a href="https://${blockExplorerURL}/tx/${receipt.transactionHash}" target="_blank "   style={{ color: "white", textDecoration: "none" }}>here</a> for details.`,
-              }}
-            />
-          );
-        } else {
-          // console.log(recipients);
-          // console.log(props.totalEth);
-          // console.log("recepients", values, {
-          //   value: props.totalEth,
-          // });
+        if (TronAddress) {
           const con = await TronContractInstance();
           // console.log("object");
 
           try {
             let tx = await con.disperseTrx(recipients, values).send({
-              callValue: props.totalEth,
+              callValue: props.totalTrx,
             });
             // console.log(tx)
             // console.log("successful")

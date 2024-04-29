@@ -3,22 +3,17 @@ import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import navStyle from "../Navbar/navbar.module.css";
 import smartlogo from "../../Assets/logo.png";
-import ConnectButtonCustom from "../ConnectButton/ConnectButtonCustom";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import Cookies from "universal-cookie";
-import { useAccount } from "wagmi";
+// import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import jwt from "jsonwebtoken";
 import TronWallet from "../TronWallet/TronConnect";
-import {
-  useWallet,
-  WalletProvider,
-} from "@tronweb3/tronwallet-adapter-react-hooks";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { usePathname } from "next/navigation";
 
 function Navbar() {
-  const { isConnected, address } = useAccount();
   const { theme, setTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -67,34 +62,35 @@ function Navbar() {
       return false;
     }
   };
-  const createSign = async () => {
-    try {
-      const { ethereum } = window;
-      if (!ethereum) {
-        throw new Error("Metamask is not installed, please install!");
-      }
+  // const createSign = async () => {
+  //   try {
+  //     const { ethereum } = window;
+  //     if (!ethereum) {
+  //       throw new Error("Metamask is not installed, please install!");
+  //     }
 
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const message =
-        "sign this message to verify the ownership of your address";
+  //     const provider = new ethers.providers.Web3Provider(ethereum);
+  //     const signer = provider.getSigner();
+  //     const message =
+  //       "sign this message to verify the ownership of your address";
 
-      // Sign the message using MetaMask
-      const signature = await signer.signMessage(message);
+  //     // Sign the message using MetaMask
+  //     const signature = await signer.signMessage(message);
 
-      const jwtToken = await decodeSignature(signature, message);
-      if (jwtToken === null) {
-        console.log("Error while decoding signature");
-      } else {
-        const storetoken = await storeToken(jwtToken);
-        if (storetoken) {
-          window.location.reload();
-        }
-      }
-    } catch (e) {
-      console.log("error", e);
-    }
-  };
+  //     const jwtToken = await decodeSignature(signature, message);
+  //     if (jwtToken === null) {
+  //       console.log("Error while decoding signature");
+  //     } else {
+  //       const storetoken = await storeToken(jwtToken);
+  //       console.log(storetoken);
+  //       if (storetoken) {
+  //         window.location.reload();
+  //       }
+  //     }
+  //   } catch (e) {
+  //     console.log("error", e);
+  //   }
+  // };
 
   const TroncreateSign = async () => {
     try {
@@ -120,9 +116,9 @@ function Navbar() {
           console.log("Error while decoding signature");
         } else {
           const storetoken = await storeToken(jwtToken);
-          // if (storetoken) {
-          //   window.location.reload();
-          // }
+          if (storetoken) {
+            window.location.reload();
+          }
         }
       }
     } catch (e) {
@@ -131,23 +127,6 @@ function Navbar() {
   };
 
   const decodeSignature = async (signature, message) => {
-    if (isConnected) {
-      try {
-        // Decode the signature to get the signer's address
-        const signerAddress = ethers.utils.verifyMessage(message, signature);
-        console.log("Signer's address:", signerAddress, address);
-
-        if (signerAddress.toLowerCase() === address.toLowerCase()) {
-          // Normalize addresses and compare them
-          const jwtToken = generateJWTToken(signature, message);
-          return jwtToken;
-        }
-        return null;
-      } catch (e) {
-        console.error("Error decoding signature:", e);
-        return null;
-      }
-    }
     if (TronConnected) {
       try {
         // Decode the signature to get the signer's address
@@ -157,7 +136,7 @@ function Navbar() {
         );
         console.log("Signer's address:", base58Address, Tronaddress);
 
-        if (base58Address.toLowerCase() === Tronaddress.toLowerCase()) {
+        if (base58Address === Tronaddress) {
           // Normalize addresses and compare them
           const jwtToken = generateJWTToken(signature, message);
           return jwtToken;
@@ -206,23 +185,14 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (isConnected && !isHome) {
-      console.log("isConnected", isConnected);
-      const jwtToken = cookie.get("jwt_token");
-      console.log(jwtToken);
-      if (jwtToken === undefined || jwtToken === null) {
-        createSign();
-      }
-    }
     if (TronConnected && !isHome) {
-      console.log("isConnected", isConnected);
       const jwtToken = cookie.get("jwt_token");
       console.log(jwtToken);
       if (jwtToken === undefined || jwtToken === null) {
         TroncreateSign();
       }
     }
-  }, [isConnected, TronConnected]);
+  }, [TronConnected]);
 
   return (
     <div className={navStyle.navbarMain}>
@@ -240,33 +210,8 @@ function Navbar() {
           <></>
         ) : (
           <div className={navStyle.connectwalletbuttondiv}>
-            {isConnected && (
-              <label className={navStyle.toggle}>
-                <input
-                  type="checkbox"
-                  onChange={handelMainnet}
-                  checked={isMainnet}
-                />
-                <span className={navStyle.slider}></span>
-                <span
-                  className={navStyle.labels}
-                  data-on="Mainnet"
-                  data-off="TestNet"
-                ></span>
-              </label>
-            )}
             <span>
-              {" "}
-              {!TronConnected ? (
-                <ConnectButtonCustom isMainnet={isMainnet} />
-              ) : null}
-              {!isConnected ? <TronWallet /> : null}
-              {isConnected && TronConnected ? (
-                <>
-                  <ConnectButtonCustom isMainnet={isMainnet} />
-                  <TronWallet />{" "}
-                </>
-              ) : null}
+              <TronWallet />
             </span>
 
             {theme === "light" ? (

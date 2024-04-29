@@ -39,23 +39,13 @@ function Displayallusers() {
   const { address: Tronaddress, connected } = useWallet();
 
   const fetchUserDetails = async () => {
-    let addressToPass = "";
-    if (Tronaddress) {
-      addressToPass = Tronaddress;
-    }
-    if (address) {
-      addressToPass = address;
-    }
-    console.log(address);
     try {
       console.log("entered into try block");
-      const result = await fetch(
-        `http://localhost:3000/api/all-user-data?address=${address}`
-      );
+      const result = await fetch(`api/all-user-data?address=${Tronaddress}`);
       const response = await result.json();
       console.log("Response from API:", response);
       const filteredData = response.result.filter(
-        (user) => user.userid === address
+        (user) => user.userid === Tronaddress
       );
       console.log("Filtered data:", filteredData);
       setIsLoading(false);
@@ -65,10 +55,10 @@ function Displayallusers() {
     }
   };
   useEffect(() => {
-    if (address || Tronaddress) {
+    if (Tronaddress) {
       fetchUserDetails();
     }
-  }, [address, Tronaddress]);
+  }, [Tronaddress]);
 
   const handleEdit = (index) => {
     setEditUserIndex(index);
@@ -85,7 +75,7 @@ function Displayallusers() {
   const handleUpdate = async (index) => {
     try {
       console.log("entered into try block");
-      const result = await fetch(`http://localhost:3000/api/all-user-data`, {
+      const result = await fetch(`api/all-user-data`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +115,7 @@ function Displayallusers() {
   const handleDelete = async (index) => {
     try {
       const addressToDelete = usersData[index].address;
-      const result = await fetch(`http://localhost:3000/api/all-user-data`, {
+      const result = await fetch(`api/all-user-data`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
