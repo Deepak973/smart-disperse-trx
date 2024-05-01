@@ -195,22 +195,26 @@ function Navbar() {
   }, [TronConnected]);
 
   useEffect(() => {
-    console.log("chainid....");
     const getChainId = async () => {
       if (typeof window !== "undefined") {
         const { tronWeb } = window;
         const adapter = new TronLinkAdapter();
         let net = await adapter.network();
         console.log(net);
-        const tronnetwork = net.networkType;
-        console.log(tronnetwork);
-        setTronNetwortk(tronnetwork);
-        // settronNetwork(tronnetwork);
-        // console.log(settronNetwork);
+        const tronNetwork = net.networkType;
+        console.log(tronNetwork);
+        setTronNetwortk(tronNetwork);
+  
+        if (tronNetwork !== "Nile") {
+          setTronNetwortk("Wrong Network");
+          alert("Please connect to the Nile testnet, which we currently support. We will soon be launching Smart Disperse on the mainnet🚀");
+        }
       }
     };
+  
     getChainId();
   }, [Tronaddress]);
+  
   return (
     <div className={navStyle.navbarMain}>
       <div className={navStyle.divtoflexlogoconnectwallet}>
