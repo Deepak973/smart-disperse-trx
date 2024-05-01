@@ -76,22 +76,9 @@ function Sameswap({ activeTab, listData, setListData }) {
           </div>
         </div>
 
-        {issimpledisperse ? (
-          <SameChain
-            activeTab={activeTab}
-            // listData={listData}
-            // setListData={setListData}
-            issimpledisperse={issimpledisperse}
-            isswapdisperse={isswapdisperse}
-          />
-        ) : null}
+        {issimpledisperse ? <SameChain activeTab={activeTab} /> : null}
 
-        {isswapdisperse ? (
-          <Swap
-            issimpledisperse={issimpledisperse}
-            isswapdisperse={isswapdisperse}
-          />
-        ) : null}
+        {isswapdisperse ? <Swap activeTab={activeTab} /> : null}
       </div>
     </div>
   );

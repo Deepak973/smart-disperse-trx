@@ -2,44 +2,76 @@
 import React, { useState, useEffect } from "react";
 import textStyle from "../Type/textify.module.css";
 import swapStyle from "./swap.module.css";
+import Textify from "../Type/Textify";
+import Listify from "../Type/Listify";
+import Uploadify from "../Type/Uploadify";
 import text from "../../../../Assets/text-editor.png";
 import Image from "next/image";
 import down from "../../../../Assets/down.png";
 import Modal from "react-modal";
 import samechainStyle from "@/Components/Dashboard/samechaindashboard.module.css";
-import TronWeb from "tronweb";
-import {
-  useWallet,
-  WalletProvider,
-} from "@tronweb3/tronwallet-adapter-react-hooks";
+import { ethers } from "ethers";
+import { SunSwapInstance } from "@/Helpers/SunSwapInstance";
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRetweet, faXmark } from "@fortawesome/free-solid-svg-icons";
 import nodata from "@/Assets/nodata.png";
 import { formatUnits } from "ethers/lib/utils";
-function Swap() {
+import { TronIsValidValue } from "@/Helpers/ValidateInput";
+import { TronLoadToken } from "@/Helpers/LoadToken";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import ExecuteSwap from "../Execute/ExecuteSwap";
+
+function Swap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedFromToken, setSelectedFromToken] = useState(null);
   const [selectedToToken, setSelectedToToken] = useState(null);
   const [tokenBalances, setTokenBalances] = useState({});
-  const [fromTokenAmount, setFromTokenAmount] = useState("");
-  const [toTokenAmount, setToTokenAmount] = useState("");
-  const { address: Tronaddress, connected } = useWallet();
+  const [fromBalance, setFromBalance] = useState();
+  const [toBalance, setToBalance] = useState();
+  const [render, setIsRender] = useState(false);
+  const [labels, setLabels] = useState([]);
+  const { address: TronAddress, connected } = useWallet();
   const [currentSection, setCurrentSection] = useState("");
   const [isSwapped, setIsSwapped] = useState(false);
+  const [allNames, setAllNames] = useState([]);
+  const [allAddresses, setAllAddresses] = useState([]);
+  const [listData, setListData] = useState([]);
+  const [maximumSold, setMaximumSold] = useState();
+  const [transactionFees, setTransactionFees] = useState();
+
+  const defaultTokenDetails = {
+    name: null,
+    symbol: null,
+    balance: null,
+    decimals: null,
+  };
+  const [tokenDetails, setTokenDetails] = useState(defaultTokenDetails);
+
   const tokenList = [
     { name: "USDC", address: "TEMVynQpntMqkPxP6wXTW2K7e4sM3cRmWz" },
     { name: "USDT", address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf" },
   ];
   const [searchQuery, setSearchQuery] = useState("");
-  const handleMaxFromAmount = () => {
-    if (selectedFromToken) {
-      setFromTokenAmount(
-        parseInt(tokenBalances[selectedFromToken.address]),
-        16
-      );
-      console.log(tokenBalances[selectedFromToken.address]);
-    }
-  };
+  const [totalTRC20, setTotalTRC20] =
+    useState(null); /* Total ERC20 tokens in wallet */
+  const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
+  const [TRC20Balance, setTRC20Balance] = useState(null);
+  const [formData, setFormData] = useState({
+    fromTokenAmount: "",
+    toTokenAmount: "",
+  });
+  // const handleMaxFromAmount = () => {
+  //   if (selectedFromToken) {
+  //     console.log(fromBalance);
+  //     let value = ethers.utils.formatUnits(fromBalance, 6);
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       ["fromTokenAmount"]: value,
+  //     }));
+  //   }
+  // };
 
   // Function to filter tokens based on search query
   const filteredTokenList = tokenList.filter(
@@ -48,36 +80,23 @@ function Swap() {
       token.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleMaxToAmount = () => {
-    if (selectedToToken) {
-      setToTokenAmount(
-        parseInt(tokenBalances[selectedToToken.address]._hex, 16)
-      );
-    }
-  };
-
   const fetchTronTokenBalance = async (tokenAddress) => {
     console.log("fetching");
     if (typeof window !== "undefined") {
       const { tronWeb } = window;
       try {
-        console.log(Tronaddress);
+        console.log(TronAddress);
         const tronTokenContractInstance = await tronWeb
           .contract()
           .at(tokenAddress);
-        console.log(tronTokenContractInstance);
         const balance = await tronTokenContractInstance
-          .balanceOf(Tronaddress)
+          .balanceOf(TronAddress)
           .call();
         console.log(balance);
-        console.log(parseInt(balance, 10));
-
-        setTokenBalances((prevBalances) => ({
-          ...prevBalances,
-          [tokenAddress]: balance,
-        }));
+        return balance;
       } catch (error) {
         console.error("Error fetching Tron token balance:", error);
+        return null;
       }
     }
   };
@@ -86,12 +105,36 @@ function Swap() {
     setCurrentSection(section); // Set the current section when opening the modal
     setModalOpen(true);
   };
+  const handleDeleteRow = (index) => {
+    const updatedList = [...listData];
+    updatedList.splice(index, 1);
+    setListData(updatedList);
+  };
 
   const handleCloseModal = () => {
     setModalOpen(false);
   };
 
-  // const handleTokenSelection = async(token) => {
+  const fetchUserDetails = async () => {
+    try {
+      const result = await fetch(`api/all-user-data?address=${TronAddress}`);
+      const response = await result.json();
+      const usersData = response.result;
+      const names = usersData.map((user) => (user.name ? user.name : ""));
+      const addresses = usersData.map((user) =>
+        user.address ? user.address : ""
+      );
+      setAllNames(names);
+
+      setAllAddresses(addresses);
+
+      setLabels([]);
+      return { names, addresses };
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
   //   if (currentSection === "from") {
   //     setSelectedFromToken(token);
   //     await fetchTronTokenBalance(token.address);
@@ -111,26 +154,252 @@ function Swap() {
   };
 
   useEffect(() => {
-    console.log(".......");
-    if (isModalOpen && selectedFromToken) {
-      console.log("fffff");
-      fetchTronTokenBalance(selectedFromToken.address);
-      console.log(selectedFromToken.address);
-    } else if (isModalOpen && currentSection === "to" && selectedToToken) {
-      console.log("toooooo");
-      fetchTronTokenBalance(selectedToToken.address);
-      console.log(selectedToToken.address);
+    const fetchbalance = async () => {
+      console.log(".......");
+      if (selectedFromToken) {
+        let fromBalance = await fetchTronTokenBalance(
+          selectedFromToken.address
+        );
+        setFromBalance(fromBalance);
+      }
+    };
+    fetchbalance();
+  }, [selectedFromToken]);
+
+  useEffect(() => {
+    console.log(TronAddress);
+    if (TronAddress) {
+      fetchUserDetails();
     }
-  }, [isModalOpen, currentSection, selectedFromToken, selectedToToken]);
+  }, [TronAddress]);
+
+  useEffect(() => {
+    const fetchbalance = async () => {
+      console.log("calling");
+      if (selectedToToken) {
+        let toBalance = await fetchTronTokenBalance(selectedToToken.address);
+        setToBalance(toBalance);
+      }
+    };
+    fetchbalance();
+  }, [selectedToToken]);
+
+  useEffect(() => {
+    const calculateTotal = () => {
+      let totalTRC20 = ethers.BigNumber.from(0);
+      if (listData.length > 0) {
+        listData.forEach((data) => {
+          console.log(data);
+          totalTRC20 = totalTRC20.add(data.value);
+        });
+      }
+      // console.log(totalTRC20);
+
+      setTotalTRC20(totalTRC20);
+    };
+
+    calculateTotal();
+  }, [listData]);
+
+  useEffect(() => {
+    calculateRemaining();
+  }, [totalTRC20]);
+
+  const calculateRemaining = () => {
+    console.log(TRC20Balance, totalTRC20);
+    if (TRC20Balance && totalTRC20) {
+      const remaining = TRC20Balance.sub(totalTRC20);
+      setRemaining(remaining);
+    } else {
+      setRemaining(null);
+    }
+  };
+
+  const getAmountIn = async (value) => {
+    const con = await SunSwapInstance();
+    const amountIn = ethers.utils.parseUnits(value, 6);
+    console.log(amountIn);
+    if (selectedToToken?.address && selectedFromToken?.address) {
+      const outputAmount = await con
+        .getAmountsIn(amountIn, [
+          selectedFromToken.address,
+          selectedToToken.address,
+        ])
+        .call();
+      console.log(outputAmount["amounts"][0]);
+      const amountInFrom = ethers.utils.formatUnits(
+        outputAmount["amounts"][0],
+        6
+      );
+      console.log(amountInFrom);
+      setFormData((prevData) => ({
+        ...prevData,
+        ["fromTokenAmount"]: amountInFrom,
+      }));
+      const increasePercentage = 0.5 / 100;
+      const increaseAmount = parseFloat(amountInFrom) * increasePercentage;
+      const newAmount = parseFloat(amountInFrom) + increaseAmount;
+      const newAmountfixed = newAmount.toFixed(6);
+      console.log(newAmountfixed);
+      const maxSold = ethers.utils.parseUnits(newAmountfixed.toString(), 6);
+      console.log(maxSold);
+      setMaximumSold(maxSold);
+      const percentageToCalculate = 3;
+      const calculatedPercentage = (
+        (parseFloat(amountInFrom) * percentageToCalculate) /
+        100
+      ).toFixed(6);
+      const calculatedPercentageInSmallestUnit = ethers.utils.parseUnits(
+        calculatedPercentage.toString(),
+        6
+      );
+      console.log(calculatedPercentageInSmallestUnit);
+      setTransactionFees(calculatedPercentageInSmallestUnit);
+    }
+  };
+
+  //   const { name, value } = e.target;
+
+  //   console.log(name, value);
+  //   if (value == "") {
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       [name]: "",
+  //     }));
+  //   }
+  //   if (TronIsValidValue(value)) {
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       [name]: value,
+  //     }));
+  //     getAmountOut(value);
+  //   }
+  // };
+
+  const handleToInputChange = async (e) => {
+    const { name, value } = e.target;
+
+    console.log(name, value);
+    if (value == "") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: "",
+      }));
+    }
+    if (TronIsValidValue(value)) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+      getAmountIn(value);
+    }
+  };
 
   const handleSwap = () => {
     const tempSelectedToken = selectedFromToken;
+    const tempBalance = toBalance;
     setSelectedFromToken(selectedToToken);
     setSelectedToToken(tempSelectedToken);
+    setToBalance(fromBalance);
+    setFromBalance(tempBalance);
 
-    setFromTokenAmount(toTokenAmount);
-    setToTokenAmount(fromTokenAmount);
+    const e = {
+      target: {
+        name: "toTokenAmount",
+        value: formData.fromTokenAmount,
+      },
+    };
+    handleToInputChange(e);
+
     setIsSwapped(!isSwapped);
+  };
+
+  const renderComponent = (tab) => {
+    switch (tab) {
+      case "text":
+        return (
+          <Textify
+            listData={listData}
+            setListData={setListData}
+            allNames={allNames}
+            allAddresses={allAddresses}
+          />
+        );
+      case "list":
+        return (
+          <Listify
+            listData={listData}
+            setListData={setListData}
+            allNames={allNames}
+            allAddresses={allAddresses}
+          />
+        );
+      case "csv":
+        return (
+          <Uploadify
+            listData={listData}
+            setListData={setListData}
+            allNames={allNames}
+            allAddresses={allAddresses}
+          />
+        );
+      default:
+        return (
+          <Textify
+            listData={listData}
+            setListData={setListData}
+            allNames={allNames}
+            allAddresses={allAddresses}
+          />
+        );
+    }
+  };
+
+  const loadToken = async () => {
+    console.log("loading");
+    console.log(selectedToToken);
+    setRemaining(null);
+    setTotalTRC20(null);
+    setListData([]);
+    // if (selectedToToken === "") {
+    //   setErrorMessage("Please add token address");
+    //   setErrorModalIsOpen(true);
+    //   return;
+    // }
+
+    setTokenDetails(defaultTokenDetails);
+
+    try {
+      var tokenDetails = {
+        name: null,
+        symbol: null,
+        balance: null,
+        decimals: null,
+      };
+
+      if (TronAddress) {
+        tokenDetails = await TronLoadToken(
+          selectedToToken.address,
+          TronAddress
+        );
+      }
+      console.log(tokenDetails);
+      if (tokenDetails) {
+        setTokenDetails(tokenDetails);
+        const swapBalance = ethers.utils.parseUnits(
+          formData.toTokenAmount,
+          tokenDetails.decimals
+        );
+        setTRC20Balance(swapBalance);
+        console.log(swapBalance);
+      } else {
+        throw new Error("Token details not found"); // Throw error if token details are not found
+      }
+    } catch (error) {
+      console.log(error);
+      // setErrorMessage("Invalid Token Address"); // Set error message
+      // setErrorModalIsOpen(true); // Open modal
+    }
   };
 
   // Helper function to check if a token is selected in the "from" section
@@ -151,8 +420,10 @@ function Swap() {
   const handleClearSelection = () => {
     if (currentSection === "from") {
       setSelectedFromToken(null);
+      setFromBalance(null);
     } else if (currentSection === "to") {
       setSelectedToToken(null);
+      setToBalance(null);
     }
     handleCloseModal();
   };
@@ -190,22 +461,19 @@ function Swap() {
                   <div className={swapStyle.FromMain}>
                     <div className={swapStyle.FromBal}>
                       <div className={swapStyle.FromBalFlex}>
-                        <div className={swapStyle.From}>From</div>
+                        <div className={swapStyle.From}>From (estimated)</div>
                         <div className={swapStyle.Balance}>
-                          {selectedFromToken &&
-                          tokenBalances[selectedFromToken.address] !==
-                            undefined ? (
+                          {fromBalance && (
                             <div>
-                              Balance:{" "}
-                              {parseFloat(
-                                formatUnits(
-                                  tokenBalances[selectedFromToken.address],
-                                  6
-                                )
-                              ).toFixed(6)}
+                              Balance:
+                              {`${(+ethers.utils.formatUnits(
+                                fromBalance,
+                                6
+                              )).toFixed(6)} `}
+                              {selectedFromToken?.name
+                                ? selectedFromToken.name
+                                : null}
                             </div>
-                          ) : (
-                            <div>Balance: Loading...</div>
                           )}
                         </div>
                       </div>
@@ -215,23 +483,19 @@ function Swap() {
               </div>
               <div className={swapStyle.FromInputMain}>
                 <input
-                  type="number"
+                  type="text"
                   min="0"
                   step="0.01"
                   placeholder="Enter Amount"
                   className={swapStyle.swapInput}
-                  value={fromTokenAmount}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (/^\d*\.?\d+$/.test(value) || value === "") {
-                      setFromTokenAmount(value);
-                    }
-                  }}
+                  name="fromTokenAmount"
+                  value={formData.fromTokenAmount}
+                  readOnly
                 />
 
-                <button id={swapStyle.swapMaxbtn} onClick={handleMaxFromAmount}>
+                {/* <button id={swapStyle.swapMaxbtn} onClick={handleMaxFromAmount}>
                   Max
-                </button>
+                </button> */}
                 <button
                   className={swapStyle.TokenMain}
                   onClick={() => handleOpenModal("from")}
@@ -254,9 +518,7 @@ function Swap() {
                   padding: "0 0.75rem 0.75rem 1rem",
                   fontSize: "14px",
                 }}
-              >
-                price
-              </div>
+              ></div>
             </div>
             {/* "from" section end here */}
 
@@ -280,20 +542,17 @@ function Swap() {
                       <div className={swapStyle.FromBalFlex}>
                         <div className={swapStyle.From}>To</div>
                         <div className={swapStyle.Balance}>
-                          {selectedToToken &&
-                          tokenBalances[selectedToToken.address] !==
-                            undefined ? (
+                          {toBalance && (
                             <div>
-                              Balance:{" "}
-                              {parseFloat(
-                                formatUnits(
-                                  tokenBalances[selectedToToken.address],
-                                  6
-                                )
-                              ).toFixed(6)}
+                              Balance:
+                              {`${(+ethers.utils.formatUnits(
+                                toBalance,
+                                6
+                              )).toFixed(6)} `}{" "}
+                              {selectedToToken?.name
+                                ? selectedToToken.name
+                                : null}
                             </div>
-                          ) : (
-                            <div>Balance: Loading...</div>
                           )}
                         </div>
                       </div>
@@ -301,21 +560,17 @@ function Swap() {
                   </div>
                 </div>
               </div>
+              <div></div>
               <div className={swapStyle.FromInputMain}>
                 <input
-                  type="number"
+                  type="text"
                   min="0"
                   step="0.01"
                   placeholder="0.0"
                   className={swapStyle.swapInput}
-                  value={toTokenAmount}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Ensure only numeric input is accepted
-                    if (/^\d*\.?\d+$/.test(value) || value === "") {
-                      setToTokenAmount(value);
-                    }
-                  }}
+                  name="toTokenAmount"
+                  value={formData.toTokenAmount}
+                  onChange={handleToInputChange}
                 />
 
                 {/* <button id={swapStyle.swapMaxbtn} onClick={handleMaxToAmount}>
@@ -341,14 +596,340 @@ function Swap() {
                   padding: "0 0.75rem 0 1rem",
                   fontSize: "14px",
                 }}
-              >
-                price
-              </div>
+              ></div>
               <div className={swapStyle.SwapBtnMain}></div>
             </div>
             {/* "to" section end here */}
           </div>
         </div>
+      </div>
+      <div>
+        Max Sold :{" "}
+        {maximumSold
+          ? `${ethers.utils.formatUnits(maximumSold, 6)} ${
+              selectedFromToken.name
+            }`
+          : null}
+      </div>
+      <div>
+        Transaction Fees :{" "}
+        {transactionFees
+          ? `${ethers.utils.formatUnits(transactionFees, 6)} ${
+              selectedFromToken.name
+            }`
+          : null}
+      </div>
+
+      <button
+        id={textStyle.greenbackground}
+        className={textStyle.sendbutton}
+        onClick={() => {
+          setIsRender(true);
+          loadToken();
+        }}
+      >
+        {" "}
+        Add Recipients
+      </button>
+      {render ? renderComponent(activeTab) : null}
+      {listData.length > 0 ? (
+        <div>
+          <div className={textStyle.tablecontainer}>
+            <div
+              className={textStyle.titleforlinupsametext}
+              style={{ padding: "5px 0px" }}
+            >
+              <h2
+                style={{
+                  padding: "10px",
+                  letterSpacing: "1px",
+                  fontSize: "20px",
+                  fontWeight: "700",
+                }}
+              >
+                Your Transaction Lineup
+              </h2>
+            </div>
+            <div className={textStyle.scrollabletablecontainer}>
+              <table
+                className={textStyle.tabletextlist}
+                style={{ padding: "30px 20px" }}
+              >
+                <thead className={textStyle.tableheadertextlist}>
+                  <tr>
+                    <th
+                      className={textStyle.fontsize12px}
+                      style={{ letterSpacing: "1px", padding: "8px" }}
+                    >
+                      Receiver Address
+                    </th>
+                    <th
+                      className={textStyle.fontsize12px}
+                      style={{ letterSpacing: "1px", padding: "8px" }}
+                    >
+                      Label
+                    </th>
+                    <th
+                      className={textStyle.fontsize12px}
+                      style={{ letterSpacing: "1px", padding: "8px" }}
+                    >
+                      Amount({tokenDetails.symbol})
+                    </th>
+                    {/* <th
+                      className={textStyle.fontsize12px}
+                      style={{ letterSpacing: "1px", padding: "8px" }}
+                    >
+                      Amount(USD)
+                    </th> */}
+                    <th
+                      className={textStyle.fontsize12px}
+                      style={{ letterSpacing: "1px", padding: "8px" }}
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listData.length > 0
+                    ? listData.map((data, index) => (
+                        <tr key={index}>
+                          <td
+                            id={textStyle.fontsize10px}
+                            style={{ letterSpacing: "1px", padding: "8px" }}
+                          >
+                            {data.address}
+                          </td>
+                          <td
+                            id={textStyle.fontsize10px}
+                            style={{ letterSpacing: "1px", padding: "8px" }}
+                          >
+                            {data.label ? (
+                              data.label
+                            ) : (
+                              <>
+                                <input
+                                  type="text"
+                                  value={labels[index] ? labels[index] : ""}
+                                  style={{
+                                    borderRadius: "8px",
+                                    padding: "10px",
+                                    color: "white",
+                                    border: "none",
+                                    background:
+                                      "linear-gradient(90deg, rgba(97, 39, 193, .58) .06%, rgba(63, 47, 110, .58) 98.57%)",
+                                  }}
+                                  onChange={(e) => {
+                                    const inputValue = e.target.value;
+                                    // Regular expression to allow only alphanumeric characters without spaces
+                                    const regex = /^[a-zA-Z0-9]*$/;
+                                    if (
+                                      regex.test(inputValue) &&
+                                      inputValue.length <= 10
+                                    ) {
+                                      setLabelValues(index, inputValue);
+                                    }
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      onAddLabel(index, data.address);
+                                    }
+                                  }}
+                                />
+                                {/* <input
+                                    type="button"
+                                    onClick={(e) => {
+                                      onAddLabel(index, data.address);
+                                    }}
+                                  /> */}
+                              </>
+                            )}
+                          </td>
+                          <td
+                            id={textStyle.fontsize10px}
+                            style={{ padding: "8px" }}
+                          >
+                            <div
+                              id={textStyle.fontsize10px}
+                              style={{
+                                width: "fit-content",
+                                margin: "0 auto",
+                                background:
+                                  "linear-gradient(269deg, #0FF 2.32%, #1BFF76 98.21%)",
+                                color: "black",
+                                borderRadius: "10px",
+                                padding: "10px 10px",
+                                fontSize: "12px",
+                                letterSpacing: "1px",
+                              }}
+                            >
+                              {(+ethers.utils.formatUnits(
+                                data.value,
+                                tokenDetails.decimals
+                              )).toFixed(4)}{" "}
+                              {tokenDetails.symbol}
+                            </div>
+                          </td>
+                          {/* <td id="font-size-10px" style={{ padding: "8px" }}>
+                            <div
+                              id="font-size-10px"
+                              style={{
+                                width: "fit-content",
+                                margin: "0 auto",
+                                background:
+                                  "linear-gradient(90deg, #00d2ff 0%, #3a47d5 100%)",
+                                color: "white",
+                                borderRadius: "10px",
+                                padding: "10px 10px",
+                                fontSize: "12px",
+                                letterSpacing: "1px",
+                              }}
+                            >
+                              {`${(
+                                ethers.utils.formatUnits(data.value, 18) *
+                                ethToUsdExchangeRate
+                              ).toFixed(2)} $`}
+                            </div>
+                          </td> */}
+
+                          <td style={{ letterSpacing: "1px", padding: "8px" }}>
+                            <button
+                              className={textStyle.deletebutton}
+                              onClick={() => handleDeleteRow(index)}
+                            >
+                              <FontAwesomeIcon icon={faTrashAlt} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    : null}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {listData.length > 0 ? (
+        <div style={{ paddingBottom: "30px" }}>
+          <div className={textStyle.titleforaccountsummarytextsame}>
+            <h2
+              style={{
+                padding: "10px",
+                letterSpacing: "1px",
+                fontSize: "20px",
+                fontWeight: "700",
+              }}
+            >
+              Account Summary
+            </h2>
+          </div>
+          <div id={textStyle.tableresponsive}>
+            <table
+              className={`${textStyle["showtokentablesametext"]} ${textStyle["tabletextlist"]}`}
+            >
+              <thead className={textStyle.tableheadertextlist}>
+                <tr style={{ width: "100%", margin: "0 auto" }}>
+                  <th className={textStyle.accountsummaryth}>
+                    Total Amount({tokenDetails.symbol})
+                  </th>
+                  {/* <th className={textStyle.accountsummaryth}>
+                    Total Amount(USD)
+                  </th> */}
+                  <th className={textStyle.accountsummaryth}>Swap Balance</th>
+                  <th className={textStyle.accountsummaryth}>
+                    Remaining Balance
+                  </th>
+                </tr>
+              </thead>
+              <tbody className={textStyle.tbodytextifyaccsum}>
+                <tr>
+                  <td id={textStyle.fontsize10px}>
+                    <div id="font-size-10px" className={textStyle.textAccSum}>
+                      {totalTRC20
+                        ? (+ethers.utils.formatUnits(
+                            totalTRC20,
+                            tokenDetails.decimals
+                          )).toFixed(4)
+                        : null}{" "}
+                    </div>
+                  </td>
+
+                  <td id={textStyle.fontsize10px}>
+                    <div
+                      id="font-size-10px"
+                      style={{
+                        width: "fit-content",
+                        margin: "0 auto",
+                        color: "white",
+                        borderRadius: "10px",
+
+                        letterSpacing: "1px",
+                      }}
+                    >
+                      {TRC20Balance
+                        ? (+ethers.utils.formatUnits(
+                            TRC20Balance,
+                            tokenDetails.decimals
+                          )).toFixed(4) +
+                          " " +
+                          tokenDetails.symbol
+                        : null}
+                    </div>
+                  </td>
+                  <td
+                    id={textStyle.fontsize10px}
+                    className={`showtoken-remaining-balance ${
+                      remaining < 0 ? "showtoken-remaining-negative" : ""
+                    }`}
+                  >
+                    <div
+                      id={textStyle.fontsize10px}
+                      className="font-size-12px"
+                      style={{
+                        width: "fit-content",
+                        margin: "0 auto",
+                        background:
+                          remaining < 0
+                            ? "red"
+                            : "linear-gradient(269deg, #0FF 2.32%, #1BFF76 98.21%)",
+                        color: remaining < 0 ? "white" : "black",
+                        borderRadius: "10px",
+                        padding: "10px 10px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      {remaining === null
+                        ? null
+                        : (+ethers.utils.formatUnits(
+                            remaining,
+                            tokenDetails.decimals
+                          )).toFixed(4) +
+                          " " +
+                          tokenDetails.symbol}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+      <div>
+        {/* {listData.length > 0 ? (
+          <ExecuteSwap
+            listData={listData}
+            setListData={setListData}
+            TRC20Balance={TRC20Balance}
+            totalTRC20={totalTRC20}
+            loading={loading}
+            setLoading={setLoading}
+            tokenDetails={tokenDetails}
+            selectedFromToken={selectedFromToken}
+            selectedToToken={selectedToToken}
+            fromTokenAmount={formData.fromTokenAmount}
+            toTokenAmount={formData.toTokenAmount}
+            maximumSold={maximumSold}
+          />
+        ) : null} */}
       </div>
       {/* Modal */}
       <Modal
@@ -435,9 +1016,7 @@ function Swap() {
                           ).toFixed(6)}
                         </div>
                       ) : (
-                        <div className={swapStyle.tokenbalanceinmodal}>
-                          Loading...
-                        </div>
+                        <div className={swapStyle.tokenbalanceinmodal}></div>
                       )}
                       <div className={swapStyle.tokenaddressinmodal}>
                         {token.address}
@@ -450,7 +1029,6 @@ function Swap() {
           </div>
         </div>
       </Modal>
-      ;
     </div>
   );
 }
