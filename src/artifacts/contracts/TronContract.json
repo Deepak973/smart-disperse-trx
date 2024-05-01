@@ -1,158 +1,78 @@
 [
+  { "stateMutability": "Nonpayable", "type": "Constructor" },
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
     "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_sender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "contract ITRC20",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "_recipients",
-        "type": "address[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "_values",
-        "type": "uint256[]"
-      }
+      { "indexed": true, "name": "_token", "type": "address" },
+      { "indexed": true, "name": "_recipients", "type": "address[]" },
+      { "name": "_values", "type": "uint256[]" }
     ],
-    "name": "TRC20TokenDispersed",
-    "type": "event"
+    "name": "ERC20TokenDispersed",
+    "type": "Event"
   },
   {
-    "anonymous": false,
     "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_sender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address payable[]",
-        "name": "_recipients",
-        "type": "address[]"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256[]",
-        "name": "_values",
-        "type": "uint256[]"
-      }
+      { "indexed": true, "name": "_recipients", "type": "address[]" },
+      { "indexed": true, "name": "_values", "type": "uint256[]" }
     ],
     "name": "TrxDispersed",
-    "type": "event"
+    "type": "Event"
   },
   {
     "inputs": [
-      {
-        "internalType": "contract ITRC20",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_recipients",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_values",
-        "type": "uint256[]"
-      }
+      { "name": "_token", "type": "address" },
+      { "name": "_recipients", "type": "address[]" },
+      { "name": "_values", "type": "uint256[]" }
     ],
     "name": "disperseToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "stateMutability": "Nonpayable",
+    "type": "Function"
   },
   {
     "inputs": [
-      {
-        "internalType": "contract ITRC20",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_recipients",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_values",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "disperseTokenSimple",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address payable[]",
-        "name": "_recipients",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_values",
-        "type": "uint256[]"
-      }
+      { "name": "_recipients", "type": "address[]" },
+      { "name": "_values", "type": "uint256[]" }
     ],
     "name": "disperseTrx",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
+    "stateMutability": "Payable",
+    "type": "Function"
   },
   {
-    "inputs": [],
+    "outputs": [{ "type": "address" }],
     "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
+    "stateMutability": "View",
+    "type": "Function"
+  },
+  {
+    "inputs": [{ "name": "_sunSwapRouter", "type": "address" }],
+    "name": "setSunSwapRouter",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "outputs": [{ "type": "address" }],
+    "name": "sunSwapRouter",
+    "stateMutability": "View",
+    "type": "Function"
   },
   {
     "inputs": [
-      {
-        "internalType": "contract ITRC20",
-        "name": "_token",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
+      { "name": "_tokenAmount", "type": "uint256" },
+      { "name": "_path", "type": "address[]" },
+      { "name": "_amountInMax", "type": "uint256" },
+      { "name": "_recipients", "type": "address[]" },
+      { "name": "_values", "type": "uint256[]" }
     ],
-    "name": "withdrawTRC20Tokens",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "name": "swapAndDisperseTokenToToken",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
+  },
+  {
+    "inputs": [
+      { "name": "_token", "type": "address" },
+      { "name": "_amount", "type": "uint256" }
+    ],
+    "name": "withdrawERC20Tokens",
+    "stateMutability": "Nonpayable",
+    "type": "Function"
   }
 ]
