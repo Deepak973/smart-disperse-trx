@@ -15,6 +15,8 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+import ExecuteSwap from "../Execute/ExecuteSwap";
+import Swap from "../swap/Swap";
 
 function SendEth({ activeTab, listData, setListData }) {
   const [ethToUsdExchangeRate, setEthToUsdExchangeRate] = useState(null); //store ETH to USD exchange rate
@@ -608,6 +610,17 @@ function SendEth({ activeTab, listData, setListData }) {
             setLoading={setLoading}
           />
         ) : null}
+        {listData.length > 0 ? (
+          <Swap
+          listData={listData}
+          setListData={setListData}
+          trxBalance={trxBalance}
+          totalTrx={totalTrx}
+          loading={loading}
+          setLoading={setLoading}
+          />
+        ) : null}
+        
       </div>
     </>
   );

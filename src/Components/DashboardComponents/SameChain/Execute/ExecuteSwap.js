@@ -42,7 +42,8 @@ function ExecuteSwap(props) {
   const { address: TronAddress, connected, wallet } = useWallet();
   const [aprrovetoken, setAprrovetoken] = useState(false);
   const [getTronnetwork, settronNetwork] = useState();
-
+  const [loading, setLoading] = useState(false); //indicate whether a request is being processed or not
+  const [balancenosame, setBalancenotsame] = useState(false);
   const sendTweet = () => {
     console.log("tweeting");
     const tweetContent = `Just used @SmartDisperse to transfer to multiple accounts simultaneously across the same chain! Transferring to multiple accounts simultaneously has never been easier. Check out Smart Disperse at https://smartdisperse.xyz/ and simplify your crypto transfers today!`;
@@ -71,98 +72,99 @@ function ExecuteSwap(props) {
 
   const execute = async () => {
     setPaymentmodal(true);
-    console.log(props.listData);
-    props.setLoading(true);
-    if (!props.TRC20Balance.gt(props.totalTRC20)) {
-      props.setLoading(false);
-      setMessage(
-        `Insufficient Token balance. Your Token Balance is ${(+ethers.utils.formatUnits(
-          props.TRC20Balance,
-          props.tokenDetails.decimal
-        )).toFixed(4)} ${
-          props.tokenDetails.symbol
-        }   and you total sending Token amount is ${(+ethers.utils.formatUnits(
-          props.totalTRC20,
-          props.tokenDetails.decimal
-        )).toFixed(4)} ${props.tokenDetails.symbol} `
-      );
-      setModalIsOpen(true);
-      return;
-    } else {
-      var recipients = [];
-      var values = [];
-      for (let i = 0; i < props.listData.length; i++) {
-        recipients.push(props.listData[i]["address"]);
-        values.push(props.listData[i]["value"]);
-        console.log(props.listData[i]["value"]);
-      }
-      try {
-        if (TronAddress) {
-          // console.log("trc token here");
-          let fromTokenValue = ethers.utils.parseUnits(
-            formData.toTokenAmount,
-            6
-          );
-          const isTokenApproved = await tronapprovetoken(
-            fromTokenValue,
-            props.selectedFromToken
-          );
-          if (isTokenApproved) {
-            const con = await TronContractInstance();
-            // console.log("object");
-
-            try {
-              console.log(recipients, values);
-              // console.log("trying");
-              let path = [props.fromTokenAmount, props.toTokenAmount];
-              let toTokenValue = ethers.utils.parseUnits(
-                props.toTokenAmount,
-                6
-              );
-              let tx = await con
-                .swapAndDisperseTokenToToken(
-                  toTokenValue,
-                  path,
-                  maximumSold,
-                  recipients,
-                  values
-                )
-                .send();
-              // console.log("transaction hash:", tx);
-              // console.log("successful");
-
-              props.setLoading(false);
-              // console.log(getTronnetwork);
-              const link = `https://${getTronnetwork}.tronscan.org/#/transaction/${tx}`;
-              // console.log(link);
-              setMessage(
-                <div
-                  className={textStyle.Link}
-                  dangerouslySetInnerHTML={{
-                    __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
-                  }}
-                />
-              );
-              setModalIsOpen(true);
-              setSuccess(true);
-            } catch (e) {
-              console.log("error", e);
-            }
-          } else {
-            props.setLoading(false);
-            setMessage("Approval Rejected");
-            setModalIsOpen(true);
-            return;
-          }
-        }
-      } catch (e) {
-        props.setLoading(false);
-        console.log("error", e);
-        setMessage("Transaction Rejected");
+    setMessage("not equal");
+    setLoading(true);
+     
+      if (!props.TRC20Balance.gt(props.totalTRC20)) {
+        if (props.fromTokenAmount !== props.toTokenAmount) {
+          setBalancenotsame(true);
+          setLoading(false);
+          setMessage("not equal")
+          setModalIsOpen(true);
+          return;
+        } else {
+        setLoading(false);
+        setMessage(
+          `Insufficient Token balance. Your Token Balance is ${(+ethers.utils.formatUnits(
+            props.TRC20Balance,
+            props.tokenDetails.decimal
+          )).toFixed(4)} ${
+            props.tokenDetails.symbol
+          }   and your total sending Token amount is ${(+ethers.utils.formatUnits(
+            props.totalTRC20,
+            props.tokenDetails.decimal
+          )).toFixed(4)} ${props.tokenDetails.symbol} `
+        );
         setModalIsOpen(true);
         return;
       }
-    }
+      } else {
+        var recipients = [];
+        var values = [];
+        for (let i = 0; i < props.listData.length; i++) {
+          recipients.push(props.listData[i]["address"]);
+          values.push(props.listData[i]["value"]);
+          console.log(props.listData[i]["value"]);
+        }
+        try {
+          if (TronAddress) {
+            let fromTokenValue = ethers.utils.parseUnits(
+              props.fromTokenAmount,
+              6
+            );
+            const isTokenApproved = await tronapprovetoken(
+              fromTokenValue,
+              props.selectedFromToken.address
+            );
+            if (isTokenApproved) {
+              const con = await TronContractInstance();
+              try {
+                console.log(recipients, values);
+                let path = [props.fromTokenAmount, props.toTokenAmount];
+                let toTokenValue = ethers.utils.parseUnits(
+                  props.toTokenAmount,
+                  6
+                );
+                let tx = await con
+                  .swapAndDisperseTokenToToken(
+                    toTokenValue,
+                    path,
+                    maximumSold,
+                    recipients,
+                    values
+                  )
+                  .send();
+                setLoading(false);
+                const link = `https://${getTronnetwork}.tronscan.org/#/transaction/${tx}`;
+                setMessage(
+                  <div
+                    className={textStyle.Link}
+                    dangerouslySetInnerHTML={{
+                      __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
+                    }}
+                  />
+                );
+                setModalIsOpen(true);
+                setSuccess(true);
+              } catch (e) {
+                console.log("error", e);
+              }
+            } else {
+              setLoading(false);
+              setMessage("Approval Rejected");
+              setModalIsOpen(true);
+              return;
+            }
+          }
+        } catch (e) {
+          setLoading(false);
+          console.log("error", e);
+          setMessage("Transaction Rejected");
+          setModalIsOpen(true);
+          return;
+        }
+      }
+    
   };
 
   // Function to get explorer URL based on chain
@@ -222,9 +224,9 @@ function ExecuteSwap(props) {
         onClick={() => {
           execute();
         }}
-        disabled={props.loading}
+        disabled={loading}
       >
-        {props.loading ? (
+        {loading ? (
           <div>
             <Modal
               className={textStyle.popupforpayment}
@@ -241,7 +243,6 @@ function ExecuteSwap(props) {
           "Begin Payment"
         )}
       </button>
-      {/* Modal for displaying transaction status */}
       <Modal
         className={textStyle.popupforpayment}
         isOpen={isModalIsOpen}
@@ -284,6 +285,11 @@ function ExecuteSwap(props) {
               )}
             </div>
             <p>{success ? "" : "Please Try again"}</p>
+            {balancenosame ? (
+              <div className={textStyle.errormessagep}>
+                Swap balance and total amount must be equal
+              </div>
+            ) : null}
             <p className={textStyle.errormessagep}>{limitexceed}</p>
             <div className={textStyle.divtocenter}>
               <button style={{ margin: "0px 5px" }} onClick={sendTweet}>
@@ -305,6 +311,7 @@ function ExecuteSwap(props) {
             <h2>Notice</h2>
             {/* <p>{alertMessage}</p> */}
             <div className={textStyle.divtocenter}>
+              
               <button onClick={() => setModalIsOpen(false)}>Close</button>
             </div>
           </>

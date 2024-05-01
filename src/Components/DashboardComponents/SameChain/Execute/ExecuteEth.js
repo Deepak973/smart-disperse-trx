@@ -70,6 +70,7 @@ function ExecuteEth(props) {
   const execute = async () => {
     setPaymentmodal(true);
     props.setLoading(true);
+    
 
     if (!props.trxBalance.gt(props.totalTrx)) {
       props.setLoading(false);
