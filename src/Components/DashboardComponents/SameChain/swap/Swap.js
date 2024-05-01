@@ -22,6 +22,9 @@ import { TronIsValidValue } from "@/Helpers/ValidateInput";
 import { TronLoadToken } from "@/Helpers/LoadToken";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import ExecuteSwap from "../Execute/ExecuteSwap";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+
 
 function Swap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -62,6 +65,49 @@ function Swap({ activeTab }) {
     fromTokenAmount: "",
     toTokenAmount: "",
   });
+
+  useEffect(() => {
+    const hasVisitedhereBefore = document.cookie.includes("visitedd=true"); //Checks if user has visited the page
+    if (!hasVisitedhereBefore) {
+      document.cookie = "visited=true; max-age=31536000"; 
+      const driverObj = driver({
+        overlayColor: "#00000094",
+        popoverClass: ` ${samechainStyle.driverpopover01}`,
+        showProgress: true,
+        steps: [
+          {
+            element: "#first",
+            popover: {
+              title: "Select token",
+              description: "select the token you want in swapping",
+              side: "right",
+              align: "start",
+            },
+          },
+          {
+            element: "#second",
+            popover: {
+              title: "Select token",
+              description: "select token you want to swap",
+              side: "right",
+              align: "start",
+            },
+          },
+          {
+            element: "#third",
+            popover: {
+              title: "Enter token here",
+              description: "Enter  token amount you want",
+              side: "right",
+              align: "start",
+            },
+          },
+        ],
+      });
+      driverObj.drive();
+    }
+
+  }, []);
   // const handleMaxFromAmount = () => {
   //   if (selectedFromToken) {
   //     console.log(fromBalance);
@@ -496,6 +542,7 @@ function Swap({ activeTab }) {
                 {/* <button id={swapStyle.swapMaxbtn} onClick={handleMaxFromAmount}>
                   Max
                 </button> */}
+                <div id="second" >
                 <button
                   className={swapStyle.TokenMain}
                   onClick={() => handleOpenModal("from")}
@@ -510,6 +557,7 @@ function Swap({ activeTab }) {
                     <Image src={down} />
                   </span>
                 </button>
+                </div>
               </div>
               <div
                 style={{
@@ -566,6 +614,7 @@ function Swap({ activeTab }) {
                   type="text"
                   min="0"
                   step="0.01"
+                  id="third"
                   placeholder="0.0"
                   className={swapStyle.swapInput}
                   name="toTokenAmount"
@@ -575,12 +624,15 @@ function Swap({ activeTab }) {
 
                 {/* <button id={swapStyle.swapMaxbtn} onClick={handleMaxToAmount}>
                   Max
+                  
                 </button> */}
+                <div id="first" >
                 <button
                   className={swapStyle.TokenMain}
                   onClick={() => handleOpenModal("to")}
                 >
-                  <span className={swapStyle.TokenSpanMain}>
+                  <span className={swapStyle.TokenSpanMain}
+                  >
                     {/* Display selected token name or placeholder in the button */}
                     <span className={swapStyle.tokenName}>
                       {selectedToToken ? selectedToToken.name : "Select Token"}
@@ -588,6 +640,7 @@ function Swap({ activeTab }) {
                     <Image src={down} />
                   </span>
                 </button>
+                  </div>
               </div>
               <div
                 style={{
@@ -603,22 +656,31 @@ function Swap({ activeTab }) {
           </div>
         </div>
       </div>
-      <div>
-        Max Sold :{" "}
+      {maximumSold > 0 && (
+  <div className={swapStyle.maxsoldtnxfeesdiv}>
+    <div className={swapStyle.maxtnxdiv}>
+      <div className={swapStyle.lableinswap}>Max Sold</div>
+      <div className={swapStyle.valueinswap}>
         {maximumSold
           ? `${ethers.utils.formatUnits(maximumSold, 6)} ${
               selectedFromToken.name
             }`
           : null}
       </div>
-      <div>
-        Transaction Fees :{" "}
+    </div>
+    <div className={swapStyle.maxtnxdiv}>
+      <div className={swapStyle.lableinswap}>Transaction Fees</div>
+      <div className={swapStyle.valueinswap}>
         {transactionFees
           ? `${ethers.utils.formatUnits(transactionFees, 6)} ${
               selectedFromToken.name
             }`
           : null}
       </div>
+    </div>
+  </div>
+)}
+      {maximumSold > 0 && (
 
       <button
         id={textStyle.greenbackground}
@@ -631,6 +693,8 @@ function Swap({ activeTab }) {
         {" "}
         Add Recipients
       </button>
+)}
+
       {render ? renderComponent(activeTab) : null}
       {listData.length > 0 ? (
         <div>
