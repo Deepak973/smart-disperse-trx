@@ -4,8 +4,7 @@ import "./globals.css";
 import { Roboto } from "next/font/google";
 import { ThemeProvider } from "@/Components/Themeprovider";
 import Navbar from "@/Components/Navbar/Navbar";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const roboto = Roboto({
@@ -16,6 +15,22 @@ const roboto = Roboto({
 // RootLayout component
 export default function RootLayout({ children }) {
   const router = useRouter();
+
+  useEffect(() => {
+    function handleNetworkChange() {
+      if (window.tronWallet && window.tronWallet.onNetworkChange) {
+        window.location.reload();
+      }
+    }
+
+    window.addEventListener("online", handleNetworkChange);
+    window.addEventListener("offline", handleNetworkChange);
+
+    return () => {
+      window.removeEventListener("online", handleNetworkChange);
+      window.removeEventListener("offline", handleNetworkChange);
+    };
+  }, []);
 
   return (
     <html lang="en" suppressHydrationWarning>

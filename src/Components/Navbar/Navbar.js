@@ -12,10 +12,12 @@ import jwt from "jsonwebtoken";
 import TronWallet from "../TronWallet/TronConnect";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { usePathname } from "next/navigation";
+import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
 
 function Navbar() {
   const { theme, setTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [TronNetowork, setTronNetwortk] = useState("Wrong Network");
   const dropdownRef = useRef(null);
   const cookie = new Cookies();
   const [isMainnet, setIsMainnet] = useState(true);
@@ -137,7 +139,6 @@ function Navbar() {
         console.log("Signer's address:", base58Address, Tronaddress);
 
         if (base58Address === Tronaddress) {
-          // Normalize addresses and compare them
           const jwtToken = generateJWTToken(signature, message);
           return jwtToken;
         }
@@ -150,7 +151,6 @@ function Navbar() {
   };
 
   const generateJWTToken = (signature, message) => {
-    // Set expiration time to 2 hrs from now
     const expirationTime = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
     const tokenPayload = {
@@ -194,6 +194,23 @@ function Navbar() {
     }
   }, [TronConnected]);
 
+  useEffect(() => {
+    console.log("chainid....");
+    const getChainId = async () => {
+      if (typeof window !== "undefined") {
+        const { tronWeb } = window;
+        const adapter = new TronLinkAdapter();
+        let net = await adapter.network();
+        console.log(net);
+        const tronnetwork = net.networkType;
+        console.log(tronnetwork);
+        setTronNetwortk(tronnetwork);
+        // settronNetwork(tronnetwork);
+        // console.log(settronNetwork);
+      }
+    };
+    getChainId();
+  }, [Tronaddress]);
   return (
     <div className={navStyle.navbarMain}>
       <div className={navStyle.divtoflexlogoconnectwallet}>
@@ -210,6 +227,13 @@ function Navbar() {
           <></>
         ) : (
           <div className={navStyle.connectwalletbuttondiv}>
+            {Tronaddress ? (
+              <div className={navStyle.outerdivtronnetwork}>
+                <div className={navStyle.displaytronnetwork}>
+                  {TronNetowork}
+                </div>
+              </div>
+            ) : null}
             <span>
               <TronWallet />
             </span>
