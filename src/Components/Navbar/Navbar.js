@@ -30,6 +30,7 @@ function Navbar() {
   } = useAccount();
   const path = usePathname();
   const isCrossChain = path === "/cross-chain";
+  const isHome = path === "/";
   const { theme, setTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -266,16 +267,18 @@ function Navbar() {
         } */}
             <span>
               {" "}
-              {isCrossChain ? (
-                <>
-                  {!isConnected ? <TronWallet /> : null}
-                  {!TronConnected ? (
-                    <ConnectButtonCustom isMainnet={isMainnet} />
-                  ) : null}
-                </>
-              ) : (
-                <TronWallet />
-              )}{" "}
+              {!isHome ? (
+                isCrossChain ? (
+                  <>
+                    {!isConnected ? <TronWallet /> : null}
+                    {!TronConnected ? (
+                      <ConnectButtonCustom isMainnet={isMainnet} />
+                    ) : null}
+                  </>
+                ) : (
+                  <TronWallet />
+                )
+              ) : null}
             </span>
 
             {/* {(isConnected || connected) ? (
