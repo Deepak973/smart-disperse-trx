@@ -494,7 +494,7 @@ function Swap({ activeTab }) {
       </div>
       <div
         id="seend-eth"
-        style={{
+        styl={{
           padding: "30px 20px",
           display: "flex",
           justifyContent: "center",
