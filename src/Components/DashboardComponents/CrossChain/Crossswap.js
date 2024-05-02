@@ -2,8 +2,31 @@ import React, { useState, useEffect } from "react";
 import textStyle from "../CrossChain/Type/textify.module.css";
 import CrossChain from './CrossChain';
 import swapStyle from "@/Components/DashboardComponents/SameChain/swap/swap.module.css";
+import { FetchMeta } from "@/Helpers/FetchMeta";
+import { RangoClient } from "rango-sdk-basic";
+
 
 function Crossswap({activeTab,setErrorModalIsOpen,errorModalIsOpen}) {
+
+
+  // State variables for showing Drop Down of Tokens and Chains
+  const [chainList, setChainList] = useState([]);
+  const [tokenList, setTokenList] = useState([]);
+
+  
+  useEffect(()=>{
+    const handleFetchMeta = async () => {
+          const meta = await FetchMeta(); // Calling RangoClient MetaData functio
+          
+        // }
+        // catch(error){
+        //   console.log("catch block")
+        //   console.error("Error Fetching MetaData...", error);
+        // }
+    }
+    console.log("calling")
+    handleFetchMeta();
+  },[]);
 
   return (
     <div className={textStyle.divtocoversametextdv}>
@@ -58,15 +81,20 @@ function Crossswap({activeTab,setErrorModalIsOpen,errorModalIsOpen}) {
                 className={swapStyle.swapInput}
               />
               <button className={swapStyle.swapMax}>Max</button>
+              
               <div className={swapStyle.TokenMain}>
+                {/* TOKEN LIST DROPDOWN */}
               <select className={swapStyle.dropdown}>
-    <option value="token1">Token 1</option>
-    <option value="token2">Token 2</option>
-  </select>
-  <select className={swapStyle.dropdown}>
-    <option value="chain1">Chain 1</option>
-    <option value="chain2">Chain 2</option>
-  </select>
+                {tokenList.map(token => (
+                  <option key={token} value={token}>{token}</option>
+                ))}
+              </select>
+              {/* CHAINLIST DROPDOWN */}
+              <select className={swapStyle.dropdown}>
+                {tokenList.map(token => (
+                  <option key={token} value={token}>{token}</option>
+                ))}
+              </select>
               </div>
             </div>
             <div
