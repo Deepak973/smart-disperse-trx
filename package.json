@@ -32,6 +32,7 @@
     "next": "^14.1.0",
     "next-themes": "^0.2.1",
     "rango-sdk": "^0.1.47",
+    "rango-sdk-basic": "^0.1.47",
     "react": "^18",
     "react-date-picker": "^10.6.0",
     "react-dom": "^18",
