@@ -221,7 +221,9 @@ function Navbar() {
       const jwtToken = cookie.get("jwt_token");
       console.log(jwtToken);
       if (jwtToken === undefined || jwtToken === null) {
-        TroncreateSign();
+        if (!isHome) {
+          TroncreateSign();
+        }
       }
     }
   }, [isConnected, TronConnected]);

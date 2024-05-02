@@ -610,17 +610,16 @@ function SendEth({ activeTab, listData, setListData }) {
             setLoading={setLoading}
           />
         ) : null}
-        {listData.length > 0 ? (
+        {/* {listData.length > 0 ? (
           <Swap
-          listData={listData}
-          setListData={setListData}
-          trxBalance={trxBalance}
-          totalTrx={totalTrx}
-          loading={loading}
-          setLoading={setLoading}
+            listData={listData}
+            setListData={setListData}
+            trxBalance={trxBalance}
+            totalTrx={totalTrx}
+            loading={loading}
+            setLoading={setLoading}
           />
-        ) : null}
-        
+        ) : null} */}
       </div>
     </>
   );
