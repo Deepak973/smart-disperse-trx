@@ -112,7 +112,7 @@ function Crossswap({ activeTab }) {
 
     },
     {
-	name: "Polygon",
+	  name: "Polygon",
         tokens: [
         { 
           blockchain: "Polygon",
@@ -127,6 +127,22 @@ function Crossswap({ activeTab }) {
       ],
 
     },
+    {
+      name: "TRON",
+          tokens: [
+          { 
+            blockchain: "TRON",
+            symbol: "USDT", 
+            address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" 
+          },
+          { 
+            blockchain: "TRON",
+            symbol: "USDC", 
+            address: "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8" 
+          },
+        ],
+  
+      },
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
