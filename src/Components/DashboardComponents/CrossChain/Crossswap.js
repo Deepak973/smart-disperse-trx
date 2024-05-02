@@ -16,6 +16,7 @@ import {
 import Image from "next/image";
 import down from "@/Assets/down.png";
 import { FetchMeta } from "@/Helpers/FetchMeta";
+import SwapComponent from "@/Helpers/swapComponent";
 
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -47,10 +48,6 @@ function Crossswap({ activeTab }) {
     handleFetchMeta();
   },[]);
 
-
-
-
-
   // Event handler for network selection
   const handleNetworkSelection = (network) => {
     setSelectedNetwork(network);
@@ -77,71 +74,67 @@ function Crossswap({ activeTab }) {
     {
       name: "Ethereum",
       tokens: [
-        { 
+        {
           blockchain: "Ethereum",
-          symbol: "ETH", 
-          address: null 
+          symbol: "ETH",
+          address: null
         },
-
-        { 
+        {
           blockchain: "Ethereum",
-          symbol: "USDT", 
-          address: "0xdac17f958d2ee523a2206206994597c13d831ec7" 
+          symbol: "USDT",
+          address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
         },
-        { 
+        {
           blockchain: "Ethereum",
-          symbol: "USDC", 
-          address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" 
+          symbol: "USDC",
+          address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
         },
       ],
     },
     {
-	name: "Optimism",
+  name: "Optimism",
         tokens: [
-        { 
+        {
           blockchain: "Optimism",
-          symbol: "USDT", 
-          address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58" 
+          symbol: "USDT",
+          address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"
         },
-        { 
+        {
           blockchain: "Ethereum",
-          symbol: "USDC", 
-          address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85" 
+          symbol: "USDC",
+          address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
         },
       ],
-
     },
     {
-	  name: "Polygon",
+    name: "Polygon",
         tokens: [
-        { 
+        {
           blockchain: "Polygon",
-          symbol: "USDT", 
-          address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F" 
+          symbol: "USDT",
+          address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
         },
-        { 
+        {
           blockchain: "Polygon",
-          symbol: "USDC", 
-          address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359" 
+          symbol: "USDC",
+          address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
         },
       ],
-
     },
     {
-      name: "TRON",
+      name: "Tron",
           tokens: [
-          { 
+          {
             blockchain: "TRON",
-            symbol: "USDT", 
-            address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" 
+            symbol: "USDT",
+            address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
           },
-          { 
+          {
             blockchain: "TRON",
-            symbol: "USDC", 
-            address: "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8" 
+            symbol: "USDC",
+            address: "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8"
           },
         ],
-  
       },
   ];
 
@@ -185,11 +178,26 @@ function Crossswap({ activeTab }) {
   const handleTokenSelection = (token) => {
     if (currentSection === "from") {
       setSelectedFromToken(token);
+      // Update token details for "from" section
+      setTokenDetails({
+        blockchain: token.blockchain,
+        symbol: token.symbol,
+        address: token.address,
+      });
+      console.log("Selected token in 'from' section:", token);
     } else if (currentSection === "to") {
       setSelectedToToken(token);
+      // Update token details for "to" section
+      setTokenDetails({
+        blockchain: token.blockchain,
+        symbol: token.symbol,
+        address: token.address,
+      });
+      console.log("Selected token in 'to' section:", token);
     }
     setModalOpen(false);
   };
+  
   const filteredTokenList = tokenList.filter(
     (token) =>
       token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -235,6 +243,12 @@ function Crossswap({ activeTab }) {
     }
     handleCloseModal();
   };
+
+  useEffect(() => {
+    console.log("Selected token in 'from' section:", selectedFromToken);
+    console.log("Selected token in 'to' section:", selectedToToken);
+  }, [selectedFromToken, selectedToToken]);
+  
 
   return (
     <div className={textStyle.divtocoversametextdv}>
@@ -306,7 +320,7 @@ function Crossswap({ activeTab }) {
                             {/* Display selected token name or placeholder in the button */}
                             <span className={swapStyle.tokenName}>
                               {selectedFromToken
-                                ? selectedFromToken.name
+                                ? selectedFromToken.symbol
                                 : "Select Token"}
                             </span>
                             <Image src={down} />
@@ -377,7 +391,7 @@ function Crossswap({ activeTab }) {
                             {/* Display selected token name or placeholder in the button */}
                             <span className={swapStyle.tokenName}>
                               {selectedToToken
-                                ? selectedToToken.name
+                                ? selectedToToken.symbol
                                 : "Select Token"}
                             </span>
                             <Image src={down} />
@@ -397,6 +411,12 @@ function Crossswap({ activeTab }) {
                   </div>
                   {/* "to" section end here */}
                 </div>
+              </div>
+              <div> 
+                <SwapComponent 
+                selectedFromToken={selectedFromToken}
+                selectedToToken={selectedToToken}/>
+                {/* <button></button> */}
               </div>
             </div>
             <Modal
@@ -486,7 +506,7 @@ function Crossswap({ activeTab }) {
                                 }
                               >
                                 <div>
-                                  {token.name}{" "}
+                                  {token.symbol}{" "}
                                   {(isTokenSelectedInTo(token) &&
                                     currentSection === "to") ||
                                   (isTokenSelectedInFrom(token) &&
@@ -514,6 +534,7 @@ function Crossswap({ activeTab }) {
           </div>
         </div>
       </div>
+    
       <CrossChain activeTab={activeTab} />
     </div>
   );
