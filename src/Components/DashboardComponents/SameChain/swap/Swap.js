@@ -15,7 +15,13 @@ import { SunSwapInstance } from "@/Helpers/SunSwapInstance";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoins, faQuestion, faQuestionCircle, faRetweet, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCoins,
+  faQuestion,
+  faQuestionCircle,
+  faRetweet,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import nodata from "@/Assets/nodata.png";
 import { formatUnits } from "ethers/lib/utils";
 import { TronIsValidValue } from "@/Helpers/ValidateInput";
@@ -280,7 +286,7 @@ function Swap({ activeTab }) {
         ...prevData,
         ["fromTokenAmount"]: amountInFrom,
       }));
-      const increasePercentage = 0.5 / 100;
+      const increasePercentage = 10 / 100;
       const increaseAmount = parseFloat(amountInFrom) * increasePercentage;
       const newAmount = parseFloat(amountInFrom) + increaseAmount;
       const newAmountfixed = newAmount.toFixed(6);
@@ -658,7 +664,10 @@ function Swap({ activeTab }) {
       {maximumSold > 0 && (
         <div className={swapStyle.maxsoldtnxfeesdiv}>
           <div className={swapStyle.maxtnxdiv}>
-            <div className={swapStyle.lableinswap}> <FontAwesomeIcon icon={faQuestionCircle} />  Max Sold</div>
+            <div className={swapStyle.lableinswap}>
+              {" "}
+              <FontAwesomeIcon icon={faQuestionCircle} /> Max Sold
+            </div>
             <div className={swapStyle.valueinswap}>
               {maximumSold
                 ? `${ethers.utils.formatUnits(maximumSold, 6)} ${
@@ -668,7 +677,10 @@ function Swap({ activeTab }) {
             </div>
           </div>
           <div className={swapStyle.maxtnxdiv}>
-            <div className={swapStyle.lableinswap}> <FontAwesomeIcon icon={faCoins} />  Transaction Fees</div>
+            <div className={swapStyle.lableinswap}>
+              {" "}
+              <FontAwesomeIcon icon={faCoins} /> Transaction Fees
+            </div>
             <div className={swapStyle.valueinswap}>
               {transactionFees
                 ? `${ethers.utils.formatUnits(transactionFees, 6)} ${
@@ -982,7 +994,6 @@ function Swap({ activeTab }) {
             setListData={setListData}
             TRC20Balance={TRC20Balance}
             totalTRC20={totalTRC20}
-          
             tokenDetails={tokenDetails}
             selectedFromToken={selectedFromToken}
             selectedToToken={selectedToToken}

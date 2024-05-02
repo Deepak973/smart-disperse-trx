@@ -9,7 +9,8 @@ export const TronContractInstance = async () => {
     try {
       console.log("trying...");
       const { tronWeb } = window;
-      const TroncontractAddress = "TSijZfgARceZzHGBU14GcfQuDSsQhZtVdh";
+      // const TroncontractAddress = "TSijZfgARceZzHGBU14GcfQuDSsQhZtVdh";
+      const TroncontractAddress = "TRjLrE8gcPVeAbcT6ET5oHXSSCziqJj4Ap";
       let contract = await tronWeb.contract(tronabi, TroncontractAddress);
       console.log(contract);
       return contract;
