@@ -301,3 +301,55 @@
 .tokenaddressinmodal {
   font-size: 10px;
 }
+
+.networkandtoken{
+  display: flex;
+
+}
+
+.networkdiv:hover{
+  background-color: #0000002d;
+
+  cursor: pointer;
+}
+.networkdiv{
+  border-bottom: 1px solid #0000006b;
+  display: flex;
+  padding: 5px;
+  margin: 5px;
+}
+
+.divnetwokr{
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  border: 1px solid rgba(0, 0, 0, 0.362);
+  height: 100%;
+padding: 5px;
+border-radius: 10px;
+}
+
+
+.tokendiv{
+  width: 60%;
+  border: 1px solid rgba(0, 0, 0, 0.362);
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.tokenaddressname:hover{
+  cursor: pointer;
+  background-color: #0000002d;
+}
+.tokenaddressname{
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #0000006b;
+  width: 100%;
+  padding: 5px;
+  font-size: 13px;
+}

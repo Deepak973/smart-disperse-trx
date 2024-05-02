@@ -3,42 +3,42 @@ import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import navStyle from "../Navbar/navbar.module.css";
 import smartlogo from "../../Assets/logo.png";
+import ConnectButtonCustom from "../ConnectButton/ConnectButtonCustom";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import Cookies from "universal-cookie";
-// import { useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import { ethers } from "ethers";
 import jwt from "jsonwebtoken";
 import TronWallet from "../TronWallet/TronConnect";
-import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
+import {
+  useWallet,
+  WalletProvider,
+} from "@tronweb3/tronwallet-adapter-react-hooks";
 import { usePathname } from "next/navigation";
-import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
+import { useDisconnect } from "wagmi";
 
 function Navbar() {
+  const [toggleSVG, setToggleSVG] = useState(false);
+  const {
+    isConnected,
+    address,
+    isDisconnected,
+    status,
+    isConnecting,
+    isReconnecting,
+  } = useAccount();
+  const path = usePathname();
+  const isCrossChain = path === "/cross-chain";
   const { theme, setTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [TronNetowork, setTronNetwortk] = useState("Wrong Network");
   const dropdownRef = useRef(null);
   const cookie = new Cookies();
   const [isMainnet, setIsMainnet] = useState(true);
-  const path = usePathname();
-  const isHome = path === "/";
+  const { disconnect } = useDisconnect();
 
   const { address: Tronaddress, connected: TronConnected } = useWallet();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
@@ -64,35 +64,34 @@ function Navbar() {
       return false;
     }
   };
-  // const createSign = async () => {
-  //   try {
-  //     const { ethereum } = window;
-  //     if (!ethereum) {
-  //       throw new Error("Metamask is not installed, please install!");
-  //     }
+  const createSign = async () => {
+    try {
+      const { ethereum } = window;
+      if (!ethereum) {
+        throw new Error("Metamask is not installed, please install!");
+      }
 
-  //     const provider = new ethers.providers.Web3Provider(ethereum);
-  //     const signer = provider.getSigner();
-  //     const message =
-  //       "sign this message to verify the ownership of your address";
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const message =
+        "sign this message to verify the ownership of your address";
 
-  //     // Sign the message using MetaMask
-  //     const signature = await signer.signMessage(message);
+      // Sign the message using MetaMask
+      const signature = await signer.signMessage(message);
 
-  //     const jwtToken = await decodeSignature(signature, message);
-  //     if (jwtToken === null) {
-  //       console.log("Error while decoding signature");
-  //     } else {
-  //       const storetoken = await storeToken(jwtToken);
-  //       console.log(storetoken);
-  //       if (storetoken) {
-  //         window.location.reload();
-  //       }
-  //     }
-  //   } catch (e) {
-  //     console.log("error", e);
-  //   }
-  // };
+      const jwtToken = await decodeSignature(signature, message);
+      if (jwtToken === null) {
+        console.log("Error while decoding signature");
+      } else {
+        const storetoken = await storeToken(jwtToken);
+        if (storetoken) {
+          window.location.reload();
+        }
+      }
+    } catch (e) {
+      console.log("error", e);
+    }
+  };
 
   const TroncreateSign = async () => {
     try {
@@ -129,6 +128,23 @@ function Navbar() {
   };
 
   const decodeSignature = async (signature, message) => {
+    if (isConnected) {
+      try {
+        // Decode the signature to get the signer's address
+        const signerAddress = ethers.utils.verifyMessage(message, signature);
+        console.log("Signer's address:", signerAddress, address);
+
+        if (signerAddress.toLowerCase() === address.toLowerCase()) {
+          // Normalize addresses and compare them
+          const jwtToken = generateJWTToken(signature, message);
+          return jwtToken;
+        }
+        return null;
+      } catch (e) {
+        console.error("Error decoding signature:", e);
+        return null;
+      }
+    }
     if (TronConnected) {
       try {
         // Decode the signature to get the signer's address
@@ -138,7 +154,8 @@ function Navbar() {
         );
         console.log("Signer's address:", base58Address, Tronaddress);
 
-        if (base58Address === Tronaddress) {
+        if (base58Address.toLowerCase() === Tronaddress.toLowerCase()) {
+          // Normalize addresses and compare them
           const jwtToken = generateJWTToken(signature, message);
           return jwtToken;
         }
@@ -151,6 +168,7 @@ function Navbar() {
   };
 
   const generateJWTToken = (signature, message) => {
+    // Set expiration time to 2 hrs from now
     const expirationTime = Math.floor(Date.now() / 1000) + 60 * 60 * 2;
 
     const tokenPayload = {
@@ -185,36 +203,28 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (TronConnected && !isHome) {
+    if (isConnected) {
+      console.log("is cross", isCrossChain);
+      if (!isCrossChain) {
+        disconnect();
+      }
+      console.log("isConnected", isConnected);
+      const jwtToken = cookie.get("jwt_token");
+      console.log(jwtToken);
+      if (jwtToken === undefined || jwtToken === null) {
+        createSign();
+      }
+    }
+    if (TronConnected) {
+      console.log("isConnected", isConnected);
       const jwtToken = cookie.get("jwt_token");
       console.log(jwtToken);
       if (jwtToken === undefined || jwtToken === null) {
         TroncreateSign();
       }
     }
-  }, [TronConnected]);
+  }, [isConnected, TronConnected]);
 
-  useEffect(() => {
-    const getChainId = async () => {
-      if (typeof window !== "undefined") {
-        const { tronWeb } = window;
-        const adapter = new TronLinkAdapter();
-        let net = await adapter.network();
-        console.log(net);
-        const tronNetwork = net.networkType;
-        console.log(tronNetwork);
-        setTronNetwortk(tronNetwork);
-  
-        if (tronNetwork !== "Nile") {
-          setTronNetwortk("Wrong Network");
-          alert("Please connect to the Nile testnet, which we currently support. We will soon be launching Smart Disperse on the mainnet🚀");
-        }
-      }
-    };
-  
-    getChainId();
-  }, [Tronaddress]);
-  
   return (
     <div className={navStyle.navbarMain}>
       <div className={navStyle.divtoflexlogoconnectwallet}>
@@ -227,20 +237,61 @@ function Navbar() {
             />
           </Link>
         </div>
-        {isHome ? (
-          <></>
-        ) : (
+        <div className={navStyle.connectwalletbuttondiv}>
           <div className={navStyle.connectwalletbuttondiv}>
-            {Tronaddress ? (
-              <div className={navStyle.outerdivtronnetwork}>
-                <div className={navStyle.displaytronnetwork}>
-                  {TronNetowork}
-                </div>
-              </div>
-            ) : null}
+            {isConnected && !TronConnected && (
+              <label className={navStyle.toggle}>
+                <input
+                  type="checkbox"
+                  onChange={handelMainnet}
+                  checked={isMainnet}
+                />
+                <span className={navStyle.slider}></span>
+                <span
+                  className={navStyle.labels}
+                  data-on="Mainnet"
+                  data-off="TestNet"
+                ></span>
+              </label>
+            )}
+
+            {/*         
+        {isConnected ? (
+             <ConnectButtonCustom  isMainnet={isMainnet} />
+              ) : connected ? (
+               <TronWallet />
+              ) : (
+                <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
+              )
+        } */}
             <span>
-              <TronWallet />
+              {" "}
+              {isCrossChain ? (
+                <>
+                  {!isConnected ? <TronWallet /> : null}
+                  {!TronConnected ? (
+                    <ConnectButtonCustom isMainnet={isMainnet} />
+                  ) : null}
+                </>
+              ) : (
+                <TronWallet />
+              )}{" "}
             </span>
+
+            {/* {(isConnected || connected) ? (
+              null
+          ) :
+          <div>     
+              {showDropdown && (
+                <div ref={dropdownRef} className={navStyle.dropdownContent}>
+                  <div style={{margin:"5px 0px"}}>
+                  <TronWallet />
+                  </div>
+                  <ConnectButtonCustom  isMainnet={isMainnet}/>
+                </div>
+              )}
+          </div>
+          } */}
 
             {theme === "light" ? (
               <svg
@@ -281,7 +332,7 @@ function Navbar() {
               </svg>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
