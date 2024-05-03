@@ -4,6 +4,7 @@ import { RangoClient } from 'rango-sdk-basic';
 import { checkApprovalSync, checkTransactionStatusSync, prepareEvmTransaction } from './utilityFunctions';
 import dotenv from 'dotenv';
 import textStyle from "@/Components/DashboardComponents/SameChain/Type/textify.module.css";
+import { fetchFeesFromQuote } from './fetchFeesFromQuote';
 dotenv.config();
 
 const rangoAPI = process.env.RANGO_API_KEY;
@@ -33,7 +34,7 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
         },
         // from: selectedFromToken,
         // to: selectedToToken,
-        amount: "1000000000000000000",
+        amount: "100000",
         fromAddress: "0x2131A6c0b66bE63E38558dC5fbe4C0ab65b9906e",
         toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
         slippage: '1.0',
@@ -52,9 +53,16 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
 
       setQuote(swap);
       console.log("Swap quote: ", quote);
-    };
 
+    };
+    
     fetchQuote();
+
+
+    // FOR CALCULATING TOTAL FEES
+    const fees = fetchFeesFromQuote(quote);
+    console.log("Fees:", fees);
+    
   }, [selectedFromToken, selectedToToken]);
 
   const handleSwap = async () => {
@@ -79,7 +87,13 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
     const mainTx = prepareEvmTransaction(evmTransaction, false);
     const mainTxHash = (await signer.sendTransaction(mainTx)).hash;
     const txStatus = await checkTransactionStatusSync(quote.requestId, mainTxHash, rangoClient);
-    console.log(txStatus);
+    console.log("txstatus: ", txStatus);
+
+
+    
+
+
+
   };}
 
   return (
