@@ -10,11 +10,12 @@ const rangoAPI = process.env.RANGO_API_KEY;
 const rangoClient = new RangoClient("95ef894a-f8f0-4eb4-90f7-f8559896474a");
 
 
-const SwapComponent = ({selectedFromToken,selectedToToken}) => {
+const SwapComponent = ({selectedFromToken,selectedToToken,formData}) => {
   const [quote, setQuote] = useState(null);
   console.log(quote);
   console.log(selectedFromToken);
   console.log(selectedToToken)
+  console.log("from amount:",formData.fromTokenAmount);
   useEffect(() => {
     console.log("fetching quote")
     const fetchQuote = async () => {
@@ -33,7 +34,8 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
         },
         // from: selectedFromToken,
         // to: selectedToToken,
-        amount: "10000",
+        amount:  "1000",
+        // amount: "1000000",
         fromAddress: "0x7D96c55A7b510e523812f67b4D49d514B8cE9040",
         toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
         slippage: '1.0',
@@ -42,8 +44,8 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
         referrerFee: null,
       };
       
+      console.log("swap", swapRequest.amount)
       const swap = await rangoClient.swap(swapRequest);
-      console.log("swap", swapRequest)
       if (!!swap.error || swap.resultType !== 'OK') {
         console.log("ifffffff")
         const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
@@ -84,7 +86,7 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
 
   return (
     <div>
-        
+      
       <button style={{margin:"10px"}} className={textStyle.sendbutton} onClick={handleSwap}>Swap Token</button>
     </div>
   );

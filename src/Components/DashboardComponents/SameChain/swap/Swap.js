@@ -671,7 +671,7 @@ function Swap({ activeTab }) {
             <div className={swapStyle.valueinswap}>
               {maximumSold
                 ? `${ethers.utils.formatUnits(maximumSold, 6)} ${
-                    selectedFromToken.name
+                    selectedFromToken?.name
                   }`
                 : null}
             </div>
@@ -684,7 +684,7 @@ function Swap({ activeTab }) {
             <div className={swapStyle.valueinswap}>
               {transactionFees
                 ? `${ethers.utils.formatUnits(transactionFees, 6)} ${
-                    selectedFromToken.name
+                    selectedFromToken?.name
                   }`
                 : null}
             </div>
