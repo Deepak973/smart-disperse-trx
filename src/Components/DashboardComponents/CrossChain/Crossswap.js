@@ -16,6 +16,8 @@ import {
 import Image from "next/image";
 import down from "@/Assets/down.png";
 import { FetchMeta } from "@/Helpers/FetchMeta";
+import { useAccount } from "wagmi";
+
 
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -31,6 +33,7 @@ function Crossswap({ activeTab }) {
   const [isSwapped, setIsSwapped] = useState(false);
   const [allNames, setAllNames] = useState([]);
   const [allAddresses, setAllAddresses] = useState([]);
+  const {address} = useAccount();
   const [listData, setListData] = useState([]);
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
@@ -52,6 +55,8 @@ function Crossswap({ activeTab }) {
     setSelectedNetwork(network);
     setModalOpen(true); // Open the modal when a network is selected
   };
+
+
   const defaultTokenDetails = {
     name: null,
     symbol: null,
@@ -138,8 +143,7 @@ function Crossswap({ activeTab }) {
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [totalTRC20, setTotalTRC20] =
-    useState(null); /* Total ERC20 tokens in wallet */
+  const [totalTRC20, setTotalTRC20] = useState(null); /* Total ERC20 tokens in wallet */
   const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
   const [TRC20Balance, setTRC20Balance] = useState(null);
   const [formData, setFormData] = useState({
@@ -175,7 +179,9 @@ function Crossswap({ activeTab }) {
     setModalOpen(false);
   };
   const handleTokenSelection = (token) => {
+    console.log("clicked")
     if (currentSection === "from") {
+      console.log("from....")
       setSelectedFromToken(token);
       // Update token details for "from" section
       setTokenDetails({
@@ -184,7 +190,15 @@ function Crossswap({ activeTab }) {
         address: token.address,
       });
       console.log("Selected token in 'from' section:", token);
+  
+      // Check if the selected network is "Tron" or not
+      if (selectedNetwork && selectedNetwork.name === "Tron") {
+        console.log("Selected network is Tron");
+      } else {
+        console.log("Selected network is Ethereum");
+      }
     } else if (currentSection === "to") {
+      console.log("to....")
       setSelectedToToken(token);
       // Update token details for "to" section
       setTokenDetails({
@@ -196,6 +210,7 @@ function Crossswap({ activeTab }) {
     }
     setModalOpen(false);
   };
+  
   
   const filteredTokenList = tokenList.filter(
     (token) =>
@@ -248,6 +263,39 @@ function Crossswap({ activeTab }) {
     console.log("Selected token in 'to' section:", selectedToToken);
   }, [selectedFromToken, selectedToToken]);
   
+  const fetchTronTokenBalance = async (tokenAddress) => {
+    console.log("fetching");
+    if (typeof window !== "undefined") {
+      const { tronWeb } = window;
+      try {
+        console.log(TronAddress);
+        const tronTokenContractInstance = await tronWeb
+          .contract()
+          .at(tokenAddress);
+        const balance = await tronTokenContractInstance
+          .balanceOf(TronAddress)
+          .call();
+        console.log(balance);
+        return balance;
+      } catch (error) {
+        console.error("Error fetching Tron token balance:", error);
+        return null;
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchbalance = async () => {
+      console.log(".......");
+      if (selectedFromToken) {
+        let fromBalance = await fetchTronTokenBalance(
+          selectedFromToken.address
+        );
+        setFromBalance(fromBalance);
+      }
+    };
+    fetchbalance();
+  }, [selectedFromToken]);
 
   return (
     <div className={textStyle.divtocoversametextdv}>
