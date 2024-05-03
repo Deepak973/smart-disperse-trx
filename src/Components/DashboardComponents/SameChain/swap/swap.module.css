@@ -24,7 +24,7 @@
   border-radius: 10px;
 }
 
-.divimagemsgnotfound{
+.divimagemsgnotfound {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -44,9 +44,10 @@
   color: white;
 }
 
-.closemodalbtn:hover{
+.closemodalbtn:hover {
   cursor: pointer;
   opacity: 0.5;
+  margin: 0px;
 }
 
 .rotate {
@@ -65,10 +66,12 @@
 
 .clearbtn:hover {
   cursor: pointer;
-  opacity: 0.5;
+  background-color: #924afc;
+  color: white;
 }
 .divtokenheadclear {
   display: flex;
+  margin-top: 20px;
   align-items: center;
   justify-content: space-between;
 }
@@ -171,18 +174,23 @@
   -webkit-box-align: center;
   align-items: center;
   height: 2.2rem;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   background-color: transparent;
-  color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
   border-radius: 12px;
-  box-shadow: none;
+  box-shadow: rgba(0, 0, 0, 0.075) 0px 8px 10px;
   outline: none;
   cursor: pointer;
   user-select: none;
   border: none;
   padding: 0px 0.5rem;
 }
+/* .TokenMain:hover {
+  background-color: white;
+  color: rgb(146, 74, 252);
+} */
+
 .TokenSpanMain {
   display: flex;
   -webkit-box-align: center;
@@ -193,14 +201,13 @@
 .TokenSpanMain img {
   width: 24px;
   height: 24px;
-  box-shadow: rgba(0, 0, 0, 0.075) 0px 6px 10px;
   border-radius: 24px;
 }
-.tokenName {
+/* .tokenName {
   margin: 0px 0.25rem 0px 0.75rem;
   font-size: 20px;
   color: rgb(255, 255, 255);
-}
+} */
 .FromInputMain {
   display: flex;
   flex-flow: row;
@@ -229,41 +236,88 @@
   height: 400px;
 }
 
-.maxsoldtnxfeesdiv{
+.maxsoldtnxfeesdiv {
   display: flex;
   justify-content: space-around;
+  margin-bottom: 20px;
+}
+/*  */
+.maxsoldtnxfeesdivsub {
+  display: flex;
+  background: transparent;
+  margin: 0 auto;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
   padding: 10px;
-  margin-bottom: 10px;
+  width: 400px;
+  box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px,
+    rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
+  justify-content: space-around;
 }
 
-.maxtnxdiv{
-  background-color: white;
+.maxtnxdiv {
+  /* background-color: white; */
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 11px;
-  color: blueviolet;
+  color: white;
   border-radius: 7px;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; */
 }
 
-.lableinswap{
-  font-weight: 900;
+.lableinswap {
+  font-weight: 700;
   font-size: 15px;
   padding: 2px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+}
+.tooltipText {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  font-size: 12px;
+  width: 200px;
+  background-color: white;
+  color: rgb(146, 74, 252);
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.075) 0px 8px 10px;
+  padding: 5px;
 }
 
-.valueinswap{
+.lableinswap:hover .tooltipText {
+  visibility: visible;
+}
+.left {
+  top: -8px;
+  right: 120%;
+}
+.right {
+  top: -8px;
+  left: 120%;
+}
+.valueinswap {
   font-size: 14px;
   padding: 5px;
 }
 
 .modalouterdiv {
-  margin: 100px;
   position: absolute;
   inset: 40px;
-  border: 1px solid rgb(204, 204, 204);
-  background: rgb(255, 255, 255);
+  border: 1px solid rgb(146, 74, 252);
+  background: white;
+  width: 50vw;
+  color: white;
+  overflow: hidden;
+  margin: 0 auto;
+  align-self: center;
+  max-width: 500px;
+  max-height: 90vh;
+  min-height: 80vh;
   overflow: auto;
   border-radius: 4px;
   outline: none;
@@ -275,9 +329,16 @@
 }
 
 .dropdownouter {
-  height: 38vh;
+  height: 532px;
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.215);
+  overflow: auto;
+  will-change: transform;
+  direction: ltr;
+  scrollbar-color: white rgb(19, 17, 24);
+  scrollbar-width: thin;
+  width: 100%;
+  border-radius: 5px;
+  width: 100%;
   border-radius: 5px;
 }
 
@@ -287,7 +348,12 @@
 }
 .alldatatokendiv {
   padding: 15px;
+  color: black;
+  margin: 5px 0px;
+  border: 1px solid #8080804d;
+  border-radius: 10px;
   display: flex;
+  box-shadow: rgba(0, 0, 0, 0.075) 0px 8px 10px;
   justify-content: space-between;
 }
 
@@ -299,38 +365,37 @@
 }
 
 .tokenaddressinmodal {
-  font-size: 10px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
 }
 
-.networkandtoken{
+.networkandtoken {
   display: flex;
-
 }
 
-.networkdiv:hover{
+.networkdiv:hover {
   background-color: #0000002d;
 
   cursor: pointer;
 }
-.networkdiv{
+.networkdiv {
   border-bottom: 1px solid #0000006b;
   display: flex;
   padding: 5px;
   margin: 5px;
 }
 
-.divnetwokr{
+.divnetwokr {
   display: flex;
   flex-direction: column;
   width: 40%;
   border: 1px solid rgba(0, 0, 0, 0.362);
   height: 100%;
-padding: 5px;
-border-radius: 10px;
+  padding: 5px;
+  border-radius: 10px;
 }
 
-
-.tokendiv{
+.tokendiv {
   width: 60%;
   border: 1px solid rgba(0, 0, 0, 0.362);
   display: flex;
@@ -341,11 +406,11 @@ border-radius: 10px;
   border-radius: 10px;
 }
 
-.tokenaddressname:hover{
+.tokenaddressname:hover {
   cursor: pointer;
   background-color: #0000002d;
 }
-.tokenaddressname{
+.tokenaddressname {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #0000006b;

@@ -48,6 +48,7 @@ function Swap({ activeTab }) {
   const [listData, setListData] = useState([]);
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
+  const [isVisible, setIsVisible] = useState(false);
 
   const defaultTokenDetails = {
     name: null,
@@ -662,31 +663,46 @@ function Swap({ activeTab }) {
         </div>
       </div>
       {maximumSold > 0 && (
-        <div className={swapStyle.maxsoldtnxfeesdiv}>
-          <div className={swapStyle.maxtnxdiv}>
-            <div className={swapStyle.lableinswap}>
-              {" "}
-              <FontAwesomeIcon icon={faQuestionCircle} /> Max Sold
+        <div
+          className={`${swapStyle.maxsoldtnxfeesdiv} ${isVisible && "show"}`}
+        >
+          <div className={swapStyle.maxsoldtnxfeesdivsub}>
+            <div className={swapStyle.maxtnxdiv}>
+              <div className={swapStyle.lableinswap}>
+                <FontAwesomeIcon icon={faQuestionCircle} /> Max Sold
+                <span
+                  className={`${swapStyle["tooltipText"]} ${swapStyle["left"]}`}
+                >
+                  (0.5%) slippage.The maximum amount you need to spent for
+                  Getting the desired tokens. the remaining amount will be sent
+                  back to the your wallet address if any.
+                </span>
+              </div>
+              <div className={swapStyle.valueinswap}>
+                {maximumSold
+                  ? `${ethers.utils.formatUnits(maximumSold, 6)} ${
+                      selectedFromToken?.name
+                    }`
+                  : null}
+              </div>
             </div>
-            <div className={swapStyle.valueinswap}>
-              {maximumSold
-                ? `${ethers.utils.formatUnits(maximumSold, 6)} ${
-                    selectedFromToken?.name
-                  }`
-                : null}
-            </div>
-          </div>
-          <div className={swapStyle.maxtnxdiv}>
-            <div className={swapStyle.lableinswap}>
-              {" "}
-              <FontAwesomeIcon icon={faCoins} /> Transaction Fees
-            </div>
-            <div className={swapStyle.valueinswap}>
-              {transactionFees
-                ? `${ethers.utils.formatUnits(transactionFees, 6)} ${
-                    selectedFromToken?.name
-                  }`
-                : null}
+            <div className={swapStyle.maxtnxdiv}>
+              <div className={swapStyle.lableinswap}>
+                {" "}
+                <FontAwesomeIcon icon={faCoins} /> Transaction Fees
+                <span
+                  className={`${swapStyle["tooltipText"]} ${swapStyle["right"]}`}
+                >
+                  0.3% (Transaction fees for the swap)
+                </span>
+              </div>
+              <div className={swapStyle.valueinswap}>
+                {transactionFees
+                  ? `${ethers.utils.formatUnits(transactionFees, 6)} ${
+                      selectedFromToken?.name
+                    }`
+                  : null}
+              </div>
             </div>
           </div>
         </div>
@@ -1017,28 +1033,36 @@ function Swap({ activeTab }) {
             textAlign: "center",
           }}
         >
-          <h2>Select a token</h2>
-          <h2 onClick={handleCloseModal} className={swapStyle.closemodalbtn}>
-            <FontAwesomeIcon icon={faXmark} />
+          <h2 style={{ color: "#924AFC", margin: "0" }}>Select a token</h2>
+          <h2
+            onClick={handleCloseModal}
+            className={swapStyle.closemodalbtn}
+            style={{ margin: "0px" }}
+          >
+            <FontAwesomeIcon icon={faXmark} color="#924AFC" />
           </h2>
         </div>
         {/* Search bar */}
-        <div className={samechainStyle.searchBar}>
-          <input
-            id={swapStyle.srchbar}
-            style={{ width: "100%" }}
-            type="text"
-            name="query"
-            placeholder="Search by name or paste address here"
-            className={samechainStyle.inputSearch}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+
         {/* Token list */}
         <div className={swapStyle.maindivoftokenname}>
           <div className={swapStyle.divtokenheadclear}>
-            <h3 style={{ textAlign: "left" }}>Token name</h3>
+            <div className={samechainStyle.searchBar}>
+              <input
+                id={swapStyle.srchbar}
+                style={{
+                  width: "100%",
+                  color: "#924afc",
+                  border: "1px solid #924afc",
+                }}
+                type="text"
+                name="query"
+                placeholder="Search by name or paste address here"
+                className={samechainStyle.inputSearch}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
             <button
               onClick={handleClearSelection}
               className={swapStyle.clearbtn}

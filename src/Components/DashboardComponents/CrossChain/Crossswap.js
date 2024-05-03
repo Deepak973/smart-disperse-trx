@@ -18,7 +18,7 @@ import down from "@/Assets/down.png";
 import { FetchMeta } from "@/Helpers/FetchMeta";
 import SwapComponent from "@/Helpers/swapComponent";
 import { useAccount } from "wagmi";
-import { ethers } from "ethers";
+
 
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -34,27 +34,29 @@ function Crossswap({ activeTab }) {
   const [isSwapped, setIsSwapped] = useState(false);
   const [allNames, setAllNames] = useState([]);
   const [allAddresses, setAllAddresses] = useState([]);
-  const { address } = useAccount();
+  const {address} = useAccount();
   const [listData, setListData] = useState([]);
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
-  const [selectedNetwork, setSelectedNetwork] = useState(null);
+  const [selectedNetwork, setSelectedNetwork] = useState(null);  
 
-  useEffect(() => {
+
+  useEffect(()=>{
     const handleFetchMeta = async () => {
       console.log("fetch meta");
-      const meta = await FetchMeta(); // Calling RangoClient MetaData function
-      console.log("MetaData:   ", meta);
-    };
-    console.log("calling");
+          const meta = await FetchMeta(); // Calling RangoClient MetaData function
+          console.log("MetaData:   ", meta);
+    }
+    console.log("calling")
     handleFetchMeta();
-  }, []);
+  },[]);
 
   // Event handler for network selection
   const handleNetworkSelection = (network) => {
     setSelectedNetwork(network);
     setModalOpen(true); // Open the modal when a network is selected
   };
+
 
   const defaultTokenDetails = {
     name: null,
@@ -78,72 +80,71 @@ function Crossswap({ activeTab }) {
       name: "Ethereum",
       tokens: [
         {
-          blockchain: "ETH",
-          address: null,
-          symbol: "ETH",
+          "blockchain": "ETH",
+          "address": null,
+          "symbol": "ETH",
         },
         {
-          blockchain: "ETH",
-          address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          symbol: "USDT",
+          "blockchain": "ETH",
+          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "symbol": "USDT",
         },
         {
-          blockchain: "ETH",
-          address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          symbol: "USDC",
-        },
-      ],
-    },
-    {
-      name: "Optimism",
-      tokens: [
-        {
-          blockchain: "OPTIMISM",
-          address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
-          symbol: "USDT",
-        },
-        {
-          blockchain: "OPTIMISM",
-          address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-          symbol: "USDC",
+          "blockchain": "ETH",
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
         },
       ],
     },
     {
-      name: "Polygon",
-      tokens: [
+  name: "Optimism",
+        tokens: [
         {
-          blockchain: "POLYGON",
-          address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-          symbol: "USDT",
+          "blockchain": "OPTIMISM",
+          "address": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
+          "symbol": "USDT",
         },
         {
-          blockchain: "POLYGON",
-          address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-          symbol: "USDC",
+          "blockchain": "OPTIMISM",
+          "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+          "symbol": "USDC",
+        },
+      ],
+    },
+    {
+    name: "Polygon",
+        tokens: [
+        {
+          "blockchain": "POLYGON",
+          "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+          "symbol": "USDT",
+        },
+        {
+          "blockchain": "POLYGON",
+          "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+          "symbol": "USDC",
         },
       ],
     },
     {
       name: "Tron",
-      tokens: [
-        {
-          blockchain: "TRON",
-          address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-          symbol: "USDT",
-        },
-        {
-          blockchain: "TRON",
-          address: "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
-          symbol: "USDC",
-        },
-      ],
-    },
-  ];
+          tokens: [
+          {
+            "blockchain": "TRON",
+            "address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+            "symbol": "USDT"
+          },
+          {
+            "blockchain": "TRON",
+            "address": "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
+            "symbol": "USDC"
+          },
+        ],
+      },
+    ]
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [totalTRC20, setTotalTRC20] =
-    useState(null); /* Total ERC20 tokens in wallet */
+  const [totalTRC20, setTotalTRC20] = useState(null); /* Total ERC20 tokens in wallet */
   const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
   const [TRC20Balance, setTRC20Balance] = useState(null);
   const [formData, setFormData] = useState({
@@ -190,7 +191,7 @@ function Crossswap({ activeTab }) {
         address: token.address,
       });
       console.log("Selected token in 'from' section:", token);
-
+  
       // Infer the network based on the token's blockchain
       if (token.blockchain === "TRON") {
         console.log("Selected token is on the Tron network");
@@ -212,7 +213,9 @@ function Crossswap({ activeTab }) {
     }
     setModalOpen(false);
   };
-
+  
+  
+  
   const filteredTokenList = tokenList.filter(
     (token) =>
       token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -220,12 +223,11 @@ function Crossswap({ activeTab }) {
   );
   const handleFromInputChange = (e) => {
     const { name, value } = e.target;
-    const parsedValue = ethers.utils.parseUnits(value.toString(), 18).toString();
     setFormData((prevData) => ({
-        ...prevData,
-        [name]: parsedValue,
+      ...prevData,
+      [name]: value,
     }));
-};
+  };
 
   const handleToInputChange = (e) => {
     const { name, value } = e.target;
@@ -264,7 +266,7 @@ function Crossswap({ activeTab }) {
     console.log("Selected token in 'from' section:", selectedFromToken);
     console.log("Selected token in 'to' section:", selectedToToken);
   }, [selectedFromToken, selectedToToken]);
-
+  
   const fetchTronTokenBalance = async (tokenAddress) => {
     console.log("fetching");
     if (typeof window !== "undefined") {
@@ -322,7 +324,7 @@ function Crossswap({ activeTab }) {
               style={{
                 padding: "30px 20px",
                 display: "flex",
-                flexDirection: "column",
+                flexDirection:"column",
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -348,14 +350,14 @@ function Crossswap({ activeTab }) {
                     </div>
                     <div className={swapStyle.FromInputMain}>
                       <input
-                        type="number"
+                        type="text"
                         min="0"
-                        step="any" // Change step to "any" to allow decimal numbers
+                        step="0.01"
                         placeholder="Enter Amount"
                         className={swapStyle.swapInput}
                         name="fromTokenAmount"
                         value={formData.fromTokenAmount}
-                        onChange={handleFromInputChange}
+                        onChange={handleFromInputChange} // Attach handleFromInputChange here
                       />
 
                       {/* <button id={swapStyle.swapMaxbtn} onClick={handleMaxFromAmount}>
@@ -418,14 +420,14 @@ function Crossswap({ activeTab }) {
                     <div></div>
                     <div className={swapStyle.FromInputMain}>
                       <input
-                        type="number"
+                        type="text"
                         min="0"
-                        step="any" // Change step to "any" to allow decimal numbers
+                        step="0.01"
                         placeholder="0.0"
                         className={swapStyle.swapInput}
                         name="toTokenAmount"
                         value={formData.toTokenAmount}
-                        onChange={handleToInputChange}
+                        onChange={handleToInputChange} // Attach handleToInputChange here
                       />
 
                       {/* <button id={swapStyle.swapMaxbtn} onClick={handleMaxToAmount}>
@@ -462,13 +464,12 @@ function Crossswap({ activeTab }) {
                   {/* "to" section end here */}
                 </div>
               </div>
-              <div></div>
-              <SwapComponent
+              <div> 
+                </div>
+                <SwapComponent 
                 selectedFromToken={selectedFromToken}
-                selectedToToken={selectedToToken}
-                formData={formData}
-              />
-              {/* <button></button> */}
+                selectedToToken={selectedToToken}/>
+                {/* <button></button> */}
             </div>
             <Modal
               className={swapStyle.modalouterdiv}
@@ -585,7 +586,7 @@ function Crossswap({ activeTab }) {
           </div>
         </div>
       </div>
-
+    
       <CrossChain activeTab={activeTab} />
     </div>
   );

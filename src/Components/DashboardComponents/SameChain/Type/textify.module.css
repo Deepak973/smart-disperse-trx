@@ -147,9 +147,9 @@
 }
 .sendbutton:hover {
   border: none;
-  color: #643bdc;
-  background: #fff !important;
-  box-shadow: 0px 0px 14px 0px #fff;
+  background-color: white !important;
+  color: rgb(146, 74, 252);
+  box-shadow: rgba(238, 242, 243, 0.553) 0px 5px 15px;
 }
 .buttontoaddformdataunload:hover {
   box-shadow: rgba(238, 242, 243, 0.553) 0px 5px 15px;
