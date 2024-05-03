@@ -16,6 +16,7 @@ import {
 import Image from "next/image";
 import down from "@/Assets/down.png";
 import { FetchMeta } from "@/Helpers/FetchMeta";
+import SwapComponent from "@/Helpers/swapComponent";
 import { useAccount } from "wagmi";
 
 
@@ -179,9 +180,9 @@ function Crossswap({ activeTab }) {
     setModalOpen(false);
   };
   const handleTokenSelection = (token) => {
-    console.log("clicked")
+    console.log("clicked");
     if (currentSection === "from") {
-      console.log("from....")
+      console.log("from....");
       setSelectedFromToken(token);
       // Update token details for "from" section
       setTokenDetails({
@@ -191,14 +192,16 @@ function Crossswap({ activeTab }) {
       });
       console.log("Selected token in 'from' section:", token);
   
-      // Check if the selected network is "Tron" or not
-      if (selectedNetwork && selectedNetwork.name === "Tron") {
-        console.log("Selected network is Tron");
+      // Infer the network based on the token's blockchain
+      if (token.blockchain === "TRON") {
+        console.log("Selected token is on the Tron network");
+      } else if (token.blockchain === "Ethereum") {
+        console.log("Selected token is on the Ethereum network");
       } else {
-        console.log("Selected network is Ethereum");
+        console.log("Selected token is on an unknown network");
       }
     } else if (currentSection === "to") {
-      console.log("to....")
+      console.log("to....");
       setSelectedToToken(token);
       // Update token details for "to" section
       setTokenDetails({
@@ -210,6 +213,7 @@ function Crossswap({ activeTab }) {
     }
     setModalOpen(false);
   };
+  
   
   
   const filteredTokenList = tokenList.filter(
@@ -320,6 +324,7 @@ function Crossswap({ activeTab }) {
               style={{
                 padding: "30px 20px",
                 display: "flex",
+                flexDirection:"column",
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -459,6 +464,12 @@ function Crossswap({ activeTab }) {
                   {/* "to" section end here */}
                 </div>
               </div>
+              <div> 
+                </div>
+                <SwapComponent 
+                selectedFromToken={selectedFromToken}
+                selectedToToken={selectedToToken}/>
+                {/* <button></button> */}
             </div>
             <Modal
               className={swapStyle.modalouterdiv}
@@ -575,6 +586,7 @@ function Crossswap({ activeTab }) {
           </div>
         </div>
       </div>
+    
       <CrossChain activeTab={activeTab} />
     </div>
   );

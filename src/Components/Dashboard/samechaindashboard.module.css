@@ -707,3 +707,8 @@ textarea::-webkit-scrollbar {
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+.sametextmainn{
+  display: flex;
+  flex-direction: column;
+}
