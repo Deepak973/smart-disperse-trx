@@ -11,11 +11,12 @@ const rangoAPI = process.env.RANGO_API_KEY;
 const rangoClient = new RangoClient("95ef894a-f8f0-4eb4-90f7-f8559896474a");
 
 
-const SwapComponent = ({selectedFromToken,selectedToToken}) => {
+const SwapComponent = ({selectedFromToken,selectedToToken,formData}) => {
   const [quote, setQuote] = useState(null);
   console.log(quote);
   console.log(selectedFromToken);
   console.log(selectedToToken)
+  console.log("from amount:",formData.fromTokenAmount);
   useEffect(() => {
     console.log("fetching quote")
     const fetchQuote = async () => {
@@ -43,8 +44,8 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
         referrerFee: null,
       };
       
+      console.log("swap", swapRequest.amount)
       const swap = await rangoClient.swap(swapRequest);
-      console.log("swap", swapRequest)
       if (!!swap.error || swap.resultType !== 'OK') {
         console.log("ifffffff")
         const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
@@ -88,12 +89,6 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
     const mainTxHash = (await signer.sendTransaction(mainTx)).hash;
     const txStatus = await checkTransactionStatusSync(quote.requestId, mainTxHash, rangoClient);
     console.log("txstatus: ", txStatus);
-
-
-    
-
-
-
   };}
 
   return (
