@@ -39,7 +39,7 @@ export const approveToken = async (amount, tokenContractAddress, chainId) => {
 export const tronapprovetoken = async (amount, tokenContractAddress) => {
   console.log("Aprroving trc token");
   // const TroncontractAddress = "TSijZfgARceZzHGBU14GcfQuDSsQhZtVdh";
-  const TroncontractAddress = "TRjLrE8gcPVeAbcT6ET5oHXSSCziqJj4Ap";
+  const TroncontractAddress = "TPt8cDuVSeKj5CsBdJ8edxLPZg6RPhVmos";
 
   if (typeof window !== "undefined") {
     const { tronWeb } = window;
