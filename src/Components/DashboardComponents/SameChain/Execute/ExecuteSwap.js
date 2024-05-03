@@ -92,6 +92,7 @@ function ExecuteSwap(props) {
             props.maximumSold,
             props.selectedFromToken.address
           );
+          // const isTokenApproved = true;
           if (isTokenApproved) {
             const con = await TronContractInstance();
             try {
@@ -104,13 +105,12 @@ function ExecuteSwap(props) {
                 props.toTokenAmount,
                 6
               );
-              console.log(
-                toTokenValue,
-                path,
-                props.maximumSold,
-                recipients,
-                values
-              );
+              console.log("toTokenValue", toTokenValue);
+              console.log("path", path);
+              console.log("maximumSold", props.maximumSold);
+              console.log("recipients", recipients);
+              console.log("values", values);
+
               let tx = await con
                 .swapAndDisperseTokenToToken(
                   toTokenValue,

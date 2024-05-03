@@ -4,6 +4,7 @@ import { RangoClient } from 'rango-sdk-basic';
 import textStyle from "@/Components/DashboardComponents/SameChain/Type/textify.module.css";
 import { checkApprovalSync, checkTransactionStatusSync, prepareEvmTransaction } from './utilityFunctions';
 import dotenv from 'dotenv';
+import textStyle from "@/Components/DashboardComponents/SameChain/Type/textify.module.css";
 dotenv.config();
 
 const rangoAPI = process.env.RANGO_API_KEY;
@@ -84,6 +85,10 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
 
   return (
     <div>
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 43e661a551bfe417349799eaa4fd52d6cc000a6c
       <button style={{margin:"10px"}} className={textStyle.sendbutton} onClick={handleSwap}>Swap Token</button>
     </div>
   );

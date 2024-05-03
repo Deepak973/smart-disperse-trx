@@ -24,8 +24,8 @@
       { "name": "_values", "type": "uint256[]" }
     ],
     "name": "disperseToken",
-    "stateMutability": "Nonpayable",
-    "type": "Function"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [
@@ -33,26 +33,26 @@
       { "name": "_values", "type": "uint256[]" }
     ],
     "name": "disperseTrx",
-    "stateMutability": "Payable",
-    "type": "Function"
+    "stateMutability": "payable",
+    "type": "function"
   },
   {
     "outputs": [{ "type": "address" }],
     "name": "owner",
-    "stateMutability": "View",
-    "type": "Function"
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [{ "name": "_sunSwapRouter", "type": "address" }],
     "name": "setSunSwapRouter",
-    "stateMutability": "Nonpayable",
-    "type": "Function"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "outputs": [{ "type": "address" }],
     "name": "sunSwapRouter",
-    "stateMutability": "View",
-    "type": "Function"
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [
@@ -63,8 +63,8 @@
       { "name": "_values", "type": "uint256[]" }
     ],
     "name": "swapAndDisperseTokenToToken",
-    "stateMutability": "Nonpayable",
-    "type": "Function"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [
@@ -72,7 +72,7 @@
       { "name": "_amount", "type": "uint256" }
     ],
     "name": "withdrawERC20Tokens",
-    "stateMutability": "Nonpayable",
-    "type": "Function"
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]

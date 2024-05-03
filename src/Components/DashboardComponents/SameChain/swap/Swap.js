@@ -536,7 +536,7 @@ function Swap({ activeTab }) {
                   type="text"
                   min="0"
                   step="0.01"
-                  placeholder="Enter Amount"
+                  placeholder=""
                   className={swapStyle.swapInput}
                   name="fromTokenAmount"
                   value={formData.fromTokenAmount}
@@ -619,7 +619,7 @@ function Swap({ activeTab }) {
                   min="0"
                   step="0.01"
                   id="third"
-                  placeholder="0.0"
+                  placeholder="Enter Amount"
                   className={swapStyle.swapInput}
                   name="toTokenAmount"
                   value={formData.toTokenAmount}

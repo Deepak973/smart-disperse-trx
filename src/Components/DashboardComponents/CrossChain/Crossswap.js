@@ -17,6 +17,8 @@ import Image from "next/image";
 import down from "@/Assets/down.png";
 import { FetchMeta } from "@/Helpers/FetchMeta";
 import SwapComponent from "@/Helpers/swapComponent";
+import { useAccount } from "wagmi";
+
 
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -32,6 +34,7 @@ function Crossswap({ activeTab }) {
   const [isSwapped, setIsSwapped] = useState(false);
   const [allNames, setAllNames] = useState([]);
   const [allAddresses, setAllAddresses] = useState([]);
+  const {address} = useAccount();
   const [listData, setListData] = useState([]);
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
@@ -53,6 +56,8 @@ function Crossswap({ activeTab }) {
     setSelectedNetwork(network);
     setModalOpen(true); // Open the modal when a network is selected
   };
+
+
   const defaultTokenDetails = {
     name: null,
     symbol: null,
@@ -139,8 +144,7 @@ function Crossswap({ activeTab }) {
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [totalTRC20, setTotalTRC20] =
-    useState(null); /* Total ERC20 tokens in wallet */
+  const [totalTRC20, setTotalTRC20] = useState(null); /* Total ERC20 tokens in wallet */
   const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
   const [TRC20Balance, setTRC20Balance] = useState(null);
   const [formData, setFormData] = useState({
@@ -176,7 +180,9 @@ function Crossswap({ activeTab }) {
     setModalOpen(false);
   };
   const handleTokenSelection = (token) => {
+    console.log("clicked");
     if (currentSection === "from") {
+      console.log("from....");
       setSelectedFromToken(token);
       // Update token details for "from" section
       setTokenDetails({
@@ -185,7 +191,17 @@ function Crossswap({ activeTab }) {
         address: token.address,
       });
       console.log("Selected token in 'from' section:", token);
+  
+      // Infer the network based on the token's blockchain
+      if (token.blockchain === "TRON") {
+        console.log("Selected token is on the Tron network");
+      } else if (token.blockchain === "Ethereum") {
+        console.log("Selected token is on the Ethereum network");
+      } else {
+        console.log("Selected token is on an unknown network");
+      }
     } else if (currentSection === "to") {
+      console.log("to....");
       setSelectedToToken(token);
       // Update token details for "to" section
       setTokenDetails({
@@ -197,6 +213,8 @@ function Crossswap({ activeTab }) {
     }
     setModalOpen(false);
   };
+  
+  
   
   const filteredTokenList = tokenList.filter(
     (token) =>
@@ -249,6 +267,39 @@ function Crossswap({ activeTab }) {
     console.log("Selected token in 'to' section:", selectedToToken);
   }, [selectedFromToken, selectedToToken]);
   
+  const fetchTronTokenBalance = async (tokenAddress) => {
+    console.log("fetching");
+    if (typeof window !== "undefined") {
+      const { tronWeb } = window;
+      try {
+        console.log(TronAddress);
+        const tronTokenContractInstance = await tronWeb
+          .contract()
+          .at(tokenAddress);
+        const balance = await tronTokenContractInstance
+          .balanceOf(TronAddress)
+          .call();
+        console.log(balance);
+        return balance;
+      } catch (error) {
+        console.error("Error fetching Tron token balance:", error);
+        return null;
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchbalance = async () => {
+      console.log(".......");
+      if (selectedFromToken) {
+        let fromBalance = await fetchTronTokenBalance(
+          selectedFromToken.address
+        );
+        setFromBalance(fromBalance);
+      }
+    };
+    fetchbalance();
+  }, [selectedFromToken]);
 
   return (
     <div className={textStyle.divtocoversametextdv}>
@@ -273,7 +324,11 @@ function Crossswap({ activeTab }) {
               style={{
                 padding: "30px 20px",
                 display: "flex",
+<<<<<<< HEAD
                 flexDirection: "column",
+=======
+                flexDirection:"column",
+>>>>>>> 43e661a551bfe417349799eaa4fd52d6cc000a6c
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -414,11 +469,11 @@ function Crossswap({ activeTab }) {
                 </div>
               </div>
               <div> 
+                </div>
                 <SwapComponent 
                 selectedFromToken={selectedFromToken}
                 selectedToToken={selectedToToken}/>
                 {/* <button></button> */}
-              </div>
             </div>
             <Modal
               className={swapStyle.modalouterdiv}
