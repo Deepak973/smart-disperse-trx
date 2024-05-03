@@ -673,15 +673,15 @@ function Swap({ activeTab }) {
                 <span
                   className={`${swapStyle["tooltipText"]} ${swapStyle["left"]}`}
                 >
-                  The maximum amount you need to spent for Getting the desired
-                  tokens. the remaining amount will be sent back to the your
-                  wallet address if any.
+                  (0.5%) slippage.The maximum amount you need to spent for
+                  Getting the desired tokens. the remaining amount will be sent
+                  back to the your wallet address if any.
                 </span>
               </div>
               <div className={swapStyle.valueinswap}>
                 {maximumSold
                   ? `${ethers.utils.formatUnits(maximumSold, 6)} ${
-                      selectedFromToken.name
+                      selectedFromToken?.name
                     }`
                   : null}
               </div>
@@ -699,7 +699,7 @@ function Swap({ activeTab }) {
               <div className={swapStyle.valueinswap}>
                 {transactionFees
                   ? `${ethers.utils.formatUnits(transactionFees, 6)} ${
-                      selectedFromToken.name
+                      selectedFromToken?.name
                     }`
                   : null}
               </div>
