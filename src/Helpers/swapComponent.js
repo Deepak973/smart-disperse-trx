@@ -16,13 +16,24 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
   console.log(selectedFromToken);
   console.log(selectedToToken)
   useEffect(() => {
+    console.log("fetching quote")
     const fetchQuote = async () => {
-      
+      console.log(selectedFromToken,selectedToToken)
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const swapRequest = {
-        selectedFromToken,
-        selectedToToken,
-        amount: "100000000000000000",
+        from: {
+          "blockchain": selectedFromToken.blockchain,
+          "symbol": selectedFromToken.symbol,
+          "address": selectedFromToken.address
+        },
+        to: {
+          "blockchain": selectedToToken.blockchain,
+          "symbol": selectedToToken.symbol,
+          "address": selectedToToken.address,
+        },
+        // from: selectedFromToken,
+        // to: selectedToToken,
+        amount: "1000000000000000000",
         fromAddress: "0x2131A6c0b66bE63E38558dC5fbe4C0ab65b9906e",
         toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
         slippage: '1.0',
@@ -32,8 +43,9 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
       };
       
       const swap = await rangoClient.swap(swapRequest);
-
+      console.log("swap", swapRequest)
       if (!!swap.error || swap.resultType !== 'OK') {
+        console.log("ifffffff")
         const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
         throw new Error(msg);
       }
@@ -43,7 +55,7 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
     };
 
     fetchQuote();
-  }, [selectedFromToken]);
+  }, [selectedFromToken, selectedToToken]);
 
   const handleSwap = async () => {
     console.log("swap btn clicked")
@@ -72,7 +84,7 @@ const SwapComponent = ({selectedFromToken,selectedToToken}) => {
 
   return (
     <div>
-        
+      
       <button style={{margin:"10px"}} className={textStyle.sendbutton} onClick={handleSwap}>Swap Token</button>
     </div>
   );
