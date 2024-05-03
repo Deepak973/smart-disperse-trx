@@ -19,7 +19,6 @@ import { FetchMeta } from "@/Helpers/FetchMeta";
 import SwapComponent from "@/Helpers/swapComponent";
 import { useAccount } from "wagmi";
 
-
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedFromToken, setSelectedFromToken] = useState(null);
@@ -34,29 +33,27 @@ function Crossswap({ activeTab }) {
   const [isSwapped, setIsSwapped] = useState(false);
   const [allNames, setAllNames] = useState([]);
   const [allAddresses, setAllAddresses] = useState([]);
-  const {address} = useAccount();
+  const { address } = useAccount();
   const [listData, setListData] = useState([]);
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
-  const [selectedNetwork, setSelectedNetwork] = useState(null);  
+  const [selectedNetwork, setSelectedNetwork] = useState(null);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const handleFetchMeta = async () => {
       console.log("fetch meta");
-          const meta = await FetchMeta(); // Calling RangoClient MetaData function
-          console.log("MetaData:   ", meta);
-    }
-    console.log("calling")
+      const meta = await FetchMeta(); // Calling RangoClient MetaData function
+      console.log("MetaData:   ", meta);
+    };
+    console.log("calling");
     handleFetchMeta();
-  },[]);
+  }, []);
 
   // Event handler for network selection
   const handleNetworkSelection = (network) => {
     setSelectedNetwork(network);
     setModalOpen(true); // Open the modal when a network is selected
   };
-
 
   const defaultTokenDetails = {
     name: null,
@@ -82,69 +79,70 @@ function Crossswap({ activeTab }) {
         {
           blockchain: "Ethereum",
           symbol: "ETH",
-          address: null
+          address: null,
         },
         {
           blockchain: "Ethereum",
           symbol: "USDT",
-          address: "0xdac17f958d2ee523a2206206994597c13d831ec7"
+          address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
         },
         {
           blockchain: "Ethereum",
           symbol: "USDC",
-          address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         },
       ],
     },
     {
-  name: "Optimism",
-        tokens: [
+      name: "Optimism",
+      tokens: [
         {
           blockchain: "Optimism",
           symbol: "USDT",
-          address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58"
+          address: "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
         },
         {
           blockchain: "Ethereum",
           symbol: "USDC",
-          address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+          address: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
         },
       ],
     },
     {
-    name: "Polygon",
-        tokens: [
+      name: "Polygon",
+      tokens: [
         {
           blockchain: "Polygon",
           symbol: "USDT",
-          address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
+          address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
         },
         {
           blockchain: "Polygon",
           symbol: "USDC",
-          address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+          address: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
         },
       ],
     },
     {
       name: "Tron",
-          tokens: [
-          {
-            blockchain: "TRON",
-            symbol: "USDT",
-            address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
-          },
-          {
-            blockchain: "TRON",
-            symbol: "USDC",
-            address: "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8"
-          },
-        ],
-      },
+      tokens: [
+        {
+          blockchain: "TRON",
+          symbol: "USDT",
+          address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+        },
+        {
+          blockchain: "TRON",
+          symbol: "USDC",
+          address: "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
+        },
+      ],
+    },
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [totalTRC20, setTotalTRC20] = useState(null); /* Total ERC20 tokens in wallet */
+  const [totalTRC20, setTotalTRC20] =
+    useState(null); /* Total ERC20 tokens in wallet */
   const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
   const [TRC20Balance, setTRC20Balance] = useState(null);
   const [formData, setFormData] = useState({
@@ -191,7 +189,7 @@ function Crossswap({ activeTab }) {
         address: token.address,
       });
       console.log("Selected token in 'from' section:", token);
-  
+
       // Infer the network based on the token's blockchain
       if (token.blockchain === "TRON") {
         console.log("Selected token is on the Tron network");
@@ -213,9 +211,7 @@ function Crossswap({ activeTab }) {
     }
     setModalOpen(false);
   };
-  
-  
-  
+
   const filteredTokenList = tokenList.filter(
     (token) =>
       token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -266,7 +262,7 @@ function Crossswap({ activeTab }) {
     console.log("Selected token in 'from' section:", selectedFromToken);
     console.log("Selected token in 'to' section:", selectedToToken);
   }, [selectedFromToken, selectedToToken]);
-  
+
   const fetchTronTokenBalance = async (tokenAddress) => {
     console.log("fetching");
     if (typeof window !== "undefined") {
@@ -324,7 +320,7 @@ function Crossswap({ activeTab }) {
               style={{
                 padding: "30px 20px",
                 display: "flex",
-                flexDirection:"column",
+                flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -464,12 +460,12 @@ function Crossswap({ activeTab }) {
                   {/* "to" section end here */}
                 </div>
               </div>
-              <div> 
-                </div>
-                <SwapComponent 
+              <div></div>
+              <SwapComponent
                 selectedFromToken={selectedFromToken}
-                selectedToToken={selectedToToken}/>
-                {/* <button></button> */}
+                selectedToToken={selectedToToken}
+              />
+              {/* <button></button> */}
             </div>
             <Modal
               className={swapStyle.modalouterdiv}
@@ -493,18 +489,7 @@ function Crossswap({ activeTab }) {
                 </h2>
               </div>
               {/* Search bar */}
-              <div className={samechainStyle.searchBar}>
-                <input
-                  id={swapStyle.srchbar}
-                  style={{ width: "100%" }}
-                  type="text"
-                  name="query"
-                  placeholder="Search by name or paste address here"
-                  className={samechainStyle.inputSearch}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+
               {/* Token list */}
               <div className={swapStyle.maindivoftokenname}>
                 <div className={swapStyle.divtokenheadclear}>
@@ -586,7 +571,7 @@ function Crossswap({ activeTab }) {
           </div>
         </div>
       </div>
-    
+
       <CrossChain activeTab={activeTab} />
     </div>
   );
