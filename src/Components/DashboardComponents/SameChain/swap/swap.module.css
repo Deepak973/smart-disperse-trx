@@ -426,13 +426,22 @@ color: white;
   border-radius: 10px;
 }
 
+.h3inmodal{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
 .tokendiv {
   width: 60%;
   border: 1px solid rgba(0, 0, 0, 0.362);
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  height: 100%;
+  height: 250px;
   padding: 10px 20px;
   border-radius: 10px;
 }
