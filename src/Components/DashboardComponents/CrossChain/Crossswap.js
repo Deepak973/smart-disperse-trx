@@ -7,7 +7,9 @@ import Modal from "react-modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import samechainStyle from "@/Components/Dashboard/samechaindashboard.module.css";
 import {
+  faClock,
   faCoins,
+  faGasPump,
   faQuestion,
   faQuestionCircle,
   faRetweet,
@@ -237,15 +239,26 @@ function Crossswap({ activeTab }) {
     }));
   };
 
+
   const isTokenSelectedInFrom = (token) => {
-    return selectedFromToken && token.address === selectedFromToken.address;
+    try {
+      return selectedFromToken && selectedFromToken.blockchain && token.address === selectedFromToken.address;
+    } catch (error) {
+      console.error("Error occurred while checking if token is selected in 'from' section:", error);
+      return false; // Or handle the error according to your application's logic
+    }
   };
-
-  // Helper function to check if a token is selected in the "to" section
+  
   const isTokenSelectedInTo = (token) => {
-    return selectedToToken && token.address === selectedToToken.address;
+    try {
+      return selectedToToken && selectedToToken.blockchain && token.address === selectedToToken.address;
+    } catch (error) {
+      console.error("Error occurred while checking if token is selected in 'to' section:", error);
+      return false; // Or handle the error according to your application's logic
+    }
   };
-
+  
+  
   // Helper function to check if a token is selected in either "from" or "to" section
   const isTokenSelected = (token) => {
     return isTokenSelectedInFrom(token) || isTokenSelectedInTo(token);
@@ -463,7 +476,9 @@ function Crossswap({ activeTab }) {
                   </div>
                   {/* "to" section end here */}
                 </div>
+                <div className={swapStyle.gaspricediv}><FontAwesomeIcon className={swapStyle.clockicon} icon={faClock} /><FontAwesomeIcon className={swapStyle.gasicon} icon={faGasPump} /></div>
               </div>
+                
               <div> 
                 </div>
                 <SwapComponent 

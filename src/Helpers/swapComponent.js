@@ -5,6 +5,8 @@ import { checkApprovalSync, checkTransactionStatusSync, prepareEvmTransaction } 
 import dotenv from 'dotenv';
 import textStyle from "@/Components/DashboardComponents/SameChain/Type/textify.module.css";
 import { fetchFeesFromQuote } from './fetchFeesFromQuote';
+import { useAccount } from 'wagmi';
+import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 dotenv.config();
 
 const rangoAPI = process.env.RANGO_API_KEY;
@@ -12,14 +14,32 @@ const rangoClient = new RangoClient("95ef894a-f8f0-4eb4-90f7-f8559896474a");
 
 
 const SwapComponent = ({selectedFromToken,selectedToToken,formData}) => {
+  const {
+    isConnected,
+    address,
+    isDisconnected,
+    status,
+    isConnecting,
+    isReconnecting,
+  } = useAccount();
+  const { address: TronAddress, connected, wallet } = useWallet();
+
   const [quote, setQuote] = useState(null);
   console.log(quote);
   console.log(selectedFromToken);
   console.log(selectedToToken)
-  console.log("from amount:",formData.fromTokenAmount);
+  console.log(address, isConnected)
+  console.log(TronAddress,connected)
+  
+
+  // console.log("from amount:",formData.fromTokenAmount);
   useEffect(() => {
     console.log("fetching quote")
     const fetchQuote = async () => {
+      if (!selectedFromToken || !selectedToToken) {
+        console.error("Selected tokens are not available.");
+        return;
+      }    
       console.log(selectedFromToken,selectedToToken)
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const swapRequest = {
@@ -36,7 +56,7 @@ const SwapComponent = ({selectedFromToken,selectedToToken,formData}) => {
         // from: selectedFromToken,
         // to: selectedToToken,
         amount: "100000",
-        fromAddress: "0x2131A6c0b66bE63E38558dC5fbe4C0ab65b9906e",
+        fromAddress: connected? TronAddress: address,
         toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
         slippage: '1.0',
         disableEstimate: false,

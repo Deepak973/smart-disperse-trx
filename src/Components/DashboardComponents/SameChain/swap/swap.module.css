@@ -10,6 +10,23 @@
   padding: 1.8rem 1rem;
   /* border: 0.5px solid white; */
 }
+.gaspricediv{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.gasicon{
+  margin-right: 35px;
+  margin-top: 10px;
+
+}
+
+.clockicon{
+  margin-left: 35px;
+  margin-top: 10px;
+
+}
 .disabledToken:hover {
   cursor: no-drop;
 }

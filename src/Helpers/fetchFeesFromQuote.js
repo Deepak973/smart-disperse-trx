@@ -1,6 +1,6 @@
 export const fetchFeesFromQuote = (quote) => {
     console.log("Quote from Helper:", quote);
-    console.log("fee object: ", quote.route.fee);
+    // console.log("fee object: ", quote.route.fee);
     if (!quote || !quote.route || !Array.isArray(quote.route.fee)) {
       // throw new Error("Quote is not available or fees are missing.");
       console.error("Quote is not available or fees are missin.");
