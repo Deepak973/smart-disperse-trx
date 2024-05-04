@@ -19,13 +19,27 @@
 .gasicon{
   margin-right: 35px;
   margin-top: 10px;
+color: white;
+}
 
+.inputswapbtndiv{
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.inputtronaddress{
+  background-color: transparent;
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid white;
 }
 
 .clockicon{
   margin-left: 35px;
   margin-top: 10px;
-
+color: white;
 }
 .disabledToken:hover {
   cursor: no-drop;

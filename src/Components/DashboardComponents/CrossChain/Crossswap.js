@@ -343,7 +343,7 @@ function Crossswap({ activeTab }) {
               }}
               className={textStyle.sametextmain}
             >
-              <div className={swapStyle.maindivofswap}>
+              <div style={{color:"black"}} className={swapStyle.maindivofswap}>
                 <div className={swapStyle.swapMain}>
                   {/* "from" section start here */}
                   <div className={swapStyle.tofromdiv}>
