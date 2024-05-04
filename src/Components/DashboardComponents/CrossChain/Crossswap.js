@@ -444,6 +444,7 @@ function Crossswap({ activeTab }) {
                   display: "flex",
                   justifyContent: "space-between",
                   textAlign: "center",
+                  color: "black",
                 }}
               >
                 <h2>Select a token</h2>
@@ -479,7 +480,7 @@ function Crossswap({ activeTab }) {
                   </button>
                 </div>
 
-                <div className={swapStyle.dropdownouter}>
+                <div className={swapStyle.dropdownouter} style={{color: "black", height: "450px"}}>
                   <div className={swapStyle.dropdown}>
                     <div className={swapStyle.networkandtoken}>
                       <div className={swapStyle.divnetwokr}>
@@ -495,7 +496,7 @@ function Crossswap({ activeTab }) {
                         ))}
                       </div>
                       <div className={swapStyle.tokendiv}>
-                        {selectedNetwork && (
+                        {selectedNetwork ? (
                           <>
                             <h2>Select Tokens</h2>
                             <h3>{selectedNetwork.name}</h3>
@@ -538,6 +539,8 @@ function Crossswap({ activeTab }) {
                               </div>
                             ))}
                           </>
+                        ):(
+                          <h3 className={swapStyle.h3inmodal}>Please select network to view the token list</h3>
                         )}
                       </div>
                     </div>
