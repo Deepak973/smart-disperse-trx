@@ -8,7 +8,7 @@ import {
 } from "./utilityFunctions";
 import dotenv from "dotenv";
 import textStyle from "@/Components/DashboardComponents/SameChain/Type/textify.module.css";
-import { fetchFeesFromQuote } from "./fetchFeesFromQuote";
+// import { fetchFeesFromQuote } from "./fetchFeesFromQuote";
 import { useAccount } from "wagmi";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import swapStyle from "@/Components/DashboardComponents/SameChain/swap/swap.module.css";
@@ -17,7 +17,13 @@ dotenv.config();
 const rangoAPI = process.env.RANGO_API_KEY;
 const rangoClient = new RangoClient("95ef894a-f8f0-4eb4-90f7-f8559896474a");
 
-const SwapComponent = ({ selectedFromToken, selectedToToken, formData }) => {
+const SwapComponent = ({
+  selectedFromToken,
+  selectedToToken,
+  fromTokenAmount,
+  formData,
+  setFormData,
+}) => {
   const [tronAddressInputValue, setTronAddressInputValue] = useState("");
   const {
     isConnected,
@@ -30,76 +36,96 @@ const SwapComponent = ({ selectedFromToken, selectedToToken, formData }) => {
   const { address: TronAddress, connected, wallet } = useWallet();
 
   const [quote, setQuote] = useState(null);
-  console.log(quote);
-  console.log(selectedFromToken);
-  console.log(selectedToToken);
-  console.log(address, isConnected);
-  console.log(TronAddress, connected);
 
   // console.log("from amount:",formData.fromTokenAmount);
   useEffect(() => {
-    console.log("fetching quote");
-    let toAddressValue = isConnected ? address : TronAddress;
-    const fetchQuote = async () => {
-      if (!selectedFromToken || !selectedToToken) {
-        console.error("Selected tokens are not available.");
-        return;
+    console.log("from token value", formData.fromTokenAmount);
+    let fromAmt = 0;
+    if (formData.fromTokenAmount && selectedFromToken && selectedToToken) {
+      if (formData.fromTokenAmount) {
+        fromAmt = ethers.utils
+          .parseUnits(formData.fromTokenAmount, 6)
+          .toString();
       }
-      console.log(selectedFromToken, selectedToToken);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const swapRequest = {
-        from: {
-          blockchain: selectedFromToken.blockchain,
-          symbol: selectedFromToken.symbol,
-          address: selectedFromToken.address,
-        },
-        to: {
-          blockchain: selectedToToken.blockchain,
-          symbol: selectedToToken.symbol,
-          address: selectedToToken.address,
-        },
-        // from: selectedFromToken,
-        // to: selectedToToken,
-        amount: "100000",
-        fromAddress: connected ? TronAddress : address,
-        // toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
-        toAddress: toAddressValue,
-        slippage: "1.0",
-        disableEstimate: false,
-        referrerAddress: null,
-        referrerFee: null,
+      console.log(fromAmt);
+
+      console.log("fetching quote");
+      let toAddressValue = isConnected ? address : TronAddress;
+      const fetchQuote = async () => {
+        if (!selectedFromToken || !selectedToToken) {
+          console.error("Selected tokens are not available.");
+          return;
+        }
+        console.log(selectedFromToken, selectedToToken);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const swapRequest = {
+          from: {
+            blockchain: selectedFromToken.blockchain,
+            symbol: selectedFromToken.symbol,
+            address: selectedFromToken.address,
+          },
+          to: {
+            blockchain: selectedToToken.blockchain,
+            symbol: selectedToToken.symbol,
+            address: selectedToToken.address,
+          },
+          // from: selectedFromToken,
+          // to: selectedToToken,
+          amount: fromAmt,
+          fromAddress: connected ? TronAddress : address,
+          // toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
+          toAddress: toAddressValue,
+          slippage: "1.0",
+          disableEstimate: false,
+          referrerAddress: null,
+          referrerFee: null,
+        };
+
+        console.log("swap", swapRequest.amount);
+        const swap = await rangoClient.swap(swapRequest);
+        if (!!swap.error || swap.resultType !== "OK") {
+          console.log("ifffffff");
+          const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
+          throw new Error(msg);
+        }
+
+        setQuote(swap);
+        const feeUsd = swap.route.feeUsd;
+        const outputAmount = swap.route.outputAmount;
+        const outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
+        setFormData((prevData) => ({
+          ...prevData,
+          ["toTokenAmount"]: outputAmountFormatted,
+        }));
+        const outputAmountMin = swap.route.outputAmountMin;
+        const outputAmountUsd = swap.route.outputAmountUsd;
+        const estimatedTimeInSeconds = swap.route.estimatedTimeInSeconds;
+        console.log("Fees in USD:", feeUsd);
+        console.log("Output Amount:", outputAmount);
+        console.log("Minimum Output Amount:", outputAmountMin);
+
+        console.log("Output Amount in USD:", outputAmountUsd);
+        console.log("Estimated Time (seconds):", estimatedTimeInSeconds);
+        console.log("Swap quote: ", swap);
       };
 
-      console.log("swap", swapRequest.amount);
-      const swap = await rangoClient.swap(swapRequest);
-      if (!!swap.error || swap.resultType !== "OK") {
-        console.log("ifffffff");
-        const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
-        throw new Error(msg);
-      }
+      const fetchFeesFromQuote = () => {
+        console.log("fetch fees.... : ");
+        if (!quote || !quote.route || !quote.route.feeUsd) {
+          // throw new Error("Quote is not available or fees are missing.");
+          console.error("Quote is not available or fees are missin.");
+          return;
+        }
 
-      setQuote(swap);
-      console.log("Swap quote: ", quote);
-    };
+        const feeusd = quote.route.feeUsd;
+        console.log("Feeusd in swap componenet:", feeusd);
+        // setFeeUsd(feeusd);
+      };
 
-    const fetchFeesFromQuote = () => {
-      console.log("fetch fees.... : ");
-      if (!quote || !quote.route || !quote.route.feeUsd) {
-        // throw new Error("Quote is not available or fees are missing.");
-        console.error("Quote is not available or fees are missin.");
-        return;
-      }
-      
-      const feeusd = quote.route.feeUsd;
-      console.log("Feeusd in swap componenet:", feeusd);
-      setFeeUsd(feeusd);
-    };
-    
-    
-    fetchQuote();
-    fetchFeesFromQuote();
-
-  }, [selectedFromToken, selectedToToken]);
+      fetchQuote();
+      fetchFeesFromQuote();
+    }
+  }, [selectedFromToken, selectedToToken, formData.fromTokenAmount]);
 
   const handleSwap = async () => {
     console.log("swap btn clicked");
@@ -134,22 +160,22 @@ const SwapComponent = ({ selectedFromToken, selectedToToken, formData }) => {
   return (
     <div>
       <div className={swapStyle.inputswapbtndiv}>
-      {selectedToToken && selectedToToken.blockchain === "TRON" && (
-        <input
-          type="text"
-          value={tronAddressInputValue}
-          onChange={(e) => setTronAddressInputValue(e.target.value)}
-          placeholder="Enter TRON address"
-          className={swapStyle.inputtronaddress}
-        />
-      )}
-      <button
-        style={{ margin: "10px" }}
-        className={textStyle.sendbutton}
-        onClick={handleSwap}
-      >
-        Swap Token
-      </button>
+        {selectedToToken && selectedToToken.blockchain === "TRON" && (
+          <input
+            type="text"
+            value={tronAddressInputValue}
+            onChange={(e) => setTronAddressInputValue(e.target.value)}
+            placeholder="Enter TRON address"
+            className={swapStyle.inputtronaddress}
+          />
+        )}
+        <button
+          style={{ margin: "10px" }}
+          className={textStyle.sendbutton}
+          onClick={handleSwap}
+        >
+          Swap Token
+        </button>
       </div>
     </div>
   );

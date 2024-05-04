@@ -20,7 +20,7 @@ import down from "@/Assets/down.png";
 import { FetchMeta } from "@/Helpers/FetchMeta";
 import SwapComponent from "@/Helpers/swapComponent";
 import { useAccount } from "wagmi";
-
+import { tokenList } from "@/Helpers/TokenListCrossChain";
 
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -36,29 +36,27 @@ function Crossswap({ activeTab }) {
   const [isSwapped, setIsSwapped] = useState(false);
   const [allNames, setAllNames] = useState([]);
   const [allAddresses, setAllAddresses] = useState([]);
-  const {address} = useAccount();
+  const { address } = useAccount();
   const [listData, setListData] = useState([]);
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
-  const [selectedNetwork, setSelectedNetwork] = useState(null);  
+  const [selectedNetwork, setSelectedNetwork] = useState(null);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const handleFetchMeta = async () => {
       console.log("fetch meta");
-          const meta = await FetchMeta(); // Calling RangoClient MetaData function
-          console.log("MetaData:   ", meta);
-    }
-    console.log("calling")
+      const meta = await FetchMeta(); // Calling RangoClient MetaData function
+      console.log("MetaData:   ", meta);
+    };
+    console.log("calling");
     handleFetchMeta();
-  },[]);
+  }, []);
 
   // Event handler for network selection
   const handleNetworkSelection = (network) => {
     setSelectedNetwork(network);
     setModalOpen(true); // Open the modal when a network is selected
   };
-
 
   const defaultTokenDetails = {
     name: null,
@@ -68,85 +66,9 @@ function Crossswap({ activeTab }) {
   };
   const [tokenDetails, setTokenDetails] = useState(defaultTokenDetails);
 
-  // const tokenList = [
-  //   { name: "USDC", address: "TEMVynQpntMqkPxP6wXTW2K7e4sM3cRmWz" },
-  //   { name: "USDT", address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf" },
-  // ];
-
-  // const networks = [
-  //   ModeTestnet, Mumbai,Polygon, PolygonTestnet,
-  // ]
-  // Dummy network and token list arrays
-  const tokenList = [
-    {
-      name: "Ethereum",
-      tokens: [
-        {
-          "blockchain": "ETH",
-          "address": null,
-          "symbol": "ETH",
-        },
-        {
-          "blockchain": "ETH",
-          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "symbol": "USDT",
-        },
-        {
-          "blockchain": "ETH",
-          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          "symbol": "USDC",
-        },
-      ],
-    },
-    {
-  name: "Optimism",
-        tokens: [
-        {
-          "blockchain": "OPTIMISM",
-          "address": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
-          "symbol": "USDT",
-        },
-        {
-          "blockchain": "OPTIMISM",
-          "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-          "symbol": "USDC",
-        },
-      ],
-    },
-    {
-    name: "Polygon",
-        tokens: [
-        {
-          "blockchain": "POLYGON",
-          "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-          "symbol": "USDT",
-        },
-        {
-          "blockchain": "POLYGON",
-          "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
-          "symbol": "USDC",
-        },
-      ],
-    },
-    {
-      name: "Tron",
-          tokens: [
-          {
-            "blockchain": "TRON",
-            "address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
-            "symbol": "USDT"
-          },
-          {
-            "blockchain": "TRON",
-            "address": "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
-            "symbol": "USDC"
-          },
-        ],
-      },
-    ]
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [totalTRC20, setTotalTRC20] = useState(null); /* Total ERC20 tokens in wallet */
+  const [totalTRC20, setTotalTRC20] =
+    useState(null); /* Total ERC20 tokens in wallet */
   const [remaining, setRemaining] = useState(null); // store remaining amount after deducting already sent value
   const [TRC20Balance, setTRC20Balance] = useState(null);
   const [formData, setFormData] = useState({
@@ -193,7 +115,7 @@ function Crossswap({ activeTab }) {
         address: token.address,
       });
       console.log("Selected token in 'from' section:", token);
-  
+
       // Infer the network based on the token's blockchain
       if (token.blockchain === "TRON") {
         console.log("Selected token is on the Tron network");
@@ -215,9 +137,8 @@ function Crossswap({ activeTab }) {
     }
     setModalOpen(false);
   };
-  
-  
-  
+
+  console.log(tokenList);
   const filteredTokenList = tokenList.filter(
     (token) =>
       token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -239,26 +160,38 @@ function Crossswap({ activeTab }) {
     }));
   };
 
-
   const isTokenSelectedInFrom = (token) => {
     try {
-      return selectedFromToken && selectedFromToken.blockchain && token.address === selectedFromToken.address;
+      return (
+        selectedFromToken &&
+        selectedFromToken.blockchain &&
+        token.address === selectedFromToken.address
+      );
     } catch (error) {
-      console.error("Error occurred while checking if token is selected in 'from' section:", error);
+      console.error(
+        "Error occurred while checking if token is selected in 'from' section:",
+        error
+      );
       return false; // Or handle the error according to your application's logic
     }
   };
-  
+
   const isTokenSelectedInTo = (token) => {
     try {
-      return selectedToToken && selectedToToken.blockchain && token.address === selectedToToken.address;
+      return (
+        selectedToToken &&
+        selectedToToken.blockchain &&
+        token.address === selectedToToken.address
+      );
     } catch (error) {
-      console.error("Error occurred while checking if token is selected in 'to' section:", error);
+      console.error(
+        "Error occurred while checking if token is selected in 'to' section:",
+        error
+      );
       return false; // Or handle the error according to your application's logic
     }
   };
-  
-  
+
   // Helper function to check if a token is selected in either "from" or "to" section
   const isTokenSelected = (token) => {
     return isTokenSelectedInFrom(token) || isTokenSelectedInTo(token);
@@ -279,7 +212,7 @@ function Crossswap({ activeTab }) {
     console.log("Selected token in 'from' section:", selectedFromToken);
     console.log("Selected token in 'to' section:", selectedToToken);
   }, [selectedFromToken, selectedToToken]);
-  
+
   const fetchTronTokenBalance = async (tokenAddress) => {
     console.log("fetching");
     if (typeof window !== "undefined") {
@@ -337,13 +270,16 @@ function Crossswap({ activeTab }) {
               style={{
                 padding: "30px 20px",
                 display: "flex",
-                flexDirection:"column",
+                flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
               }}
               className={textStyle.sametextmain}
             >
-              <div style={{color:"black"}} className={swapStyle.maindivofswap}>
+              <div
+                style={{ color: "black" }}
+                className={swapStyle.maindivofswap}
+              >
                 <div className={swapStyle.swapMain}>
                   {/* "from" section start here */}
                   <div className={swapStyle.tofromdiv}>
@@ -476,15 +412,26 @@ function Crossswap({ activeTab }) {
                   </div>
                   {/* "to" section end here */}
                 </div>
-                <div className={swapStyle.gaspricediv}><FontAwesomeIcon className={swapStyle.clockicon} icon={faClock} /><FontAwesomeIcon className={swapStyle.gasicon} icon={faGasPump} /></div>
-              </div>
-                
-              <div> 
+                <div className={swapStyle.gaspricediv}>
+                  <FontAwesomeIcon
+                    className={swapStyle.clockicon}
+                    icon={faClock}
+                  />
+                  <FontAwesomeIcon
+                    className={swapStyle.gasicon}
+                    icon={faGasPump}
+                  />
                 </div>
-                <SwapComponent 
+              </div>
+
+              <div></div>
+              <SwapComponent
                 selectedFromToken={selectedFromToken}
-                selectedToToken={selectedToToken}/>
-                {/* <button></button> */}
+                selectedToToken={selectedToToken}
+                formData={formData}
+                setFormData={setFormData}
+              />
+              {/* <button></button> */}
             </div>
             <Modal
               className={swapStyle.modalouterdiv}
@@ -601,7 +548,7 @@ function Crossswap({ activeTab }) {
           </div>
         </div>
       </div>
-    
+
       <CrossChain activeTab={activeTab} />
     </div>
   );
