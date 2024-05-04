@@ -49,6 +49,7 @@ function Swap({ activeTab }) {
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
   const [isVisible, setIsVisible] = useState(false);
+  const [isEnoughBalance, setIsEnoughBalance] = useState(true);
 
   const defaultTokenDetails = {
     name: null,
@@ -268,44 +269,54 @@ function Swap({ activeTab }) {
 
   const getAmountIn = async (value) => {
     const con = await SunSwapInstance();
-    const amountIn = ethers.utils.parseUnits(value, 6);
-    console.log(amountIn);
-    if (selectedToToken?.address && selectedFromToken?.address) {
-      const outputAmount = await con
-        .getAmountsIn(amountIn, [
-          selectedFromToken.address,
-          selectedToToken.address,
-        ])
-        .call();
-      console.log(outputAmount["amounts"][0]);
-      const amountInFrom = ethers.utils.formatUnits(
-        outputAmount["amounts"][0],
-        6
-      );
-      console.log(amountInFrom);
-      setFormData((prevData) => ({
-        ...prevData,
-        ["fromTokenAmount"]: amountInFrom,
-      }));
-      const increasePercentage = 10 / 100;
-      const increaseAmount = parseFloat(amountInFrom) * increasePercentage;
-      const newAmount = parseFloat(amountInFrom) + increaseAmount;
-      const newAmountfixed = newAmount.toFixed(6);
-      console.log(newAmountfixed);
-      const maxSold = ethers.utils.parseUnits(newAmountfixed.toString(), 6);
-      console.log(maxSold);
-      setMaximumSold(maxSold);
-      const percentageToCalculate = 3;
-      const calculatedPercentage = (
-        (parseFloat(amountInFrom) * percentageToCalculate) /
-        100
-      ).toFixed(6);
-      const calculatedPercentageInSmallestUnit = ethers.utils.parseUnits(
-        calculatedPercentage.toString(),
-        6
-      );
-      console.log(calculatedPercentageInSmallestUnit);
-      setTransactionFees(calculatedPercentageInSmallestUnit);
+    if (formData.toTokenAmount !== "") {
+      const amountIn = ethers.utils.parseUnits(value, 6);
+      console.log(formData.toTokenAmount);
+      const toToken = ethers.utils.parseUnits(formData.toTokenAmount, 6);
+      console.log(amountIn, toBalance);
+      if (amountIn.gt(toBalance)) {
+        setIsEnoughBalance(false);
+        console.log("balance exceeded");
+      } else {
+        setIsEnoughBalance(true);
+      }
+      if (selectedToToken?.address && selectedFromToken?.address) {
+        const outputAmount = await con
+          .getAmountsIn(amountIn, [
+            selectedFromToken.address,
+            selectedToToken.address,
+          ])
+          .call();
+        console.log(outputAmount["amounts"][0]);
+        const amountInFrom = ethers.utils.formatUnits(
+          outputAmount["amounts"][0],
+          6
+        );
+        console.log(amountInFrom);
+        setFormData((prevData) => ({
+          ...prevData,
+          ["fromTokenAmount"]: amountInFrom,
+        }));
+        const increasePercentage = 10 / 100;
+        const increaseAmount = parseFloat(amountInFrom) * increasePercentage;
+        const newAmount = parseFloat(amountInFrom) + increaseAmount;
+        const newAmountfixed = newAmount.toFixed(6);
+        console.log(newAmountfixed);
+        const maxSold = ethers.utils.parseUnits(newAmountfixed.toString(), 6);
+        console.log(maxSold);
+        setMaximumSold(maxSold);
+        const percentageToCalculate = 3;
+        const calculatedPercentage = (
+          (parseFloat(amountInFrom) * percentageToCalculate) /
+          100
+        ).toFixed(6);
+        const calculatedPercentageInSmallestUnit = ethers.utils.parseUnits(
+          calculatedPercentage.toString(),
+          6
+        );
+        console.log(calculatedPercentageInSmallestUnit);
+        setTransactionFees(calculatedPercentageInSmallestUnit);
+      }
     }
   };
 
@@ -329,20 +340,21 @@ function Swap({ activeTab }) {
 
   const handleToInputChange = async (e) => {
     const { name, value } = e.target;
-
-    console.log(name, value);
-    if (value == "") {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: "",
-      }));
-    }
-    if (TronIsValidValue(value)) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-      getAmountIn(value);
+    if (selectedToToken && selectedFromToken) {
+      console.log(name, value);
+      if (value == "") {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: "",
+        }));
+      }
+      if (TronIsValidValue(value)) {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: value,
+        }));
+        getAmountIn(value);
+      }
     }
   };
 
@@ -472,9 +484,18 @@ function Swap({ activeTab }) {
     if (currentSection === "from") {
       setSelectedFromToken(null);
       setFromBalance(null);
+      setFormData((prevData) => ({
+        ...prevData,
+        ["fromTokenAmount"]: "",
+      }));
     } else if (currentSection === "to") {
       setSelectedToToken(null);
       setToBalance(null);
+      setFormData((prevData) => ({
+        ...prevData,
+        ["toTokenAmount"]: "",
+        ["fromTokenAmount"]: "",
+      }));
     }
     handleCloseModal();
   };
@@ -647,6 +668,9 @@ function Swap({ activeTab }) {
                     </span>
                   </button>
                 </div>
+              </div>
+              <div>
+                {!isEnoughBalance ? "You dont have enough Balance" : null}
               </div>
               <div
                 style={{
