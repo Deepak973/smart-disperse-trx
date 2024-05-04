@@ -82,11 +82,23 @@ const SwapComponent = ({ selectedFromToken, selectedToToken, formData }) => {
       console.log("Swap quote: ", quote);
     };
 
+    const fetchFeesFromQuote = () => {
+      console.log("fetch fees.... : ");
+      if (!quote || !quote.route || !quote.route.feeUsd) {
+        // throw new Error("Quote is not available or fees are missing.");
+        console.error("Quote is not available or fees are missin.");
+        return;
+      }
+      
+      const feeusd = quote.route.feeUsd;
+      console.log("Feeusd in swap componenet:", feeusd);
+      setFeeUsd(feeusd);
+    };
+    
+    
     fetchQuote();
+    fetchFeesFromQuote();
 
-    // FOR CALCULATING TOTAL FEES
-    const fees = fetchFeesFromQuote(quote);
-    console.log("Fees:", fees);
   }, [selectedFromToken, selectedToToken]);
 
   const handleSwap = async () => {
