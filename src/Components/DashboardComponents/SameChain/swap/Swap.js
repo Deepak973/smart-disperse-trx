@@ -269,54 +269,52 @@ function Swap({ activeTab }) {
 
   const getAmountIn = async (value) => {
     const con = await SunSwapInstance();
-    if (formData.toTokenAmount !== "") {
-      const amountIn = ethers.utils.parseUnits(value, 6);
-      console.log(formData.toTokenAmount);
-      const toToken = ethers.utils.parseUnits(formData.toTokenAmount, 6);
-      console.log(amountIn, toBalance);
-      if (amountIn.gt(toBalance)) {
-        setIsEnoughBalance(false);
-        console.log("balance exceeded");
-      } else {
-        setIsEnoughBalance(true);
-      }
-      if (selectedToToken?.address && selectedFromToken?.address) {
-        const outputAmount = await con
-          .getAmountsIn(amountIn, [
-            selectedFromToken.address,
-            selectedToToken.address,
-          ])
-          .call();
-        console.log(outputAmount["amounts"][0]);
-        const amountInFrom = ethers.utils.formatUnits(
-          outputAmount["amounts"][0],
-          6
-        );
-        console.log(amountInFrom);
-        setFormData((prevData) => ({
-          ...prevData,
-          ["fromTokenAmount"]: amountInFrom,
-        }));
-        const increasePercentage = 10 / 100;
-        const increaseAmount = parseFloat(amountInFrom) * increasePercentage;
-        const newAmount = parseFloat(amountInFrom) + increaseAmount;
-        const newAmountfixed = newAmount.toFixed(6);
-        console.log(newAmountfixed);
-        const maxSold = ethers.utils.parseUnits(newAmountfixed.toString(), 6);
-        console.log(maxSold);
-        setMaximumSold(maxSold);
-        const percentageToCalculate = 3;
-        const calculatedPercentage = (
-          (parseFloat(amountInFrom) * percentageToCalculate) /
-          100
-        ).toFixed(6);
-        const calculatedPercentageInSmallestUnit = ethers.utils.parseUnits(
-          calculatedPercentage.toString(),
-          6
-        );
-        console.log(calculatedPercentageInSmallestUnit);
-        setTransactionFees(calculatedPercentageInSmallestUnit);
-      }
+
+    const amountIn = ethers.utils.parseUnits(value, 6);
+
+    console.log(amountIn, toBalance);
+    if (amountIn.gt(toBalance)) {
+      setIsEnoughBalance(false);
+      console.log("balance exceeded");
+    } else {
+      setIsEnoughBalance(true);
+    }
+    if (selectedToToken?.address && selectedFromToken?.address) {
+      const outputAmount = await con
+        .getAmountsIn(amountIn, [
+          selectedFromToken.address,
+          selectedToToken.address,
+        ])
+        .call();
+      console.log(outputAmount["amounts"][0]);
+      const amountInFrom = ethers.utils.formatUnits(
+        outputAmount["amounts"][0],
+        6
+      );
+      console.log(amountInFrom);
+      setFormData((prevData) => ({
+        ...prevData,
+        ["fromTokenAmount"]: amountInFrom,
+      }));
+      const increasePercentage = 0.5 / 100;
+      const increaseAmount = parseFloat(amountInFrom) * increasePercentage;
+      const newAmount = parseFloat(amountInFrom) + increaseAmount;
+      const newAmountfixed = newAmount.toFixed(6);
+      console.log(newAmountfixed);
+      const maxSold = ethers.utils.parseUnits(newAmountfixed.toString(), 6);
+      console.log(maxSold);
+      setMaximumSold(maxSold);
+      const percentageToCalculate = 3;
+      const calculatedPercentage = (
+        (parseFloat(amountInFrom) * percentageToCalculate) /
+        100
+      ).toFixed(6);
+      const calculatedPercentageInSmallestUnit = ethers.utils.parseUnits(
+        calculatedPercentage.toString(),
+        6
+      );
+      console.log(calculatedPercentageInSmallestUnit);
+      setTransactionFees(calculatedPercentageInSmallestUnit);
     }
   };
 
@@ -735,6 +733,7 @@ function Swap({ activeTab }) {
         <button
           id={textStyle.greenbackground}
           className={textStyle.sendbutton}
+          disabled={!isEnoughBalance}
           onClick={() => {
             setIsRender(true);
             loadToken();
