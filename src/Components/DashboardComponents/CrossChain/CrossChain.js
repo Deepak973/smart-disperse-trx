@@ -17,83 +17,27 @@ function CrossChain({ activeTab }) {
   /*
   Funtion : To load SendEth component
   */
-  const handleSendEthbuttonClick = () => {
-    setIsSendingEth(true);
-    setIsSendingToken(false);
-  };
+  // const handleSendEthbuttonClick = () => {
+  //   setIsSendingEth(true);
+  //   setIsSendingToken(false);
+  // };
 
-  /*
-  Funtion : To load SendToken component
-  */
+  // /*
+  // Funtion : To load SendToken component
+  // */
 
-  const handleImporttokenbuttonClick = () => {
-    // console.log("import token");
-    setIsSendingToken(true);
-    setListData([]);
-    setIsSendingEth(false);
-  };
+  // const handleImporttokenbuttonClick = () => {
+  //   // console.log("import token");
+  //   setIsSendingToken(true);
+  //   setListData([]);
+  //   setIsSendingEth(false);
+  // };
 
   return (
+    
     <>
       <div className={textStyle.divtocoversameetextdiv}>
         <div className={textStyle.divforwholetoken}>
-          <div className={textStyle.titlesametexttextarea}>
-            <h2
-              style={{
-                padding: "10px",
-                letterSpacing: "1px",
-                fontSize: "20px",
-                margin: "0px",
-                fontWeight: "700",
-              }}
-            >
-              Choose Your Token, Define Your Destination
-            </h2>
-          </div>
-          <div
-            id="seend-eth"
-            style={{
-              padding: "30px 20px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            className={textStyle.sametextmain}
-          >
-            <div id="send-eth" className={textStyle.sendethdiv}>
-              <select id={textStyle.blockchainChains}>
-                <option value="bitcoin">Select Token</option>
-                <option value="bitcoin">Bitcoin</option>
-                <option value="ethereum">Ethereum</option>
-                <option value="binance-smart-chain">Binance Smart Chain</option>
-                <option value="solana">Solana</option>
-                <option value="cardano">Cardano</option>
-                <option value="ripple">Ripple</option>
-                <option value="polkadot">Polkadot</option>
-                <option value="tezos">Tezos</option>
-                <option value="tron">Tron</option>
-                <option value="eos">EOS</option>
-              </select>
-            </div>
-
-            <div className={textStyle.importtokendiv}>
-              <div style={{ margin: "10px 10px" }}>⇨</div>
-
-              <select id={textStyle.blockchainChains}>
-                <option value="bitcoin">Select Chain</option>
-                <option value="bitcoin">Bitcoin</option>
-                <option value="ethereum">Ethereum</option>
-                <option value="binance-smart-chain">Binance Smart Chain</option>
-                <option value="solana">Solana</option>
-                <option value="cardano">Cardano</option>
-                <option value="ripple">Ripple</option>
-                <option value="polkadot">Polkadot</option>
-                <option value="tezos">Tezos</option>
-                <option value="tron">Tron</option>
-                <option value="eos">EOS</option>
-              </select>
-            </div>
-          </div>
 
           {isSendingEth ? (
             <SendEth
