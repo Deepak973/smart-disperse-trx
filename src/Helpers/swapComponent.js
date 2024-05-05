@@ -12,6 +12,7 @@ import textStyle from "@/Components/DashboardComponents/SameChain/Type/textify.m
 import { useAccount } from "wagmi";
 import { useWallet } from "@tronweb3/tronwallet-adapter-react-hooks";
 import swapStyle from "@/Components/DashboardComponents/SameChain/swap/swap.module.css";
+import { ToastContainer, toast } from "react-toastify";
 dotenv.config();
 
 const rangoAPI = process.env.RANGO_API_KEY;
@@ -45,13 +46,24 @@ const SwapComponent = ({
   useEffect(() => {
     console.log("from token value", formData.fromTokenAmount);
     console.log(quote, "🚀");
-    let fromAmt = 0;
+    var fromAmt = 0;
     if (formData.fromTokenAmount && selectedFromToken && selectedToToken) {
       if (formData.fromTokenAmount) {
-        fromAmt = ethers.utils
-          .parseUnits(formData.fromTokenAmount, 6)
-          .toString();
-      }
+        fromAmt = formData.fromTokenAmount;
+        let decimalIndex = fromAmt.indexOf('.');
+        console.log(decimalIndex, "deciamalsindex"); 
+        // console.log(fromAmt.substring(decimalIndex + 1).length, "1234");
+        // Check if there is a decimal point and if the length of the decimal part is greater than six
+        if (decimalIndex === -1 || fromAmt.substring(decimalIndex + 1).length <= 6) {
+            fromAmt = ethers.utils.parseUnits(fromAmt, 6).toString();
+            console.log(fromAmt)
+        }
+        else {
+          toast.error("Please Enter amount greater than 6 decimals");
+        }
+        
+    }
+    
       console.log(fromAmt);
 
       console.log("fetching quote");
@@ -89,9 +101,14 @@ const SwapComponent = ({
         console.log("swap", swapRequest.amount);
         const swap = await rangoClient.swap(swapRequest);
         if (!!swap.error || swap.resultType !== "OK") {
-          console.log("ifffffff");
+
           const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
-          throw new Error(msg);
+
+          console.log(swap.error);
+          if(swap.error.substring(0, 5) === 'Rango'){
+            toast.error("Price Impact is very high, Smart Disperse prohibits you from performing this swap!");
+          }
+          else toast.error(swap.error);
         }
 
         setQuote(swap);
@@ -184,6 +201,7 @@ const SwapComponent = ({
   };
 
   return (
+    
     <div>
       <div className={swapStyle.inputswapbtndiv}>
         {selectedToToken && selectedToToken.blockchain === "TRON" && (
@@ -203,6 +221,7 @@ const SwapComponent = ({
           Swap Token
         </button>
       </div>
+      <ToastContainer/>
     </div>
   );
 };
