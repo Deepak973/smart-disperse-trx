@@ -76,9 +76,8 @@ function Modal({ closeModal }) {
           <button
             className={homeStyle.continuebutton}
             style={{ width: "70%", margin: "10px auto", padding: "10px" }}
-            disabled
           >
-            Continue on the Cross-Chain Coming Soon.....
+            Continue on the Cross-Chain
           </button>
         </Link>
       </div>

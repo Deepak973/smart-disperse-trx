@@ -1,4 +1,6 @@
 import { RangoClient, TransactionStatus } from "rango-sdk-basic";
+import { ToastContainer, toast } from "react-toastify";
+
 
 export function prepareEvmTransaction(evmTx, isApprove) {
   const gasPrice = !!evmTx.gasPrice && !evmTx.gasPrice.startsWith('0x') ? '0x' + parseInt(evmTx.gasPrice).toString(16) : null;
@@ -40,10 +42,11 @@ export async function checkTransactionStatusSync(requestId, txId, rangoClient) {
         txId,
       });
       if (!!txStatus) {
-        console.log({ txStatus });
+        // console.log({ txStatus });
+        // toast.success(txStatus);
         if (
           !!txStatus.status &&
-          [TransactionStatus.FAILED, TransactionStatus.SUCCESS].includes(txStatus.status)
+          [TransactionStatus.FAILED, TransactionStatus.SUCCESS,TransactionStatus.RUNNING].includes(txStatus.status)
         ) {
           return txStatus;
         }

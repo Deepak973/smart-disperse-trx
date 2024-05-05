@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { RangoClient } from "rango-sdk-basic";
+import { RangoClient, TransactionStatus } from "rango-sdk-basic";
 import {
   checkApprovalSync,
   checkTransactionStatusSync,
@@ -29,7 +29,7 @@ const SwapComponent = ({
   setfromusdvalue,
   setFormData,
 }) => {
-  const [tronAddressInputValue, setTronAddressInputValue] = useState("");
+  const [toTokenInputValue, setToTokenInputValue] = useState("");
   const {
     isConnected,
     address,
@@ -39,7 +39,7 @@ const SwapComponent = ({
     isReconnecting,
   } = useAccount();
   const { address: TronAddress, connected, wallet } = useWallet();
-
+  const [swapstatus, setswapstatus] = useState("Begin payment");
   const [quote, setQuote] = useState(null);
 
   // console.log("from amount:",formData.fromTokenAmount);
@@ -50,20 +50,21 @@ const SwapComponent = ({
     if (formData.fromTokenAmount && selectedFromToken && selectedToToken) {
       if (formData.fromTokenAmount) {
         fromAmt = formData.fromTokenAmount;
-        let decimalIndex = fromAmt.indexOf('.');
-        console.log(decimalIndex, "deciamalsindex"); 
+        let decimalIndex = fromAmt.indexOf(".");
+        console.log(decimalIndex, "deciamalsindex");
         // console.log(fromAmt.substring(decimalIndex + 1).length, "1234");
         // Check if there is a decimal point and if the length of the decimal part is greater than six
-        if (decimalIndex === -1 || fromAmt.substring(decimalIndex + 1).length <= 6) {
-            fromAmt = ethers.utils.parseUnits(fromAmt, 6).toString();
-            console.log(fromAmt)
-        }
-        else {
+        if (
+          decimalIndex === -1 ||
+          fromAmt.substring(decimalIndex + 1).length <= 6
+        ) {
+          fromAmt = ethers.utils.parseUnits(fromAmt, 6).toString();
+          console.log(fromAmt);
+        } else {
           toast.error("Please Enter amount greater than 6 decimals");
         }
-        
-    }
-    
+      }
+
       console.log(fromAmt);
 
       console.log("fetching quote");
@@ -90,7 +91,7 @@ const SwapComponent = ({
           // to: selectedToToken,
           amount: fromAmt,
           fromAddress: connected ? TronAddress : address,
-          toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
+          toAddress: toTokenInputValue,
           // toAddress: toAddressValue,
           slippage: "1.0",
           disableEstimate: false,
@@ -98,31 +99,33 @@ const SwapComponent = ({
           referrerFee: null,
         };
 
-        console.log("swap", swapRequest.amount);
+        console.log("swap", swapRequest);
         const swap = await rangoClient.swap(swapRequest);
         if (!!swap.error || swap.resultType !== "OK") {
-
           const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
 
           console.log(swap.error);
-          if(swap.error.substring(0, 5) === 'Rango'){
-            toast.error("Price Impact is very high, Smart Disperse prohibits you from performing this swap!");
-          }
-          else toast.error(swap.error);
+          if (swap.error.substring(0, 5) === "Rango") {
+            toast.error(
+              "Price Impact is very high, Smart Disperse prohibits you from performing this swap!"
+            );
+          } else toast.error(swap.error);
         }
 
         setQuote(swap);
         const feeUsd = swap.route.feeUsd;
         const outputAmount = swap.route.outputAmount;
         var outputAmountFormatted = 0;
-        if(selectedToToken.symbol === 'ETH') outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
+        if (selectedToToken.symbol === "ETH")
+          outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
         else outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
-        console.log(outputAmountFormatted,outputAmount,"👁️👁️")
+        console.log(outputAmountFormatted, outputAmount, "👁️👁️");
         // ----------------------------
         var outputAmountFormatted = 0;
-        if(selectedToToken.symbol === 'ETH') outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
+        if (selectedToToken.symbol === "ETH")
+          outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
         else outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
-        console.log(outputAmountFormatted,outputAmount,"👁️👁️")
+        console.log(outputAmountFormatted, outputAmount, "👁️👁️");
         setFormData((prevData) => ({
           ...prevData,
           ["toTokenAmount"]: outputAmountFormatted,
@@ -132,15 +135,17 @@ const SwapComponent = ({
         const formatTime = (totalSeconds) => {
           const minutes = Math.floor(totalSeconds / 60);
           const seconds = totalSeconds % 60;
-          return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+          return `${minutes < 10 ? "0" : ""}${minutes}:${
+            seconds < 10 ? "0" : ""
+          }${seconds}`;
         };
-        
+
         const estimatedTimeInSeconds = swap.route.estimatedTimeInSeconds;
         const formattedTime = formatTime(estimatedTimeInSeconds);
         const usdprice = swap.route.path[0].from.usdPrice;
         setfromusdvalue(usdprice);
-        console.log(usdprice)
-        console.log(formattedTime);        
+        console.log(usdprice);
+        console.log(formattedTime);
         setestimatetime(formattedTime);
         console.log("Fees in USD:", feeUsd);
         setusdfee(feeUsd);
@@ -170,8 +175,22 @@ const SwapComponent = ({
     }
   }, [selectedFromToken, selectedToToken, formData.fromTokenAmount]);
 
-  const handleSwap = async () => {
-    console.log("swap btn clicked");
+  const getToAddress = () => {
+    if (
+      selectedFromToken &&
+      selectedToToken &&
+      selectedFromToken.blockchain === "TRON" &&
+      selectedToToken.blockchain === "TRON"
+    ) {
+      return TronAddress;
+    } else {
+      return address;
+    }
+  };
+
+ const handleSwap = async () => {
+  console.log("swap btn clicked");
+  try {
     if (!quote) return;
     const { ethereum } = window;
     if (ethereum) {
@@ -180,6 +199,22 @@ const SwapComponent = ({
       const signer = provider.getSigner();
       const evmTransaction = quote.tx;
       console.log("1");
+      // Set toAddress based on selected tokens' blockchains
+      let toAddress;
+      if (
+        selectedFromToken &&
+        selectedToToken &&
+        selectedFromToken.blockchain === "TRON" &&
+        selectedToToken.blockchain === "TRON"
+      ) {
+        toAddress = TronAddress;
+      } else {
+        toAddress = address;
+      }
+      
+      // Update swap request object with the correct toAddress
+      evmTransaction.toAddress = toAddress;
+
       // needs approving the tx
       if (quote.approveTo && quote.approveData) {
         const approveTx = prepareEvmTransaction(evmTransaction, true);
@@ -191,34 +226,70 @@ const SwapComponent = ({
       // main transaction
       const mainTx = prepareEvmTransaction(evmTransaction, false);
       const mainTxHash = (await signer.sendTransaction(mainTx)).hash;
-      const txStatus = await checkTransactionStatusSync(
-        quote.requestId,
-        mainTxHash,
-        rangoClient
-      );
-      console.log("txstatus: ", txStatus);
+      while (true) {
+        const txStatus = await checkTransactionStatusSync(
+          quote.requestId,
+          mainTxHash,
+          rangoClient
+        );
+        console.log("txstatus: ", txStatus.status);
+        setswapstatus(txStatus.status);
+        if (
+          !!txStatus.status &&
+          [TransactionStatus.FAILED, TransactionStatus.SUCCESS].includes(
+            txStatus.status
+          )
+        ) {
+          console.log(txStatus.status);
+          setswapstatus(txStatus.status);
+          break;
+        }
+      }
     }
-  };
+  } catch (error) {
+    console.log("error", error);
+    toast.error(error);
+  }
+};
 
   return (
-    
     <div>
       <div className={swapStyle.inputswapbtndiv}>
-        {selectedToToken && selectedToToken.blockchain === "TRON" && (
-          <input
-            type="text"
-            value={tronAddressInputValue}
-            onChange={(e) => setTronAddressInputValue(e.target.value)}
-            placeholder="Enter TRON address"
-            className={swapStyle.inputtronaddress}
-          />
-        )}
+      {selectedToToken &&
+          selectedToToken.blockchain === "TRON" &&
+          selectedFromToken &&
+          selectedFromToken.blockchain !== "TRON" && (
+            <div className={swapStyle.inputswapbtndiv}>
+              <input
+                type="text"
+                value={toTokenInputValue}
+                onChange={(e) => setToTokenInputValue(e.target.value)}
+                placeholder="Enter TRON address"
+                className={swapStyle.inputtronaddress}
+              />
+            </div>
+          )}
+        {selectedToToken &&
+          selectedToToken.blockchain !== "TRON" &&
+          selectedFromToken &&
+          selectedFromToken.blockchain === "TRON" && (
+            <div className={swapStyle.inputswapbtndiv}>
+              <input
+                type="text"
+                value={toTokenInputValue}
+                onChange={(e) => setToTokenInputValue(e.target.value)}
+                placeholder="Enter EVM address"
+                className={swapStyle.inputtronaddress}
+              />
+            </div>
+          )}
+
         <button
           style={{ margin: "10px" }}
           className={textStyle.sendbutton}
           onClick={handleSwap}
         >
-          Swap Token
+          {swapstatus }
         </button>
       </div>
       <ToastContainer/>
