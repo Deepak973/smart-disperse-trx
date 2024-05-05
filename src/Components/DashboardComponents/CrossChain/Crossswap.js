@@ -21,6 +21,8 @@ import { FetchMeta } from "@/Helpers/FetchMeta";
 import SwapComponent from "@/Helpers/swapComponent";
 import { useAccount } from "wagmi";
 import { tokenList } from "@/Helpers/TokenListCrossChain";
+import { ToastContainer, toast } from "react-toastify";
+
 
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -43,8 +45,10 @@ function Crossswap({ activeTab }) {
   const [selectedNetwork, setSelectedNetwork] = useState(null);
   const [usdfee, setusdfee] = useState("0");
   const [estimatedtime, setestimatetime] = useState("0");
-  const [outputusd, setoutputusd] = useState("");
+  const [outputusd, setoutputusd] = useState("0");
   const [fromusdvalue, setfromusdvalue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [calculatedData, setCalculatedData] = useState(null);
 
   useEffect(() => {
     const handleFetchMeta = async () => {
@@ -108,8 +112,21 @@ function Crossswap({ activeTab }) {
     setModalOpen(false);
   };
   const handleTokenSelection = (token) => {
-    console.log("clicked");
     if (currentSection === "from") {
+      if (token.blockchain === "TRON") {
+        if (!connected) {
+          console.log("Connect to Tron wallet"); // Log a message if user is not connected
+          toast.error("Please connect to Tron Wallet");
+          return;
+        }
+      } else {
+        if(connected){
+          console.log("Connect to EVM wallet"); // Log a message if user is not connected
+          toast.error("Please connect to EVM Wallet");
+          return;
+        }
+      
+      }
       console.log("from....");
       setSelectedFromToken(token);
       // Update token details for "from" section
@@ -119,6 +136,16 @@ function Crossswap({ activeTab }) {
         address: token.address,
       });
       console.log("Selected token in 'from' section:", token);
+
+      // Update outputusdd based on selected token
+      if (token.symbol === "ETH") {
+        setoutputusd((formData.fromTokenAmount * fromusdvalue).toFixed(6));
+        setoutputusd((formData.toTokenAmount * fromusdvalue).toFixed(6));
+      } else {
+        setoutputusd((formData.fromTokenAmount * fromusdvalue).toFixed(6));
+        setoutputusd((formData.toTokenAmount * fromusdvalue).toFixed(6));
+
+      }
 
       // Infer the network based on the token's blockchain
       if (token.blockchain === "TRON") {
@@ -130,6 +157,7 @@ function Crossswap({ activeTab }) {
       }
     } else if (currentSection === "to") {
       console.log("to....");
+      
       setSelectedToToken(token);
       // Update token details for "to" section
       setTokenDetails({
@@ -564,9 +592,7 @@ function Crossswap({ activeTab }) {
                                     : ""}
                                 </div>
                                 <div>
-                                  {"("}
                                   {token.address}
-                                  {")"}
                                 </div>
                               </div>
                             ))}
@@ -580,6 +606,7 @@ function Crossswap({ activeTab }) {
                     </div>
                   </div>
                 </div>
+                <ToastContainer/>
               </div>
             </Modal>
           </div>

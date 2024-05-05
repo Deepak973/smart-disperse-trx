@@ -16,6 +16,7 @@ import {
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
 import { usePathname } from "next/navigation";
+import { TronLinkAdapter } from "@tronweb3/tronwallet-adapter-tronlink";
 import { useDisconnect } from "wagmi";
 
 function Navbar() {
@@ -37,6 +38,7 @@ function Navbar() {
   const cookie = new Cookies();
   const [isMainnet, setIsMainnet] = useState(true);
   const { disconnect } = useDisconnect();
+  const [TronNetowork, setTronNetwortk] = useState("Wrong Network");
 
   const { address: Tronaddress, connected: TronConnected } = useWallet();
 
@@ -228,6 +230,24 @@ function Navbar() {
     }
   }, [isConnected, TronConnected]);
 
+  useEffect(() => {
+  console.log("chainid....");
+  const getChainId = async () => {
+    if (typeof window !== "undefined") {
+      const { tronWeb } = window;
+      const adapter = new TronLinkAdapter();
+      let net = await adapter.network();
+      console.log(net);
+      const tronnetwork = net.networkType;
+      console.log(tronnetwork);
+      setTronNetwortk(tronnetwork);
+      // settronNetwork(tronnetwork);
+      // console.log(settronNetwork);
+    }
+  };
+  getChainId();
+}, [Tronaddress]);
+
   return (
     <div className={navStyle.navbarMain}>
       <div className={navStyle.divtoflexlogoconnectwallet}>
@@ -272,13 +292,19 @@ function Navbar() {
               {!isHome ? (
                 isCrossChain ? (
                   <>
-                    {!isConnected ? <TronWallet /> : null}
+                    {!isConnected ? 
+                    
+                      <TronWallet /> 
+                    : null}
                     {!TronConnected ? (
                       <ConnectButtonCustom isMainnet={isMainnet} />
                     ) : null}
                   </>
                 ) : (
-                  <TronWallet />
+                  <div className={navStyle.walletarndnetwork}>
+                      <div className={navStyle.walletandnetwork}>{TronNetowork}</div>
+                      <TronWallet />
+                    </div>
                 )
               ) : null}
             </span>
