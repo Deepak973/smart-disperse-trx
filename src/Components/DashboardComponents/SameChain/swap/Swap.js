@@ -49,6 +49,7 @@ function Swap({ activeTab }) {
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
   const [isVisible, setIsVisible] = useState(false);
+  const [isEnoughBalance, setIsEnoughBalance] = useState(true);
 
   const defaultTokenDetails = {
     name: null,
@@ -268,8 +269,16 @@ function Swap({ activeTab }) {
 
   const getAmountIn = async (value) => {
     const con = await SunSwapInstance();
+
     const amountIn = ethers.utils.parseUnits(value, 6);
-    console.log(amountIn);
+
+    console.log(amountIn, toBalance);
+    if (amountIn.gt(toBalance)) {
+      setIsEnoughBalance(false);
+      console.log("balance exceeded");
+    } else {
+      setIsEnoughBalance(true);
+    }
     if (selectedToToken?.address && selectedFromToken?.address) {
       const outputAmount = await con
         .getAmountsIn(amountIn, [
@@ -287,7 +296,7 @@ function Swap({ activeTab }) {
         ...prevData,
         ["fromTokenAmount"]: amountInFrom,
       }));
-      const increasePercentage = 10 / 100;
+      const increasePercentage = 0.5 / 100;
       const increaseAmount = parseFloat(amountInFrom) * increasePercentage;
       const newAmount = parseFloat(amountInFrom) + increaseAmount;
       const newAmountfixed = newAmount.toFixed(6);
@@ -329,20 +338,21 @@ function Swap({ activeTab }) {
 
   const handleToInputChange = async (e) => {
     const { name, value } = e.target;
-
-    console.log(name, value);
-    if (value == "") {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: "",
-      }));
-    }
-    if (TronIsValidValue(value)) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-      getAmountIn(value);
+    if (selectedToToken && selectedFromToken) {
+      console.log(name, value);
+      if (value == "") {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: "",
+        }));
+      }
+      if (TronIsValidValue(value)) {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: value,
+        }));
+        getAmountIn(value);
+      }
     }
   };
 
@@ -472,9 +482,18 @@ function Swap({ activeTab }) {
     if (currentSection === "from") {
       setSelectedFromToken(null);
       setFromBalance(null);
+      setFormData((prevData) => ({
+        ...prevData,
+        ["fromTokenAmount"]: "",
+      }));
     } else if (currentSection === "to") {
       setSelectedToToken(null);
       setToBalance(null);
+      setFormData((prevData) => ({
+        ...prevData,
+        ["toTokenAmount"]: "",
+        ["fromTokenAmount"]: "",
+      }));
     }
     handleCloseModal();
   };
@@ -648,6 +667,9 @@ function Swap({ activeTab }) {
                   </button>
                 </div>
               </div>
+              <div>
+                {!isEnoughBalance ? "You dont have enough Balance" : null}
+              </div>
               <div
                 style={{
                   color: "white",
@@ -711,6 +733,7 @@ function Swap({ activeTab }) {
         <button
           id={textStyle.greenbackground}
           className={textStyle.sendbutton}
+          disabled={!isEnoughBalance}
           onClick={() => {
             setIsRender(true);
             loadToken();

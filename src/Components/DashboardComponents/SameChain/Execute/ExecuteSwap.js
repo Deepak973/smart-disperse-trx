@@ -77,6 +77,7 @@ function ExecuteSwap(props) {
     if (props.TRC20Balance.eq(props.totalTRC20)) {
       console.log(props.totalTRC20, props.TRC20Balance);
       console.log(props.TRC20Balance.eq(props.totalTRC20));
+      setBalancenotsame(false);
 
       var recipients = [];
       var values = [];
@@ -151,15 +152,22 @@ function ExecuteSwap(props) {
       }
     } else {
       setLoading(false);
+      console.log("bal not same");
+      console.log(
+        props.totalTRC20,
+        props.TRC20Balance,
+        props.tokenDetails.decimals
+      );
+      setBalancenotsame(true);
       setMessage(
-        `Swap balance and total sending balance do not match .Your Token Balance is ${(+ethers.utils.formatUnits(
-          props.TRC20Balance,
-          props.tokenDetails.decimal
+        `Swap balance and total sending balance do not match .Your Total Sending Amount is ${(+ethers.utils.formatUnits(
+          props.totalTRC20,
+          props.tokenDetails.decimals
         )).toFixed(4)} ${
           props.tokenDetails.symbol
         }   and your Swap Balance amount is ${(+ethers.utils.formatUnits(
-          props.totalTRC20,
-          props.tokenDetails.decimal
+          props.TRC20Balance,
+          props.tokenDetails.decimals
         )).toFixed(4)} ${props.tokenDetails.symbol} `
       );
       setModalIsOpen(true);
@@ -286,9 +294,7 @@ function ExecuteSwap(props) {
             </div>
             <p>{success ? "" : "Please Try again"}</p>
             {balancenosame ? (
-              <div className={textStyle.errormessagep}>
-                Swap balance and total amount must be equal
-              </div>
+              <div className={textStyle.errormessagep}>{message}</div>
             ) : null}
             <p className={textStyle.errormessagep}>{limitexceed}</p>
             <div className={textStyle.divtocenter}>
