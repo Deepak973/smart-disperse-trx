@@ -74,6 +74,9 @@ const SwapComponent = ({
           console.error("Selected tokens are not available.");
           return;
         }
+        if(toTokenInputValue!=="")
+        {
+        console.log(toTokenInputValue);
         console.log(selectedFromToken, selectedToToken);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const swapRequest = {
@@ -92,7 +95,6 @@ const SwapComponent = ({
           amount: fromAmt,
           fromAddress: connected ? TronAddress : address,
           toAddress: toTokenInputValue,
-          // toAddress: toAddressValue,
           slippage: "1.0",
           disableEstimate: false,
           referrerAddress: null,
@@ -155,7 +157,7 @@ const SwapComponent = ({
         setoutputusd(outputAmountUsd);
         console.log("Estimated Time (seconds):", estimatedTimeInSeconds);
         console.log("Swap quote: ", swap);
-      };
+     } };
 
       const fetchFeesFromQuote = () => {
         console.log("fetch fees.... : ");
