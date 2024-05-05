@@ -13,12 +13,19 @@
 .gaspricediv{
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  color: white ;
+  justify-content: flex-end;
+}
+.clockdiv{
+  width: 100%;
+  display: flex;
+  color: white ;
+  justify-content: flex-start;
 }
 
 .gasicon{
-  margin-right: 35px;
-  margin-top: 10px;
+  /* margin-right: 35px;
+  margin-top: 10px; */
 color: white;
 }
 
@@ -47,8 +54,8 @@ color: white;
 }
 
 .clockicon{
-  margin-left: 35px;
-  margin-top: 10px;
+  /* margin-left: 35px;
+  margin-top: 10px; */
 color: white;
 }
 .disabledToken:hover {

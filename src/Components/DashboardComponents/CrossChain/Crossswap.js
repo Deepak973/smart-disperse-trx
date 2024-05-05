@@ -333,7 +333,10 @@ function Crossswap({ activeTab }) {
                         </button>
                       </div>
                     </div>
-                      <div className={swapStyle.outputusdd}>{"~$"}{formData.fromTokenAmount * fromusdvalue}</div>
+                    <div className={swapStyle.outputusdd}>
+                      {"~$"}
+                      {formData.fromTokenAmount * fromusdvalue}
+                    </div>
                     <div
                       style={{
                         color: "white",
@@ -381,6 +384,7 @@ function Crossswap({ activeTab }) {
                         name="toTokenAmount"
                         value={formData.toTokenAmount}
                         onChange={handleToInputChange}
+                        readOnly
                       />
 
                       <div id="first">
@@ -416,17 +420,31 @@ function Crossswap({ activeTab }) {
                   </div>
                   {/* "to" section end here */}
                 </div>
-                <div className={swapStyle.gaspricediv}>
-                  <FontAwesomeIcon
-                    className={swapStyle.clockicon}
-                    icon={faClock}
-                  />
-                  {estimatedtime}
-                  <FontAwesomeIcon
-                    className={swapStyle.gasicon}
-                    icon={faGasPump}
-                  />
-                  {usdfee}
+                <div
+                  style={{
+                    display:
+                      !formData.toTokenAmount || formData.toTokenAmount === "0"
+                        ? "none"
+                        : "flex",
+                  }}
+                >
+                  <div className={swapStyle.clockdiv}>
+                    <FontAwesomeIcon
+                      className={swapStyle.clockicon}
+                      icon={faClock}
+                    />
+                    &nbsp;
+                    {estimatedtime}
+                  </div>
+                  <div className={swapStyle.gaspricediv}>
+                    <FontAwesomeIcon
+                      className={swapStyle.gasicon}
+                      icon={faGasPump}
+                    />
+                    &nbsp;
+                    {"$"}
+                    {usdfee}
+                  </div>
                 </div>
               </div>
 
