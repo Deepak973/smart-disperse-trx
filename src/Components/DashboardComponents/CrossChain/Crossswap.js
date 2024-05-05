@@ -41,6 +41,10 @@ function Crossswap({ activeTab }) {
   const [maximumSold, setMaximumSold] = useState();
   const [transactionFees, setTransactionFees] = useState();
   const [selectedNetwork, setSelectedNetwork] = useState(null);
+  const [usdfee, setusdfee] = useState("0");
+  const [estimatedtime, setestimatetime] = useState("0");
+  const [outputusd, setoutputusd] = useState("");
+  const [fromusdvalue, setfromusdvalue] = useState("");
 
   useEffect(() => {
     const handleFetchMeta = async () => {
@@ -329,6 +333,7 @@ function Crossswap({ activeTab }) {
                         </button>
                       </div>
                     </div>
+                      <div className={swapStyle.outputusdd}>{"~$"}{formData.fromTokenAmount * fromusdvalue}</div>
                     <div
                       style={{
                         color: "white",
@@ -366,7 +371,6 @@ function Crossswap({ activeTab }) {
                         </div>
                       </div>
                     </div>
-                    <div></div>
                     <div className={swapStyle.FromInputMain}>
                       <input
                         type="text"
@@ -376,13 +380,9 @@ function Crossswap({ activeTab }) {
                         className={swapStyle.swapInput}
                         name="toTokenAmount"
                         value={formData.toTokenAmount}
-                        onChange={handleToInputChange} // Attach handleToInputChange here
+                        onChange={handleToInputChange}
                       />
 
-                      {/* <button id={swapStyle.swapMaxbtn} onClick={handleMaxToAmount}>
-                  Max
-                  
-                </button> */}
                       <div id="first">
                         <button
                           className={swapStyle.TokenMain}
@@ -399,6 +399,10 @@ function Crossswap({ activeTab }) {
                           </span>
                         </button>
                       </div>
+                    </div>
+                    <div className={swapStyle.outputusdd}>
+                      {"~$"}
+                      {outputusd}
                     </div>
                     <div
                       style={{
@@ -417,10 +421,12 @@ function Crossswap({ activeTab }) {
                     className={swapStyle.clockicon}
                     icon={faClock}
                   />
+                  {estimatedtime}
                   <FontAwesomeIcon
                     className={swapStyle.gasicon}
                     icon={faGasPump}
                   />
+                  {usdfee}
                 </div>
               </div>
 
@@ -429,8 +435,13 @@ function Crossswap({ activeTab }) {
                 selectedFromToken={selectedFromToken}
                 selectedToToken={selectedToToken}
                 formData={formData}
+                setusdfee={setusdfee}
                 setFormData={setFormData}
+                setestimatetime={setestimatetime}
+                setfromusdvalue={setfromusdvalue}
+                setoutputusd={setoutputusd}
               />
+
               {/* <button></button> */}
             </div>
             <Modal
@@ -480,7 +491,10 @@ function Crossswap({ activeTab }) {
                   </button>
                 </div>
 
-                <div className={swapStyle.dropdownouter} style={{color: "black", height: "450px"}}>
+                <div
+                  className={swapStyle.dropdownouter}
+                  style={{ color: "black", height: "450px" }}
+                >
                   <div className={swapStyle.dropdown}>
                     <div className={swapStyle.networkandtoken}>
                       <div className={swapStyle.divnetwokr}>
@@ -539,8 +553,10 @@ function Crossswap({ activeTab }) {
                               </div>
                             ))}
                           </>
-                        ):(
-                          <h3 className={swapStyle.h3inmodal}>Please select network to view the token list</h3>
+                        ) : (
+                          <h3 className={swapStyle.h3inmodal}>
+                            Please select network to view the token list
+                          </h3>
                         )}
                       </div>
                     </div>

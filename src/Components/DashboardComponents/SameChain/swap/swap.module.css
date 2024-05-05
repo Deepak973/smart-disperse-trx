@@ -27,7 +27,17 @@ color: white;
   flex-direction: column;
   padding: 10px;
 }
-
+.usdethamountdiv{
+  display: flex;
+  flex-direction: row;
+}
+.outputusdd{
+  display: flex;
+    color: #cfb3b3;
+    margin-top: -13px;
+    margin-bottom: 10px;
+    margin-left: 15px;
+}
 .inputtronaddress{
   background-color: transparent;
   width: 100%;

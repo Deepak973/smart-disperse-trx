@@ -20,8 +20,12 @@ const rangoClient = new RangoClient("95ef894a-f8f0-4eb4-90f7-f8559896474a");
 const SwapComponent = ({
   selectedFromToken,
   selectedToToken,
+  setusdfee,
   fromTokenAmount,
+  setestimatetime,
+  setoutputusd,
   formData,
+  setfromusdvalue,
   setFormData,
 }) => {
   const [tronAddressInputValue, setTronAddressInputValue] = useState("");
@@ -40,6 +44,7 @@ const SwapComponent = ({
   // console.log("from amount:",formData.fromTokenAmount);
   useEffect(() => {
     console.log("from token value", formData.fromTokenAmount);
+    console.log(quote, "🚀");
     let fromAmt = 0;
     if (formData.fromTokenAmount && selectedFromToken && selectedToToken) {
       if (formData.fromTokenAmount) {
@@ -73,8 +78,8 @@ const SwapComponent = ({
           // to: selectedToToken,
           amount: fromAmt,
           fromAddress: connected ? TronAddress : address,
-          // toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
-          toAddress: toAddressValue,
+          toAddress: "0x5428DAc9103799F18eb6562eD85e48E0790D4643",
+          // toAddress: toAddressValue,
           slippage: "1.0",
           disableEstimate: false,
           referrerAddress: null,
@@ -92,19 +97,40 @@ const SwapComponent = ({
         setQuote(swap);
         const feeUsd = swap.route.feeUsd;
         const outputAmount = swap.route.outputAmount;
-        const outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
+        var outputAmountFormatted = 0;
+        if(selectedToToken.symbol === 'ETH') outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
+        else outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
+        console.log(outputAmountFormatted,outputAmount,"👁️👁️")
+        // ----------------------------
+        var outputAmountFormatted = 0;
+        if(selectedToToken.symbol === 'ETH') outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
+        else outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
+        console.log(outputAmountFormatted,outputAmount,"👁️👁️")
         setFormData((prevData) => ({
           ...prevData,
           ["toTokenAmount"]: outputAmountFormatted,
         }));
         const outputAmountMin = swap.route.outputAmountMin;
         const outputAmountUsd = swap.route.outputAmountUsd;
+        const formatTime = (totalSeconds) => {
+          const minutes = Math.floor(totalSeconds / 60);
+          const seconds = totalSeconds % 60;
+          return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        };
+        
         const estimatedTimeInSeconds = swap.route.estimatedTimeInSeconds;
+        const formattedTime = formatTime(estimatedTimeInSeconds);
+        const usdprice = swap.route.path[0].from.usdPrice;
+        setfromusdvalue(usdprice);
+        console.log(usdprice)
+        console.log(formattedTime);        
+        setestimatetime(formattedTime);
         console.log("Fees in USD:", feeUsd);
+        setusdfee(feeUsd);
         console.log("Output Amount:", outputAmount);
         console.log("Minimum Output Amount:", outputAmountMin);
-
         console.log("Output Amount in USD:", outputAmountUsd);
+        setoutputusd(outputAmountUsd);
         console.log("Estimated Time (seconds):", estimatedTimeInSeconds);
         console.log("Swap quote: ", swap);
       };
