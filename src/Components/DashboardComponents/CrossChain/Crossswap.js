@@ -22,7 +22,7 @@ import SwapComponent from "@/Helpers/swapComponent";
 import { useAccount } from "wagmi";
 import { tokenList } from "@/Helpers/TokenListCrossChain";
 import { ToastContainer, toast } from "react-toastify";
-
+import soon from "@/Assets/soon.gif";
 
 function Crossswap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -49,6 +49,7 @@ function Crossswap({ activeTab }) {
   const [fromusdvalue, setfromusdvalue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [calculatedData, setCalculatedData] = useState(null);
+  const [isLoadingAmount, setIsLoadingAmount] = useState(false);
 
   useEffect(() => {
     const handleFetchMeta = async () => {
@@ -120,12 +121,11 @@ function Crossswap({ activeTab }) {
           return;
         }
       } else {
-        if(connected){
+        if (connected) {
           console.log("Connect to EVM wallet"); // Log a message if user is not connected
           toast.error("Please connect to EVM Wallet");
           return;
         }
-      
       }
       console.log("from....");
       setSelectedFromToken(token);
@@ -144,7 +144,6 @@ function Crossswap({ activeTab }) {
       } else {
         setoutputusd((formData.fromTokenAmount * fromusdvalue).toFixed(6));
         setoutputusd((formData.toTokenAmount * fromusdvalue).toFixed(6));
-
       }
 
       // Infer the network based on the token's blockchain
@@ -157,7 +156,7 @@ function Crossswap({ activeTab }) {
       }
     } else if (currentSection === "to") {
       console.log("to....");
-      
+
       setSelectedToToken(token);
       // Update token details for "to" section
       setTokenDetails({
@@ -182,6 +181,7 @@ function Crossswap({ activeTab }) {
       ...prevData,
       [name]: value,
     }));
+    setIsLoadingAmount(true);
   };
 
   const handleToInputChange = (e) => {
@@ -414,6 +414,9 @@ function Crossswap({ activeTab }) {
                         onChange={handleToInputChange}
                         readOnly
                       />
+                      {/* {isLoadingAmount && (
+                        <img src={soon.src} alt="Loading..." width={100} height={100}/>
+                      )} */}
 
                       <div id="first">
                         <button
@@ -591,9 +594,7 @@ function Crossswap({ activeTab }) {
                                       : "(input)"
                                     : ""}
                                 </div>
-                                <div>
-                                  {token.address}
-                                </div>
+                                <div>{token.address}</div>
                               </div>
                             ))}
                           </>
@@ -606,7 +607,7 @@ function Crossswap({ activeTab }) {
                     </div>
                   </div>
                 </div>
-                <ToastContainer/>
+                <ToastContainer />
               </div>
             </Modal>
           </div>
