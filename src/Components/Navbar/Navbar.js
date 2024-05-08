@@ -40,12 +40,26 @@ function Navbar() {
   const { disconnect } = useDisconnect();
   const [TronNetowork, setTronNetwortk] = useState("Wrong Network");
 
-  const { address: Tronaddress, connected: TronConnected } = useWallet();
+  const { address: Tronaddress, connected } = useWallet();
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      console.log("....................")
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
-
+  
   const handelMainnet = () => {
     console.log(!isMainnet);
 
@@ -148,7 +162,7 @@ function Navbar() {
         return null;
       }
     }
-    if (TronConnected) {
+    if (connected) {
       try {
         // Decode the signature to get the signer's address
         const base58Address = await tronWeb.trx.verifyMessageV2(
@@ -218,7 +232,7 @@ function Navbar() {
         createSign();
       }
     }
-    if (TronConnected) {
+    if (connected) {
       console.log("isConnected", isConnected);
       const jwtToken = cookie.get("jwt_token");
       console.log(jwtToken);
@@ -228,7 +242,7 @@ function Navbar() {
         }
       }
     }
-  }, [isConnected, TronConnected]);
+  }, [isConnected, connected]);
 
   useEffect(() => {
   console.log("chainid....");
@@ -262,7 +276,7 @@ function Navbar() {
         </div>
         <div className={navStyle.connectwalletbuttondiv}>
           <div className={navStyle.connectwalletbuttondiv}>
-            {isConnected && !TronConnected && (
+            {isConnected && !connected && (
               <label className={navStyle.toggle}>
                 <input
                   type="checkbox"
@@ -278,7 +292,7 @@ function Navbar() {
               </label>
             )}
 
-            {/*         
+               
         {isConnected ? (
              <ConnectButtonCustom  isMainnet={isMainnet} />
               ) : connected ? (
@@ -286,7 +300,22 @@ function Navbar() {
               ) : (
                 <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
               )
-        } */}
+        } 
+            {(isConnected || connected) ? (
+              null
+          ) :
+          <div>     
+              {showDropdown && (
+                <div ref={dropdownRef} className={navStyle.dropdownContent}>
+                  <div style={{margin:"5px 0px"}}>
+                  <TronWallet />
+                  </div>
+                  <ConnectButtonCustom  isMainnet={isMainnet}/>
+                </div>
+              )}
+          </div>
+          }
+          {/*
             <span>
               {" "}
               {!isHome ? (
@@ -296,7 +325,7 @@ function Navbar() {
                     
                       <TronWallet /> 
                     : null}
-                    {!TronConnected ? (
+                    {!connected ? (
                       <ConnectButtonCustom isMainnet={isMainnet} />
                     ) : null}
                   </>
@@ -308,6 +337,7 @@ function Navbar() {
                 )
               ) : null}
             </span>
+          */}
 
             {/* {(isConnected || connected) ? (
               null
