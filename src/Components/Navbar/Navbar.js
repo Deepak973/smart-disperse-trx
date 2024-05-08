@@ -298,13 +298,17 @@ function Navbar() {
               ) : connected ? (
                <TronWallet />
               ) : (
+                isCrossChain ? (
                 <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
-              )
+              ): null)
         } 
             {(isConnected || connected) ? (
               null
           ) :
-          <div>     
+          <div>  
+             {!isHome ? (   
+                isCrossChain ? (
+              <div>
               {showDropdown && (
                 <div ref={dropdownRef} className={navStyle.dropdownContent}>
                   <div style={{margin:"5px 0px"}}>
@@ -313,46 +317,18 @@ function Navbar() {
                   <ConnectButtonCustom  isMainnet={isMainnet}/>
                 </div>
               )}
+              </div>
+               ) : (
+                <div className={navStyle.walletarndnetwork}>
+                  {connected?(
+                    <div className={navStyle.walletandnetwork}>{TronNetowork}</div>
+                  ):null}
+                    <TronWallet />
+                  </div>
+              )
+            ) : null}
           </div>
           }
-          {/*
-            <span>
-              {" "}
-              {!isHome ? (
-                isCrossChain ? (
-                  <>
-                    {!isConnected ? 
-                    
-                      <TronWallet /> 
-                    : null}
-                    {!connected ? (
-                      <ConnectButtonCustom isMainnet={isMainnet} />
-                    ) : null}
-                  </>
-                ) : (
-                  <div className={navStyle.walletarndnetwork}>
-                      <div className={navStyle.walletandnetwork}>{TronNetowork}</div>
-                      <TronWallet />
-                    </div>
-                )
-              ) : null}
-            </span>
-          */}
-
-            {/* {(isConnected || connected) ? (
-              null
-          ) :
-          <div>     
-              {showDropdown && (
-                <div ref={dropdownRef} className={navStyle.dropdownContent}>
-                  <div style={{margin:"5px 0px"}}>
-                  <TronWallet />
-                  </div>
-                  <ConnectButtonCustom  isMainnet={isMainnet}/>
-                </div>
-              )}
-          </div>
-          } */}
 
             {theme === "light" ? (
               <svg
