@@ -40,12 +40,26 @@ function Navbar() {
   const { disconnect } = useDisconnect();
   const [TronNetowork, setTronNetwortk] = useState("Wrong Network");
 
-  const { address: Tronaddress, connected: TronConnected } = useWallet();
+  const { address: Tronaddress, connected } = useWallet();
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      console.log("....................")
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
-
+  
   const handelMainnet = () => {
     console.log(!isMainnet);
 
@@ -148,7 +162,7 @@ function Navbar() {
         return null;
       }
     }
-    if (TronConnected) {
+    if (connected) {
       try {
         // Decode the signature to get the signer's address
         const base58Address = await tronWeb.trx.verifyMessageV2(
@@ -218,7 +232,7 @@ function Navbar() {
         createSign();
       }
     }
-    if (TronConnected) {
+    if (connected) {
       console.log("isConnected", isConnected);
       const jwtToken = cookie.get("jwt_token");
       console.log(jwtToken);
@@ -228,7 +242,7 @@ function Navbar() {
         }
       }
     }
-  }, [isConnected, TronConnected]);
+  }, [isConnected, connected]);
 
   useEffect(() => {
   console.log("chainid....");
@@ -262,7 +276,7 @@ function Navbar() {
         </div>
         <div className={navStyle.connectwalletbuttondiv}>
           <div className={navStyle.connectwalletbuttondiv}>
-            {isConnected && !TronConnected && (
+            {isConnected && !connected && (
               <label className={navStyle.toggle}>
                 <input
                   type="checkbox"
@@ -278,41 +292,23 @@ function Navbar() {
               </label>
             )}
 
-            {/*         
+               
         {isConnected ? (
              <ConnectButtonCustom  isMainnet={isMainnet} />
               ) : connected ? (
                <TronWallet />
               ) : (
-                <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
-              )
-        } */}
-            <span>
-              {" "}
-              {!isHome ? (
                 isCrossChain ? (
-                  <>
-                    {!isConnected ? 
-                    
-                      <TronWallet /> 
-                    : null}
-                    {!TronConnected ? (
-                      <ConnectButtonCustom isMainnet={isMainnet} />
-                    ) : null}
-                  </>
-                ) : (
-                  <div className={navStyle.walletarndnetwork}>
-                      <div className={navStyle.walletandnetwork}>{TronNetowork}</div>
-                      <TronWallet />
-                    </div>
-                )
-              ) : null}
-            </span>
-
-            {/* {(isConnected || connected) ? (
+                <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
+              ): null)
+        } 
+            {(isConnected || connected) ? (
               null
           ) :
-          <div>     
+          <div>  
+             {!isHome ? (   
+                isCrossChain ? (
+              <div>
               {showDropdown && (
                 <div ref={dropdownRef} className={navStyle.dropdownContent}>
                   <div style={{margin:"5px 0px"}}>
@@ -321,8 +317,18 @@ function Navbar() {
                   <ConnectButtonCustom  isMainnet={isMainnet}/>
                 </div>
               )}
+              </div>
+               ) : (
+                <div className={navStyle.walletarndnetwork}>
+                  {connected?(
+                    <div className={navStyle.walletandnetwork}>{TronNetowork}</div>
+                  ):null}
+                    <TronWallet />
+                  </div>
+              )
+            ) : null}
           </div>
-          } */}
+          }
 
             {theme === "light" ? (
               <svg

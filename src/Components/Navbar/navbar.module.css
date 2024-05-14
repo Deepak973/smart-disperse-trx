@@ -272,29 +272,3 @@
     display: none;
   }
 }
-
-
-
-.walletandnetwork{
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(92deg, #1e1e1e 0.87%, #1c1b1b 98.92%);
-  width: 100%;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: white;
-  justify-content: center;
-  margin: 5px;
-  z-index: 1;
-  padding: 15px 30px;
-  border-radius: 26px;
-  border: 0.5px solid #5fffbc;
-}
-
-.walletarndnetwork{
-  display: flex;
-}

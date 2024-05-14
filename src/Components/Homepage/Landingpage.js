@@ -129,7 +129,7 @@ export default function Landingpage() {
               className={homeStyle.ihometitleii}
               style={{ marginRight: "80px" }}
             >
-              Smart-Disperse Your Crypto Transactions on
+              Smart-Disperse  Crypto Transactions on
               <div className={homeStyle.slidingVertical}>
                 <span>Mode !</span>
                 <span>Tron !</span>
