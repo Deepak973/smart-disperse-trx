@@ -74,90 +74,105 @@ const SwapComponent = ({
           console.error("Selected tokens are not available.");
           return;
         }
-        if(toTokenInputValue!=="")
-        {
-        console.log(toTokenInputValue);
-        console.log(selectedFromToken, selectedToToken);
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const swapRequest = {
-          from: {
-            blockchain: selectedFromToken.blockchain,
-            symbol: selectedFromToken.symbol,
-            address: selectedFromToken.address,
-          },
-          to: {
-            blockchain: selectedToToken.blockchain,
-            symbol: selectedToToken.symbol,
-            address: selectedToToken.address,
-          },
-          // from: selectedFromToken,
-          // to: selectedToToken,
-          amount: fromAmt,
-          fromAddress: connected ? TronAddress : address,
-          toAddress: toTokenInputValue,
-          slippage: "1.0",
-          disableEstimate: false,
-          referrerAddress: null,
-          referrerFee: null,
-        };
+        if (toTokenInputValue !== "") {
+          console.log(toTokenInputValue);
+          console.log(selectedFromToken, selectedToToken);
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const swapRequest = {
+            from: {
+              blockchain: selectedFromToken.blockchain,
+              symbol: selectedFromToken.symbol,
+              address: selectedFromToken.address,
+            },
+            to: {
+              blockchain: selectedToToken.blockchain,
+              symbol: selectedToToken.symbol,
+              address: selectedToToken.address,
+            },
+            // from: selectedFromToken,
+            // to: selectedToToken,
+            amount: fromAmt,
+            fromAddress: connected ? TronAddress : address,
+            toAddress: toTokenInputValue,
+            slippage: "1.0",
+            disableEstimate: false,
+            referrerAddress: null,
+            referrerFee: null,
+          };
 
-        console.log("swap", swapRequest);
-        const swap = await rangoClient.swap(swapRequest);
-        if (!!swap.error || swap.resultType !== "OK") {
-          const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
+          console.log("swap", swapRequest);
 
-          console.log(swap.error);
-          if (swap.error.substring(0, 5) === "Rango") {
-            toast.error(
-              "Price Impact is very high, Smart Disperse prohibits you from performing this swap!"
-            );
-          } else toast.error(swap.error);
+          const swapping = await fetch(`api/rango-api`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              requestData: swapRequest,
+            }),
+          });
+          const data = await swapping.json();
+          console.log(data.swapData);
+          const swap = data.swapData;
+          // const swap = await rangoClient.swap(swapRequest);
+          if (!!swap.error || swap.resultType !== "OK") {
+            const msg = `Error swapping, message: ${swap.error}, status: ${swap.resultType}`;
+
+            console.log(swap.error);
+            if (swap.error.substring(0, 5) === "Rango") {
+              toast.error(
+                "Price Impact is very high, Smart Disperse prohibits you from performing this swap!"
+              );
+            } else toast.error(swap.error);
+          }
+
+          setQuote(swap);
+          const feeUsd = swap.route.feeUsd;
+          const outputAmount = swap.route.outputAmount;
+          var outputAmountFormatted = 0;
+          if (selectedToToken.symbol === "ETH")
+            outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
+          else
+            outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
+          console.log(outputAmountFormatted, outputAmount, "👁️👁️");
+          // ----------------------------
+          var outputAmountFormatted = 0;
+          if (selectedToToken.symbol === "ETH")
+            outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
+          else
+            outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
+          console.log(outputAmountFormatted, outputAmount, "👁️👁️");
+          setFormData((prevData) => ({
+            ...prevData,
+            ["toTokenAmount"]: outputAmountFormatted,
+          }));
+          const outputAmountMin = swap.route.outputAmountMin;
+          const outputAmountUsd = swap.route.outputAmountUsd;
+          const formatTime = (totalSeconds) => {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes < 10 ? "0" : ""}${minutes}:${
+              seconds < 10 ? "0" : ""
+            }${seconds}`;
+          };
+
+          const estimatedTimeInSeconds = swap.route.estimatedTimeInSeconds;
+          const formattedTime = formatTime(estimatedTimeInSeconds);
+          const usdprice = swap.route.path[0].from.usdPrice;
+          setfromusdvalue(usdprice);
+          console.log(usdprice);
+          console.log(formattedTime);
+          setestimatetime(formattedTime);
+          console.log("Fees in USD:", feeUsd);
+          setusdfee(feeUsd);
+          console.log("Output Amount:", outputAmount);
+          console.log("Minimum Output Amount:", outputAmountMin);
+          console.log("Output Amount in USD:", outputAmountUsd);
+          setoutputusd(outputAmountUsd);
+          console.log("Estimated Time (seconds):", estimatedTimeInSeconds);
+          console.log("Swap quote: ", swap);
         }
-
-        setQuote(swap);
-        const feeUsd = swap.route.feeUsd;
-        const outputAmount = swap.route.outputAmount;
-        var outputAmountFormatted = 0;
-        if (selectedToToken.symbol === "ETH")
-          outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
-        else outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
-        console.log(outputAmountFormatted, outputAmount, "👁️👁️");
-        // ----------------------------
-        var outputAmountFormatted = 0;
-        if (selectedToToken.symbol === "ETH")
-          outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 18);
-        else outputAmountFormatted = ethers.utils.formatUnits(outputAmount, 6);
-        console.log(outputAmountFormatted, outputAmount, "👁️👁️");
-        setFormData((prevData) => ({
-          ...prevData,
-          ["toTokenAmount"]: outputAmountFormatted,
-        }));
-        const outputAmountMin = swap.route.outputAmountMin;
-        const outputAmountUsd = swap.route.outputAmountUsd;
-        const formatTime = (totalSeconds) => {
-          const minutes = Math.floor(totalSeconds / 60);
-          const seconds = totalSeconds % 60;
-          return `${minutes < 10 ? "0" : ""}${minutes}:${
-            seconds < 10 ? "0" : ""
-          }${seconds}`;
-        };
-
-        const estimatedTimeInSeconds = swap.route.estimatedTimeInSeconds;
-        const formattedTime = formatTime(estimatedTimeInSeconds);
-        const usdprice = swap.route.path[0].from.usdPrice;
-        setfromusdvalue(usdprice);
-        console.log(usdprice);
-        console.log(formattedTime);
-        setestimatetime(formattedTime);
-        console.log("Fees in USD:", feeUsd);
-        setusdfee(feeUsd);
-        console.log("Output Amount:", outputAmount);
-        console.log("Minimum Output Amount:", outputAmountMin);
-        console.log("Output Amount in USD:", outputAmountUsd);
-        setoutputusd(outputAmountUsd);
-        console.log("Estimated Time (seconds):", estimatedTimeInSeconds);
-        console.log("Swap quote: ", swap);
-     } };
+      };
 
       const fetchFeesFromQuote = () => {
         console.log("fetch fees.... : ");
@@ -190,74 +205,74 @@ const SwapComponent = ({
     }
   };
 
- const handleSwap = async () => {
-  console.log("swap btn clicked");
-  try {
-    if (!quote) return;
-    const { ethereum } = window;
-    if (ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const evmTransaction = quote.tx;
-      console.log("1");
-      // Set toAddress based on selected tokens' blockchains
-      let toAddress;
-      if (
-        selectedFromToken &&
-        selectedToToken &&
-        selectedFromToken.blockchain === "TRON" &&
-        selectedToToken.blockchain === "TRON"
-      ) {
-        toAddress = TronAddress;
-      } else {
-        toAddress = address;
-      }
-      
-      // Update swap request object with the correct toAddress
-      evmTransaction.toAddress = toAddress;
-
-      // needs approving the tx
-      if (quote.approveTo && quote.approveData) {
-        const approveTx = prepareEvmTransaction(evmTransaction, true);
-        const approveTxHash = (await signer.sendTransaction(approveTx)).hash;
-        await checkApprovalSync(quote.requestId, approveTxHash, rangoClient);
-      }
-      console.log("12");
-
-      // main transaction
-      const mainTx = prepareEvmTransaction(evmTransaction, false);
-      const mainTxHash = (await signer.sendTransaction(mainTx)).hash;
-      while (true) {
-        const txStatus = await checkTransactionStatusSync(
-          quote.requestId,
-          mainTxHash,
-          rangoClient
-        );
-        console.log("txstatus: ", txStatus.status);
-        setswapstatus(txStatus.status);
+  const handleSwap = async () => {
+    console.log("swap btn clicked");
+    try {
+      if (!quote) return;
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const evmTransaction = quote.tx;
+        console.log("1");
+        // Set toAddress based on selected tokens' blockchains
+        let toAddress;
         if (
-          !!txStatus.status &&
-          [TransactionStatus.FAILED, TransactionStatus.SUCCESS].includes(
-            txStatus.status
-          )
+          selectedFromToken &&
+          selectedToToken &&
+          selectedFromToken.blockchain === "TRON" &&
+          selectedToToken.blockchain === "TRON"
         ) {
-          console.log(txStatus.status);
+          toAddress = TronAddress;
+        } else {
+          toAddress = address;
+        }
+
+        // Update swap request object with the correct toAddress
+        evmTransaction.toAddress = toAddress;
+
+        // needs approving the tx
+        if (quote.approveTo && quote.approveData) {
+          const approveTx = prepareEvmTransaction(evmTransaction, true);
+          const approveTxHash = (await signer.sendTransaction(approveTx)).hash;
+          await checkApprovalSync(quote.requestId, approveTxHash, rangoClient);
+        }
+        console.log("12");
+
+        // main transaction
+        const mainTx = prepareEvmTransaction(evmTransaction, false);
+        const mainTxHash = (await signer.sendTransaction(mainTx)).hash;
+        while (true) {
+          const txStatus = await checkTransactionStatusSync(
+            quote.requestId,
+            mainTxHash,
+            rangoClient
+          );
+          console.log("txstatus: ", txStatus.status);
           setswapstatus(txStatus.status);
-          break;
+          if (
+            !!txStatus.status &&
+            [TransactionStatus.FAILED, TransactionStatus.SUCCESS].includes(
+              txStatus.status
+            )
+          ) {
+            console.log(txStatus.status);
+            setswapstatus(txStatus.status);
+            break;
+          }
         }
       }
+    } catch (error) {
+      console.log("error", error);
+      toast.error(error);
     }
-  } catch (error) {
-    console.log("error", error);
-    toast.error(error);
-  }
-};
+  };
 
   return (
     <div>
       <div className={swapStyle.inputswapbtndiv}>
-      {selectedToToken &&
+        {selectedToToken &&
           selectedToToken.blockchain === "TRON" &&
           selectedFromToken &&
           selectedFromToken.blockchain !== "TRON" && (
@@ -291,10 +306,10 @@ const SwapComponent = ({
           className={textStyle.sendbutton}
           onClick={handleSwap}
         >
-          {swapstatus }
+          {swapstatus}
         </button>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };
