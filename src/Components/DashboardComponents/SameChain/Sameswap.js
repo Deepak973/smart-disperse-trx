@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import textStyle from "./Type/textify.module.css";
 import Swap from "./swap/Swap";
 import SameChain from "./SameChain";
-import { TronContractInstance } from "@/Helpers/troncontractinstance";
+
 import {
   useWallet,
   WalletProvider,

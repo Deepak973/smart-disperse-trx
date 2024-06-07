@@ -30,6 +30,7 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import ExecuteSwap from "../Execute/ExecuteSwap";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 
 function Swap({ activeTab }) {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -50,6 +51,11 @@ function Swap({ activeTab }) {
   const [transactionFees, setTransactionFees] = useState();
   const [isVisible, setIsVisible] = useState(false);
   const [isEnoughBalance, setIsEnoughBalance] = useState(true);
+  const [getTronnetwork, settronNetwork] = useState();
+  const [tokenListData, SetTokenList] = useState([
+    { name: "USDC", address: "" },
+    { name: "USDT", address: "" },
+  ]);
 
   const defaultTokenDetails = {
     name: null,
@@ -59,10 +65,6 @@ function Swap({ activeTab }) {
   };
   const [tokenDetails, setTokenDetails] = useState(defaultTokenDetails);
 
-  const tokenList = [
-    { name: "USDC", address: "TEMVynQpntMqkPxP6wXTW2K7e4sM3cRmWz" },
-    { name: "USDT", address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf" },
-  ];
   const [searchQuery, setSearchQuery] = useState("");
   const [totalTRC20, setTotalTRC20] =
     useState(null); /* Total ERC20 tokens in wallet */
@@ -126,11 +128,40 @@ function Swap({ activeTab }) {
   // };
 
   // Function to filter tokens based on search query
-  const filteredTokenList = tokenList.filter(
-    (token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.address.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // const filteredTokenList = tokenListData.filter(
+  //   (token) =>
+  //     token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     token.address.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+
+  useEffect(() => {
+    console.log("chainid....");
+    const getChainId = async () => {
+      if (typeof window !== "undefined") {
+        const { tronWeb } = window;
+        const adapter = new TronLinkAdapter();
+        let net = await adapter.network();
+        console.log(net);
+        console.log(net.networkType);
+        const tronnetwork = net.networkType;
+        if (tronnetwork === "Mainnet") {
+          const tokenList = [
+            { name: "USDC", address: "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8" },
+            { name: "USDT", address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" },
+          ];
+          SetTokenList(tokenList);
+        } else if (tronnetwork === "Nile") {
+          const tokenList = [
+            { name: "USDC", address: "TEMVynQpntMqkPxP6wXTW2K7e4sM3cRmWz" },
+            { name: "USDT", address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf" },
+          ];
+          SetTokenList(tokenList);
+          console.log(tokenList);
+        }
+      }
+    };
+    getChainId();
+  }, [connected]);
 
   const fetchTronTokenBalance = async (tokenAddress) => {
     console.log("fetching");
@@ -206,6 +237,23 @@ function Swap({ activeTab }) {
   };
 
   useEffect(() => {
+    console.log("chainid....");
+    const getChainId = async () => {
+      if (typeof window !== "undefined") {
+        const { tronWeb } = window;
+        const adapter = new TronLinkAdapter();
+        let net = await adapter.network();
+        console.log(net);
+        console.log(net.networkType);
+        const tronnetwork = net.networkType;
+        settronNetwork(tronnetwork);
+        console.log(settronNetwork);
+      }
+    };
+    getChainId();
+  }, [TronAddress]);
+
+  useEffect(() => {
     const fetchbalance = async () => {
       console.log(".......");
       if (selectedFromToken) {
@@ -268,7 +316,7 @@ function Swap({ activeTab }) {
   };
 
   const getAmountIn = async (value) => {
-    const con = await SunSwapInstance();
+    const con = await SunSwapInstance(getTronnetwork);
 
     const amountIn = ethers.utils.parseUnits(value, 6);
 
@@ -1097,7 +1145,8 @@ function Swap({ activeTab }) {
           <div className={swapStyle.dropdownouter}>
             <div className={swapStyle.dropdown}>
               {/* Conditional rendering based on the length of the filtered token list */}
-              {filteredTokenList.length === 0 ? (
+
+              {tokenListData.length === 0 ? (
                 <div className={swapStyle.divimagemsgnotfound}>
                   <div className={swapStyle.divimage}>
                     <Image src={nodata} alt="none" width={200} />
@@ -1106,7 +1155,7 @@ function Swap({ activeTab }) {
                 </div>
               ) : (
                 // Mapping through filtered token list
-                filteredTokenList.map((token) => (
+                tokenListData.map((token) => (
                   <div
                     className={`${swapStyle.alldatatokendiv} ${
                       isTokenSelected(token) ? swapStyle.disabledToken : ""

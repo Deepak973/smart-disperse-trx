@@ -70,7 +70,6 @@ function ExecuteEth(props) {
   const execute = async () => {
     setPaymentmodal(true);
     props.setLoading(true);
-    
 
     if (!props.trxBalance.gt(props.totalTrx)) {
       props.setLoading(false);
@@ -96,7 +95,7 @@ function ExecuteEth(props) {
 
       try {
         if (TronAddress) {
-          const con = await TronContractInstance();
+          const con = await TronContractInstance(getTronnetwork);
           // console.log("object");
 
           try {

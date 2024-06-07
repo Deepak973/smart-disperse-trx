@@ -40,6 +40,27 @@
   cursor: pointer;
 }
 
+.connectedMessage {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  padding: 15px 30px;
+  border-radius: 26px;
+  border: 0.5px solid #5fffbc;
+  background: linear-gradient(92deg, #1e1e1e 0.87%, #1c1b1b 98.92%);
+  width: 100%;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+}
+
+.connectedMessage:hover {
+  background-color: #333; /* Slightly lighter black on hover */
+}
 .toggle input {
   display: none;
 }
@@ -115,7 +136,7 @@
 .toggle input:checked ~ .labels::before {
   opacity: 1;
 }
-.connect{
+.connect {
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -138,7 +159,6 @@
   left: 50%;
   font-size: 15px;
   transform: translate(-50%, -50%);
- 
 }
 .dropdownContent {
   position: absolute;
@@ -149,7 +169,7 @@
   background: linear-gradient(92deg, #1e1e1e 0.87%, #1c1b1b 98.92%);
   border-radius: 10px;
   padding: 8px;
- 
+
   /* Add styles for the dropdown content */
 }
 @media only screen and (max-width: 1024px) {

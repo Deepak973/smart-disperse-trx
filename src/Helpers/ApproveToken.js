@@ -6,7 +6,6 @@ import {
   useWallet,
   WalletProvider,
 } from "@tronweb3/tronwallet-adapter-react-hooks";
-import { TronContractInstance } from "./troncontractinstance";
 
 export const approveToken = async (amount, tokenContractAddress, chainId) => {
   const { ethereum } = window; // Grab the global ethereum object so we can interact with it
@@ -36,10 +35,20 @@ export const approveToken = async (amount, tokenContractAddress, chainId) => {
   }
 };
 
-export const tronapprovetoken = async (amount, tokenContractAddress) => {
+export const tronapprovetoken = async (
+  amount,
+  tokenContractAddress,
+  tronnetwork
+) => {
   console.log("Aprroving trc token");
   // const TroncontractAddress = "TSijZfgARceZzHGBU14GcfQuDSsQhZtVdh";
-  const TroncontractAddress = "TPt8cDuVSeKj5CsBdJ8edxLPZg6RPhVmos";
+  let TroncontractAddress = "";
+
+  if (tronnetwork === "Mainnet") {
+    TroncontractAddress = "TJKVtvZDhNhRX2eQRxzuk7ctgBxA2cmHAK";
+  } else if (tronnetwork === "Nile") {
+    TroncontractAddress = "TPt8cDuVSeKj5CsBdJ8edxLPZg6RPhVmos";
+  }
 
   if (typeof window !== "undefined") {
     const { tronWeb } = window;

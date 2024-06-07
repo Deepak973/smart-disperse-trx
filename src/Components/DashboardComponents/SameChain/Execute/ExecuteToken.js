@@ -102,10 +102,11 @@ function ExecuteToken(props) {
 
           const isTokenApproved = await tronapprovetoken(
             props.totalTRC20,
-            props.customTokenAddress
+            props.customTokenAddress,
+            getTronnetwork
           );
           if (isTokenApproved) {
-            const con = await TronContractInstance();
+            const con = await TronContractInstance(getTronnetwork);
             // console.log("object");
 
             try {

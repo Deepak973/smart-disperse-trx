@@ -41,10 +41,10 @@ function Navbar() {
   const [TronNetowork, setTronNetwortk] = useState("Wrong Network");
 
   const { address: Tronaddress, connected } = useWallet();
-  
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log("....................")
+      console.log("....................");
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
       }
@@ -59,7 +59,7 @@ function Navbar() {
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
-  
+
   const handelMainnet = () => {
     console.log(!isMainnet);
 
@@ -245,22 +245,25 @@ function Navbar() {
   }, [isConnected, connected]);
 
   useEffect(() => {
-  console.log("chainid....");
-  const getChainId = async () => {
-    if (typeof window !== "undefined") {
-      const { tronWeb } = window;
-      const adapter = new TronLinkAdapter();
-      let net = await adapter.network();
-      console.log(net);
-      const tronnetwork = net.networkType;
-      console.log(tronnetwork);
-      setTronNetwortk(tronnetwork);
-      // settronNetwork(tronnetwork);
-      // console.log(settronNetwork);
-    }
-  };
-  getChainId();
-}, [Tronaddress]);
+    console.log("chainid....");
+    const getChainId = async () => {
+      if (typeof window !== "undefined") {
+        const { tronWeb } = window;
+        const adapter = new TronLinkAdapter();
+        let net = await adapter.network();
+        console.log(net);
+        const tronnetwork = net.networkType;
+        console.log(tronnetwork);
+        setTronNetwortk(tronnetwork);
+        if (tronnetwork !== "Nile" && tronnetwork !== "Mainnet") {
+          setTronNetwortk("Wrong Network");
+        }
+        // settronNetwork(tronnetwork);
+        // console.log(settronNetwork);
+      }
+    };
+    getChainId();
+  }, [Tronaddress]);
 
   return (
     <div className={navStyle.navbarMain}>
@@ -274,102 +277,109 @@ function Navbar() {
             />
           </Link>
         </div>
-        <div className={navStyle.connectwalletbuttondiv}>
+        {!isHome ? (
           <div className={navStyle.connectwalletbuttondiv}>
-            {isConnected && !connected && (
-              <label className={navStyle.toggle}>
-                <input
-                  type="checkbox"
-                  onChange={handelMainnet}
-                  checked={isMainnet}
-                />
-                <span className={navStyle.slider}></span>
-                <span
-                  className={navStyle.labels}
-                  data-on="Mainnet"
-                  data-off="TestNet"
-                ></span>
-              </label>
-            )}
+            <div className={navStyle.connectwalletbuttondiv}>
+              {isConnected && !connected && (
+                <label className={navStyle.toggle}>
+                  <input
+                    type="checkbox"
+                    onChange={handelMainnet}
+                    checked={isMainnet}
+                  />
+                  <span className={navStyle.slider}></span>
+                  <span
+                    className={navStyle.labels}
+                    data-on="Mainnet"
+                    data-off="TestNet"
+                  ></span>
+                </label>
+              )}
 
-               
-        {isConnected ? (
-             <ConnectButtonCustom  isMainnet={isMainnet} />
+              {isConnected && !isHome ? (
+                <ConnectButtonCustom isMainnet={isMainnet} />
               ) : connected ? (
-               <TronWallet />
-              ) : (
-                isCrossChain ? (
-                <button onClick ={toggleDropdown}className={navStyle.connect}>Connect Wallet</button>
-              ): null)
-        } 
-            {(isConnected || connected) ? (
-              null
-          ) :
-          <div>  
-             {!isHome ? (   
-                isCrossChain ? (
-              <div>
-              {showDropdown && (
-                <div ref={dropdownRef} className={navStyle.dropdownContent}>
-                  <div style={{margin:"5px 0px"}}>
+                <>
+                  <div className={navStyle.connectedMessage}>
+                    {TronNetowork}
+                  </div>{" "}
                   <TronWallet />
-                  </div>
-                  <ConnectButtonCustom  isMainnet={isMainnet}/>
+                </>
+              ) : isCrossChain ? (
+                <button onClick={toggleDropdown} className={navStyle.connect}>
+                  Connect Wallet
+                </button>
+              ) : null}
+              {isConnected || connected ? null : (
+                <div>
+                  {!isHome ? (
+                    isCrossChain ? (
+                      <div>
+                        {showDropdown && (
+                          <div
+                            ref={dropdownRef}
+                            className={navStyle.dropdownContent}
+                          >
+                            <div style={{ margin: "5px 0px" }}>
+                              <TronWallet />
+                            </div>
+                            <ConnectButtonCustom isMainnet={isMainnet} />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className={navStyle.walletarndnetwork}>
+                        {connected ? (
+                          <div className={navStyle.walletandnetwork}>
+                            {TronNetowork}
+                          </div>
+                        ) : null}
+                        <TronWallet />
+                      </div>
+                    )
+                  ) : null}
                 </div>
               )}
-              </div>
-               ) : (
-                <div className={navStyle.walletarndnetwork}>
-                  {connected?(
-                    <div className={navStyle.walletandnetwork}>{TronNetowork}</div>
-                  ):null}
-                    <TronWallet />
-                  </div>
-              )
-            ) : null}
-          </div>
-          }
 
-            {theme === "light" ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                onClick={() => setTheme("dark")}
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="moon"
-                width="50px"
-                id={navStyle.changeMode}
-              >
-                {/* Dark mode moon SVG path */}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                onClick={() => setTheme("light")}
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="sun "
-                id={navStyle.changeMode}
-              >
-                {/* Light mode sun SVG path */}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                />
-              </svg>
-            )}
+              {theme === "light" ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  onClick={() => setTheme("dark")}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="moon"
+                  width="50px"
+                  id={navStyle.changeMode}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  onClick={() => setTheme("light")}
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="sun "
+                  id={navStyle.changeMode}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                  />
+                </svg>
+              )}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );

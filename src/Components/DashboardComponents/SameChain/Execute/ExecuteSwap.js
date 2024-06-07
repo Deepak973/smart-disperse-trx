@@ -91,11 +91,12 @@ function ExecuteSwap(props) {
           console.log(props.maximumSold);
           const isTokenApproved = await tronapprovetoken(
             props.maximumSold,
-            props.selectedFromToken.address
+            props.selectedFromToken.address,
+            getTronnetwork
           );
           // const isTokenApproved = true;
           if (isTokenApproved) {
-            const con = await TronContractInstance();
+            const con = await TronContractInstance(getTronnetwork);
             try {
               console.log(recipients, values);
               let path = [
