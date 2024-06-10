@@ -215,7 +215,7 @@ function Textify({
                 }}
               >
                 Enter Recipients and Amount (enter one address and amount on
-                each line, supports any format)
+                each line, supports any below format)
               </h2>
             </div>
             <div id="tt" style={{ position: "relative", height: "150px" }}>
@@ -237,7 +237,7 @@ function Textify({
                   resize: "vertical",
                 }}
                 className={textStyle.textareaInput}
-                placeholder="@Justin/0xe57f4c84539a6414C4Cf48f135210e01c477EFE0 1.41421"
+                placeholder={`TEqqmXaynt9XmmcBNYbJh5tMVDmm183c2r 3.141592\nTEqqmXaynt9XmmcBNYbJh5tMVDmm183c2r,2.7182\nTEqqmXaynt9XmmcBNYbJh5tMVDmm183c2r=1.41421`}
               ></textarea>
               {suggestions.length > 0 && (
                 <div
