@@ -352,7 +352,7 @@ function Swap({ activeTab }) {
       const maxSold = ethers.utils.parseUnits(newAmountfixed.toString(), 6);
       console.log(maxSold);
       setMaximumSold(maxSold);
-      const percentageToCalculate = 3;
+      const percentageToCalculate = 0.3;
       const calculatedPercentage = (
         (parseFloat(amountInFrom) * percentageToCalculate) /
         100
