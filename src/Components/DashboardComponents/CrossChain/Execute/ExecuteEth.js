@@ -49,15 +49,15 @@ function ExecuteEth(props) {
 
     if (!props.ethBalance.gt(props.totalEth)) {
       props.setLoading(false);
-      setLimitexceed("Insufficient ETH balance");
+      setLimitexceed("Insufficient TRX balance");
       setMessage(
-        `Current ETH Balance is ${(+ethers.utils.formatEther(
+        `Current TRX Balance is ${(+ethers.utils.formatEther(
           props.ethBalance
         )).toFixed(
           9
-        )}ETH & your Total Sending ETH Amount is ${(+ethers.utils.formatEther(
+        )}TRX & your Total Sending TRX Amount is ${(+ethers.utils.formatEther(
           props.totalEth
-        )).toFixed(9)} ETH `
+        )).toFixed(9)} TRX `
       );
       setModalIsOpen(true);
       return;
@@ -81,7 +81,7 @@ function ExecuteEth(props) {
         let blockExplorerURL = await getExplorer();
         setMessage(
           <div
-          className={textStyle.Link}
+            className={textStyle.Link}
             dangerouslySetInnerHTML={{
               __html: `Your Transaction was successful. Visit <a href="https://${blockExplorerURL}/tx/${receipt.transactionHash}" target="_blank "   style={{ color: "white", textDecoration: "none" }}>here</a> for details.`,
             }}

@@ -73,15 +73,15 @@ function ExecuteEth(props) {
 
     if (!props.trxBalance.gt(props.totalTrx)) {
       props.setLoading(false);
-      setLimitexceed("Insufficient ETH balance");
+      setLimitexceed("Insufficient TRX balance");
       setMessage(
-        `Current ETH Balance is ${(+ethers.utils.formatEther(
+        `Current TRX Balance is ${(+ethers.utils.formatEther(
           props.trxBalance
         )).toFixed(
           9
-        )}ETH & your Total Sending ETH Amount is ${(+ethers.utils.formatEther(
+        )}TRX & your Total Sending TRX Amount is ${(+ethers.utils.formatEther(
           props.totalTrx
-        )).toFixed(9)} ETH `
+        )).toFixed(9)} TRX `
       );
       setModalIsOpen(true);
       return;
