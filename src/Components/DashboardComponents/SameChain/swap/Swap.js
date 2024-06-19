@@ -321,12 +321,7 @@ function Swap({ activeTab }) {
     const amountIn = ethers.utils.parseUnits(value, 6);
 
     console.log(amountIn, toBalance);
-    if (amountIn.gt(toBalance)) {
-      setIsEnoughBalance(false);
-      console.log("balance exceeded");
-    } else {
-      setIsEnoughBalance(true);
-    }
+
     if (selectedToToken?.address && selectedFromToken?.address) {
       const outputAmount = await con
         .getAmountsIn(amountIn, [
@@ -352,6 +347,12 @@ function Swap({ activeTab }) {
       const maxSold = ethers.utils.parseUnits(newAmountfixed.toString(), 6);
       console.log(maxSold);
       setMaximumSold(maxSold);
+      if (maxSold.gt(fromBalance)) {
+        setIsEnoughBalance(false);
+        console.log("balance exceeded");
+      } else {
+        setIsEnoughBalance(true);
+      }
       const percentageToCalculate = 0.3;
       const calculatedPercentage = (
         (parseFloat(amountInFrom) * percentageToCalculate) /

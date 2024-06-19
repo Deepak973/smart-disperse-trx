@@ -381,7 +381,7 @@ function SendEth({ activeTab, listData, setListData }) {
                             >
                               {`${(+ethers.utils.formatEther(
                                 data.value
-                              )).toFixed(9)} ETH`}
+                              )).toFixed(9)} TRX`}
                             </div>
                           </td>
                           <td id="font-size-10px" style={{ padding: "8px" }}>
@@ -490,7 +490,7 @@ function SendEth({ activeTab, listData, setListData }) {
                       {totalEth
                         ? `${(+ethers.utils.formatEther(totalEth)).toFixed(
                             9
-                          )} ETH`
+                          )} TRX`
                         : null}
                     </div>
                   </td>
@@ -533,7 +533,7 @@ function SendEth({ activeTab, listData, setListData }) {
                       {ethBalance
                         ? `${(+ethers.utils.formatEther(ethBalance)).toFixed(
                             9
-                          )} ETH`
+                          )} TRX`
                         : null}
                     </div>
                   </td>

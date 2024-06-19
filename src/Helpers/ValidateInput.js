@@ -42,7 +42,7 @@ export const TronIsValidValue = (value) => {
       if (!/^\d/.test(value)) {
         value = value.slice(1);
       }
-      if (+value > 0) {
+      if (+value >= 0) {
         return ethers.utils.parseUnits(value, 6);
       }
       return false;
