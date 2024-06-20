@@ -127,7 +127,9 @@ function ExecuteToken(props) {
                 <div
                   className={textStyle.Link}
                   dangerouslySetInnerHTML={{
-                    __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
+                    __html: `Your Transaction was successful. Visit <a href="https://${
+                      getTronnetwork === "Mainnet" ? "" : getTronnetwork
+                    }.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
                   }}
                 />
               );

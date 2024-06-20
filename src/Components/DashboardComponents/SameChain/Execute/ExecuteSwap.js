@@ -123,12 +123,16 @@ function ExecuteSwap(props) {
                 )
                 .send({ feeLimit: 15000000000 });
               setLoading(false);
-              const link = `https://${getTronnetwork}.tronscan.org/#/transaction/${tx}`;
+              const link = `https://${
+                getTronnetwork === "Mainnet" ? "" : getTronnetwork
+              }.tronscan.org/#/transaction/${tx}`;
               setMessage(
                 <div
                   className={textStyle.Link}
                   dangerouslySetInnerHTML={{
-                    __html: `Your Transaction was successful. Visit <a href="https://${getTronnetwork}.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
+                    __html: `Your Transaction was successful. Visit <a href="https://${
+                      getTronnetwork == "Mainnet" ? "" : getTronnetwork
+                    }.tronscan.org/#/transaction/${tx}" target="_blank">here</a> for details.`,
                   }}
                 />
               );
