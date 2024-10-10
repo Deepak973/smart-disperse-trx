@@ -268,7 +268,7 @@ function SendEth({ activeTab, listData, setListData }) {
                   fontWeight: "700",
                 }}
               >
-                Your Transaction Lineup
+                Your Transaction Lineup  ----Total Recipients {listData.length}
               </h2>
             </div>
             <div className={textStyle.scrollabletablecontainer}>

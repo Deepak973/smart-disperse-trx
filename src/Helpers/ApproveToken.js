@@ -54,6 +54,7 @@ export const tronapprovetoken = async (
     const { tronWeb } = window;
     if (tronWeb) {
       try {
+        
         let con = await tronWeb.contract(ERC20ABI.abi, tokenContractAddress);
         const tx = await con.approve(TroncontractAddress, amount).send();
         // await tx.wait();
