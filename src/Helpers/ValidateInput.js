@@ -25,6 +25,7 @@ export const isValidValue = (value) => {
         value = value.slice(1);
       }
       if (+value > 0) {
+        console.log("valie",value);
         return ethers.utils.parseUnits(value, "ether");
       }
       return false;

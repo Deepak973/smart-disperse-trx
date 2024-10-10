@@ -87,8 +87,6 @@ function Uploadify({
         const parsedData = parseCSV(content);
 
         if (parsedData) {
-          // setCsvData(parsedData);
-          // setIsCsvDataEmpty(parsedData.length === 0);
 
           const listData = [];
           for (let i = 0; i < parsedData.length; i++) {
@@ -98,7 +96,8 @@ function Uploadify({
                 tokenDecimal
               );
             } else {
-              var validValue = isValidValue(parsedData[i]["Token Amount"]);
+              var validValue = TronIsValidValue(parsedData[i]["Token Amount"]);
+              console.log("trx to send",validValue);
             }
 
             if (
