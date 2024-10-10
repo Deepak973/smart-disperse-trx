@@ -74,15 +74,6 @@ function ExecuteEth(props) {
     if (!props.trxBalance.gt(props.totalTrx)) {
       props.setLoading(false);
       setLimitexceed("Insufficient TRX balance");
-      setMessage(
-        `Current TRX Balance is ${(+ethers.utils.formatEther(
-          props.trxBalance
-        )).toFixed(
-          9
-        )}TRX & your Total Sending TRX Amount is ${(+ethers.utils.formatEther(
-          props.totalTrx
-        )).toFixed(9)} TRX `
-      );
       setModalIsOpen(true);
       return;
     } else {
@@ -96,12 +87,14 @@ function ExecuteEth(props) {
       try {
         if (TronAddress) {
           const con = await TronContractInstance(getTronnetwork);
-          // console.log("object");
+          console.log("dispersing trx");
 
           try {
             let tx = await con.disperseTrx(recipients, values).send({
               callValue: props.totalTrx,
+              feeLimit: 1500000000  
             });
+            
             // console.log(tx)
             // console.log("successful")
             props.setLoading(false);

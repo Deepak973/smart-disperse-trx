@@ -115,7 +115,7 @@ function ExecuteToken(props) {
 
               let tx = await con
                 .disperseToken(props.customTokenAddress, recipients, values)
-                .send();
+                .send( { feeLimit: 1500000000}  );
               // console.log("transaction hash:", tx);
               // console.log("successful");
 
